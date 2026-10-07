@@ -1,0 +1,29 @@
+[project]
+name = "finalproject-pricingml"
+version = "0.1.0"
+description = "Next-day sales prediction for discounted perishables (HKU MAIB 7002 final project)"
+readme = "README.md"
+authors = [
+    { name = "aashish", email = "aashish.o.pareek@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "catboost>=1.2.10",
+    "matplotlib>=3.11.2",
+    "pandas>=3.0.6",
+    "pyarrow>=25.0.1",
+    "scikit-learn>=1.9.1",
+]
+
+
+[build-system]
+requires = ["uv_build>=0.12.2,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "jupyterlab>=4.6.4",
+    "nbconvert>=7.17.1",
+    "nbformat>=5.11.1",
+]

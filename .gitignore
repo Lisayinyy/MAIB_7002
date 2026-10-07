@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Data (kept local: not in git, not synced to iCloud via .nosync)
+data
+data.nosync/
+
+# Editor and notebook scratch
+.vscode/
+.ipynb_checkpoints/
+catboost_info/
+
+# Claude Code local settings
+.claude/
