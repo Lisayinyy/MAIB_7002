@@ -1,0 +1,179 @@
+{
+  "seed": 7002,
+  "data_revision": "08c1fab7f9257bc73679d415d65d644165d351d4",
+  "source_hashes": {
+    "train": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "eval": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e"
+  },
+  "cohort_series": 312,
+  "cohort_selection_through": "2024-06-25",
+  "features": {
+    "full": [
+      "discount",
+      "weekday",
+      "holiday_flag",
+      "activity_flag",
+      "sales_lag1",
+      "sales_lag7",
+      "sales_mean7",
+      "discount_lag1",
+      "stockout_lag1",
+      "series_mean"
+    ],
+    "without_target_promotion": [
+      "weekday",
+      "holiday_flag",
+      "sales_lag1",
+      "sales_lag7",
+      "sales_mean7",
+      "discount_lag1",
+      "stockout_lag1",
+      "series_mean"
+    ]
+  },
+  "series_mean": "shift(1).expanding mean including raw warm-up dates",
+  "weekday": "integer Monday=0 through Sunday=6",
+  "grids": {
+    "Ridge Regression": [
+      {
+        "alpha": 0.1
+      },
+      {
+        "alpha": 10.0
+      },
+      {
+        "alpha": 100.0
+      }
+    ],
+    "Decision Tree Regressor": [
+      {
+        "max_depth": 4,
+        "min_samples_leaf": 20
+      },
+      {
+        "max_depth": 8,
+        "min_samples_leaf": 20
+      },
+      {
+        "max_depth": 12,
+        "min_samples_leaf": 40
+      }
+    ],
+    "Random Forest Regressor": [
+      {
+        "n_estimators": 200,
+        "max_depth": 10,
+        "min_samples_leaf": 5
+      },
+      {
+        "n_estimators": 200,
+        "max_depth": null,
+        "min_samples_leaf": 5
+      },
+      {
+        "n_estimators": 200,
+        "max_depth": null,
+        "min_samples_leaf": 15
+      }
+    ],
+    "HistGradientBoostingRegressor": [
+      {
+        "max_iter": 300,
+        "learning_rate": 0.05,
+        "max_leaf_nodes": 15
+      },
+      {
+        "max_iter": 300,
+        "learning_rate": 0.05,
+        "max_leaf_nodes": 31
+      },
+      {
+        "max_iter": 500,
+        "learning_rate": 0.03,
+        "max_leaf_nodes": 15
+      }
+    ],
+    "CatBoost Regressor": [
+      {
+        "iterations": 400,
+        "depth": 4,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 5
+      },
+      {
+        "iterations": 400,
+        "depth": 6,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 5
+      },
+      {
+        "iterations": 400,
+        "depth": 8,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 5
+      }
+    ]
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "train_start": "2024-04-04",
+      "train_end": "2024-05-21",
+      "valid_start": "2024-05-22",
+      "valid_end": "2024-05-28",
+      "n_train": 14976,
+      "n_valid": 2184
+    },
+    {
+      "fold": 2,
+      "train_start": "2024-04-04",
+      "train_end": "2024-05-28",
+      "valid_start": "2024-05-29",
+      "valid_end": "2024-06-04",
+      "n_train": 17160,
+      "n_valid": 2184
+    },
+    {
+      "fold": 3,
+      "train_start": "2024-04-04",
+      "train_end": "2024-06-04",
+      "valid_start": "2024-06-05",
+      "valid_end": "2024-06-11",
+      "n_train": 19344,
+      "n_valid": 2184
+    },
+    {
+      "fold": 4,
+      "train_start": "2024-04-04",
+      "train_end": "2024-06-11",
+      "valid_start": "2024-06-12",
+      "valid_end": "2024-06-18",
+      "n_train": 21528,
+      "n_valid": 2184
+    },
+    {
+      "fold": 5,
+      "train_start": "2024-04-04",
+      "train_end": "2024-06-18",
+      "valid_start": "2024-06-19",
+      "valid_end": "2024-06-25",
+      "n_train": 23712,
+      "n_valid": 2184
+    }
+  ],
+  "selection_metric": "mean of five weekly validation MAEs",
+  "forecast_protocol": "rolling one day ahead; prior observed days update features; no within-week model refit",
+  "test_period": [
+    "2024-06-26",
+    "2024-07-02"
+  ],
+  "test_previously_viewed_by_team": true,
+  "prediction_postprocessing": "clip at zero",
+  "alignment": "report-based reconstruction; teammate preprocessing source unavailable",
+  "scenario_demo": {
+    "maximum_proxy_loss": 0.05,
+    "minimum_same_series_activity_rate_support": 3,
+    "discount_rounding_decimals": 2,
+    "decision_metric": "predicted normalized sales"
+  }
+}

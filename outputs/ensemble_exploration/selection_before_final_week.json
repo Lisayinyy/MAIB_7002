@@ -1,0 +1,12 @@
+{
+  "method": "RF + CatBoost (50/50)",
+  "weights": {
+    "Ridge": 0.0,
+    "Decision Tree": 0.0,
+    "Random Forest": 0.5,
+    "HistGBR": 0.0,
+    "CatBoost": 0.5
+  },
+  "CV_mean_MAE": 0.3014047338421128,
+  "selection_uses_final_week": false
+}

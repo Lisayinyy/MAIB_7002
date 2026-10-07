@@ -1,0 +1,52 @@
+{
+  "selected_by_validation": "Random Forest Regressor",
+  "parameters": {
+    "full::Random Forest Regressor": {
+      "max_depth": 10,
+      "min_samples_leaf": 5,
+      "n_estimators": 200
+    },
+    "full::CatBoost Regressor": {
+      "depth": 4,
+      "iterations": 400,
+      "l2_leaf_reg": 5,
+      "learning_rate": 0.05
+    },
+    "full::HistGradientBoostingRegressor": {
+      "learning_rate": 0.05,
+      "max_iter": 300,
+      "max_leaf_nodes": 15
+    },
+    "full::Ridge Regression": {
+      "alpha": 100.0
+    },
+    "without_target_promotion::Random Forest Regressor": {
+      "max_depth": null,
+      "min_samples_leaf": 15,
+      "n_estimators": 200
+    },
+    "without_target_promotion::CatBoost Regressor": {
+      "depth": 4,
+      "iterations": 400,
+      "l2_leaf_reg": 5,
+      "learning_rate": 0.05
+    },
+    "without_target_promotion::Ridge Regression": {
+      "alpha": 0.1
+    },
+    "full::Decision Tree Regressor": {
+      "max_depth": 8,
+      "min_samples_leaf": 20
+    },
+    "without_target_promotion::HistGradientBoostingRegressor": {
+      "learning_rate": 0.03,
+      "max_iter": 500,
+      "max_leaf_nodes": 15
+    },
+    "without_target_promotion::Decision Tree Regressor": {
+      "max_depth": 8,
+      "min_samples_leaf": 20
+    }
+  },
+  "selection_rule": "lowest mean five-fold MAE, before final-period scoring"
+}

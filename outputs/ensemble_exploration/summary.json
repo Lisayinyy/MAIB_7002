@@ -1,0 +1,33 @@
+{
+  "selected": {
+    "method": "RF + CatBoost (50/50)",
+    "weights": {
+      "Ridge": 0.0,
+      "Decision Tree": 0.0,
+      "Random Forest": 0.5,
+      "HistGBR": 0.0,
+      "CatBoost": 0.5
+    },
+    "CV_mean_MAE": 0.3014047338421128,
+    "selection_uses_final_week": false
+  },
+  "selected_final_week": {
+    "Method": "RF + CatBoost (50/50)",
+    "CV_MAE": 0.3014047338421128,
+    "selected_by_validation": true,
+    "MAE": 0.28728787974114606,
+    "MSE": 0.20509761628187792,
+    "RMSE": 0.4528770432268321,
+    "WAPE_pct": 29.659167821859853
+  },
+  "final_week_baseline_MAE": 0.3141849816849817,
+  "single_model_CV_reproduction_pass": true,
+  "prediction_weights_sum_to_one": true,
+  "n_oof": 10920,
+  "n_test": 2184,
+  "caveats": [
+    "Base-model settings were already tuned on these five folds; ensemble CV is additional tuning evidence, not an independent nested evaluation.",
+    "The team already inspected the final week before proposing ensembles; final-week results are descriptive and not a fresh holdout.",
+    "No candidate or weight is chosen using final-week scores."
+  ]
+}

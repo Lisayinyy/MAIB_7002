@@ -1,0 +1,400 @@
+{
+  "created_utc": "2026-10-07T08:56:08.529396+00:00",
+  "versions": {
+    "python": "3.11.14",
+    "numpy": "2.1.3",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.6.1",
+    "catboost": "1.2.10",
+    "pyarrow": "19.0.0"
+  },
+  "protocol": {
+    "seed": 7002,
+    "data_revision": "08c1fab7f9257bc73679d415d65d644165d351d4",
+    "source_hashes": {
+      "train": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+      "eval": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e"
+    },
+    "cohort_series": 312,
+    "cohort_selection_through": "2024-06-25",
+    "features": {
+      "full": [
+        "discount",
+        "weekday",
+        "holiday_flag",
+        "activity_flag",
+        "sales_lag1",
+        "sales_lag7",
+        "sales_mean7",
+        "discount_lag1",
+        "stockout_lag1",
+        "series_mean"
+      ],
+      "without_target_promotion": [
+        "weekday",
+        "holiday_flag",
+        "sales_lag1",
+        "sales_lag7",
+        "sales_mean7",
+        "discount_lag1",
+        "stockout_lag1",
+        "series_mean"
+      ]
+    },
+    "series_mean": "shift(1).expanding mean including raw warm-up dates",
+    "weekday": "integer Monday=0 through Sunday=6",
+    "grids": {
+      "Ridge Regression": [
+        {
+          "alpha": 0.1
+        },
+        {
+          "alpha": 10.0
+        },
+        {
+          "alpha": 100.0
+        }
+      ],
+      "Decision Tree Regressor": [
+        {
+          "max_depth": 4,
+          "min_samples_leaf": 20
+        },
+        {
+          "max_depth": 8,
+          "min_samples_leaf": 20
+        },
+        {
+          "max_depth": 12,
+          "min_samples_leaf": 40
+        }
+      ],
+      "Random Forest Regressor": [
+        {
+          "n_estimators": 200,
+          "max_depth": 10,
+          "min_samples_leaf": 5
+        },
+        {
+          "n_estimators": 200,
+          "max_depth": null,
+          "min_samples_leaf": 5
+        },
+        {
+          "n_estimators": 200,
+          "max_depth": null,
+          "min_samples_leaf": 15
+        }
+      ],
+      "HistGradientBoostingRegressor": [
+        {
+          "max_iter": 300,
+          "learning_rate": 0.05,
+          "max_leaf_nodes": 15
+        },
+        {
+          "max_iter": 300,
+          "learning_rate": 0.05,
+          "max_leaf_nodes": 31
+        },
+        {
+          "max_iter": 500,
+          "learning_rate": 0.03,
+          "max_leaf_nodes": 15
+        }
+      ],
+      "CatBoost Regressor": [
+        {
+          "iterations": 400,
+          "depth": 4,
+          "learning_rate": 0.05,
+          "l2_leaf_reg": 5
+        },
+        {
+          "iterations": 400,
+          "depth": 6,
+          "learning_rate": 0.05,
+          "l2_leaf_reg": 5
+        },
+        {
+          "iterations": 400,
+          "depth": 8,
+          "learning_rate": 0.05,
+          "l2_leaf_reg": 5
+        }
+      ]
+    },
+    "folds": [
+      {
+        "fold": 1,
+        "train_start": "2024-04-04",
+        "train_end": "2024-05-21",
+        "valid_start": "2024-05-22",
+        "valid_end": "2024-05-28",
+        "n_train": 14976,
+        "n_valid": 2184
+      },
+      {
+        "fold": 2,
+        "train_start": "2024-04-04",
+        "train_end": "2024-05-28",
+        "valid_start": "2024-05-29",
+        "valid_end": "2024-06-04",
+        "n_train": 17160,
+        "n_valid": 2184
+      },
+      {
+        "fold": 3,
+        "train_start": "2024-04-04",
+        "train_end": "2024-06-04",
+        "valid_start": "2024-06-05",
+        "valid_end": "2024-06-11",
+        "n_train": 19344,
+        "n_valid": 2184
+      },
+      {
+        "fold": 4,
+        "train_start": "2024-04-04",
+        "train_end": "2024-06-11",
+        "valid_start": "2024-06-12",
+        "valid_end": "2024-06-18",
+        "n_train": 21528,
+        "n_valid": 2184
+      },
+      {
+        "fold": 5,
+        "train_start": "2024-04-04",
+        "train_end": "2024-06-18",
+        "valid_start": "2024-06-19",
+        "valid_end": "2024-06-25",
+        "n_train": 23712,
+        "n_valid": 2184
+      }
+    ],
+    "selection_metric": "mean of five weekly validation MAEs",
+    "forecast_protocol": "rolling one day ahead; prior observed days update features; no within-week model refit",
+    "test_period": [
+      "2024-06-26",
+      "2024-07-02"
+    ],
+    "test_previously_viewed_by_team": true,
+    "prediction_postprocessing": "clip at zero",
+    "alignment": "report-based reconstruction; teammate preprocessing source unavailable",
+    "scenario_demo": {
+      "maximum_proxy_loss": 0.05,
+      "minimum_same_series_activity_rate_support": 3,
+      "discount_rounding_decimals": 2,
+      "decision_metric": "predicted normalized sales"
+    }
+  },
+  "selection": {
+    "selected_by_validation": "Random Forest Regressor",
+    "parameters": {
+      "full::Random Forest Regressor": {
+        "max_depth": 10,
+        "min_samples_leaf": 5,
+        "n_estimators": 200
+      },
+      "full::CatBoost Regressor": {
+        "depth": 4,
+        "iterations": 400,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.05
+      },
+      "full::HistGradientBoostingRegressor": {
+        "learning_rate": 0.05,
+        "max_iter": 300,
+        "max_leaf_nodes": 15
+      },
+      "full::Ridge Regression": {
+        "alpha": 100.0
+      },
+      "without_target_promotion::Random Forest Regressor": {
+        "max_depth": null,
+        "min_samples_leaf": 15,
+        "n_estimators": 200
+      },
+      "without_target_promotion::CatBoost Regressor": {
+        "depth": 4,
+        "iterations": 400,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.05
+      },
+      "without_target_promotion::Ridge Regression": {
+        "alpha": 0.1
+      },
+      "full::Decision Tree Regressor": {
+        "max_depth": 8,
+        "min_samples_leaf": 20
+      },
+      "without_target_promotion::HistGradientBoostingRegressor": {
+        "learning_rate": 0.03,
+        "max_iter": 500,
+        "max_leaf_nodes": 15
+      },
+      "without_target_promotion::Decision Tree Regressor": {
+        "max_depth": 8,
+        "min_samples_leaf": 20
+      }
+    },
+    "selection_rule": "lowest mean five-fold MAE, before final-period scoring"
+  },
+  "n_train": 25896,
+  "n_test": 2184,
+  "test_row_target_sha256": "82f0f86c38d3568156e3e6bd8c04afc2e5413240bf3f48b3e44f27cc190579d9",
+  "test_scores": [
+    {
+      "Model": "7-day average baseline",
+      "feature_set": "baseline",
+      "fit_seconds": 0.0,
+      "MAE": 0.3141849816849817,
+      "WAPE_pct": 32.43598409824674,
+      "MSE": 0.2713266707782014,
+      "RMSE": 0.5208902675019004,
+      "n": 2184,
+      "MAE_improvement_vs_7day_pct": 0.0,
+      "selected_by_validation": false
+    },
+    {
+      "Model": "Same-weekday baseline",
+      "feature_set": "baseline",
+      "fit_seconds": 0.0,
+      "MAE": 0.39975274725274723,
+      "WAPE_pct": 41.2698712827761,
+      "MSE": 0.3807744505494505,
+      "RMSE": 0.6170692429131843,
+      "n": 2184,
+      "MAE_improvement_vs_7day_pct": -27.234836340318846,
+      "selected_by_validation": false
+    },
+    {
+      "Model": "Ridge Regression",
+      "feature_set": "full",
+      "fit_seconds": 0.006463417000077243,
+      "MAE": 0.30754052845731333,
+      "WAPE_pct": 31.750020758820533,
+      "MSE": 0.25313402597104057,
+      "RMSE": 0.5031242649396276,
+      "n": 2184,
+      "MAE_improvement_vs_7day_pct": 2.114822036379338,
+      "selected_by_validation": false
+    },
+    {
+      "Model": "Decision Tree Regressor",
+      "feature_set": "full",
+      "fit_seconds": 0.050144708000061655,
+      "MAE": 0.3139349201263708,
+      "WAPE_pct": 32.410168119726116,
+      "MSE": 0.2438320409593069,
+      "RMSE": 0.493793520572422,
+      "n": 2184,
+      "MAE_improvement_vs_7day_pct": 0.07959055116824043,
+      "selected_by_validation": false
+    },
+    {
+      "Model": "Random Forest Regressor",
+      "feature_set": "full",
+      "fit_seconds": 1.6669457089999469,
+      "MAE": 0.29294911113322303,
+      "WAPE_pct": 30.24362482048883,
+      "MSE": 0.21408112925253928,
+      "RMSE": 0.4626890200259125,
+      "n": 2184,
+      "MAE_improvement_vs_7day_pct": 6.759034259966912,
+      "selected_by_validation": true
+    },
+    {
+      "Model": "HistGradientBoostingRegressor",
+      "feature_set": "full",
+      "fit_seconds": 0.3421917499999836,
+      "MAE": 0.2891758676473495,
+      "WAPE_pct": 29.854080848494267,
+      "MSE": 0.2063464791972173,
+      "RMSE": 0.4542537607958984,
+      "n": 2184,
+      "MAE_improvement_vs_7day_pct": 7.959996656589929,
+      "selected_by_validation": false
+    },
+    {
+      "Model": "CatBoost Regressor",
+      "feature_set": "full",
+      "fit_seconds": 0.37726933299995835,
+      "MAE": 0.2877972205182926,
+      "WAPE_pct": 29.711751396222674,
+      "MSE": 0.2042182500297939,
+      "RMSE": 0.4519051338829798,
+      "n": 2184,
+      "MAE_improvement_vs_7day_pct": 8.398797748119879,
+      "selected_by_validation": false
+    }
+  ],
+  "selected_cv_MAE": 0.3037155823729482,
+  "promotion_ablation": [
+    {
+      "Model": "Ridge Regression",
+      "full": 0.30754052845731333,
+      "without_target_promotion": 0.30844206298329035,
+      "test_MAE_improvement_with_promotion_pct": 0.2922865050432044,
+      "CV_full_MAE": 0.31505853006634604,
+      "CV_without_promotion_MAE": 0.32121272452648014
+    },
+    {
+      "Model": "Decision Tree Regressor",
+      "full": 0.3139349201263708,
+      "without_target_promotion": 0.32160457162950384,
+      "test_MAE_improvement_with_promotion_pct": 2.3848079846230053,
+      "CV_full_MAE": 0.3217903760264024,
+      "CV_without_promotion_MAE": 0.3336089801099863
+    },
+    {
+      "Model": "Random Forest Regressor",
+      "full": 0.29294911113322303,
+      "without_target_promotion": 0.3106083199158667,
+      "test_MAE_improvement_with_promotion_pct": 5.685362448574116,
+      "CV_full_MAE": 0.3037155823729482,
+      "CV_without_promotion_MAE": 0.3191187088316497
+    },
+    {
+      "Model": "HistGradientBoostingRegressor",
+      "full": 0.2891758676473495,
+      "without_target_promotion": 0.30790111959730265,
+      "test_MAE_improvement_with_promotion_pct": 6.081579688454375,
+      "CV_full_MAE": 0.3055201011332822,
+      "CV_without_promotion_MAE": 0.3229841854403186
+    },
+    {
+      "Model": "CatBoost Regressor",
+      "full": 0.2877972205182926,
+      "without_target_promotion": 0.30098707721899676,
+      "test_MAE_improvement_with_promotion_pct": 4.382200333174868,
+      "CV_full_MAE": 0.30378645430529244,
+      "CV_without_promotion_MAE": 0.3201143465397411
+    }
+  ],
+  "notebook": "01_freshretail_project.ipynb",
+  "scenario": {
+    "store_id": 18,
+    "product_id": 11,
+    "target_date": "2024-06-26",
+    "activity_flag": 0,
+    "reference_discount": 1.0,
+    "max_proxy_loss": 0.05,
+    "selection_rule": "first first-day row with >=2 supported historical rates; highest supported rate is reference",
+    "interpretation": "illustrative predictions, not observed uplift or verified revenue"
+  },
+  "source_files": {
+    "train": "data/raw/train.parquet",
+    "eval": "data/raw/eval.parquet"
+  },
+  "artifacts": [
+    "feature_frame.parquet",
+    "selected_series.csv",
+    "validation_trials.csv",
+    "chosen_parameters.csv",
+    "model_comparison_test.csv",
+    "test_predictions.csv",
+    "promotion_ablation_test.csv",
+    "test_slice_scores.csv",
+    "selected_forecast_model.joblib"
+  ]
+}

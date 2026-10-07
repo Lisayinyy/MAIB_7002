@@ -1,0 +1,2 @@
+series,stores,products,rows,first_date,last_date,mean_normalized_sales,zero_sales_pct,days_with_stockout_pct
+312,5,122,28080,2024-03-28,2024-06-25,0.862752849002849,1.9978632478632476,44.76851851851852

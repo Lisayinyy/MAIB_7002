@@ -1,0 +1,135 @@
+{
+  "feature_rows": 28080,
+  "feature_columns_checked": [
+    "discount",
+    "weekday",
+    "holiday_flag",
+    "activity_flag",
+    "sales_lag1",
+    "sales_lag7",
+    "sales_mean7",
+    "discount_lag1",
+    "stockout_lag1",
+    "series_mean"
+  ],
+  "feature_row_identity_match": true,
+  "feature_numeric_match": true,
+  "causality_future_outcome_mutation_pass": true,
+  "cohort_id_match_reconstruction": true,
+  "fold_dates_and_counts_pass": true,
+  "baseline_cv_metrics_recomputed": true,
+  "test_row_identity_and_targets_match": true,
+  "test_metrics_independently_recomputed": [
+    {
+      "feature_set": "baseline",
+      "Model": "7-day average baseline",
+      "MAE": 0.3141849816849817,
+      "MSE": 0.2713266707782014,
+      "RMSE": 0.5208902675019004,
+      "WAPE_percent": 32.43598409824675
+    },
+    {
+      "feature_set": "baseline",
+      "Model": "Same-weekday baseline",
+      "MAE": 0.39975274725274723,
+      "MSE": 0.3807744505494505,
+      "RMSE": 0.6170692429131843,
+      "WAPE_percent": 41.269871282776094
+    },
+    {
+      "feature_set": "full",
+      "Model": "Ridge Regression",
+      "MAE": 0.30754052845731333,
+      "MSE": 0.25313402597104057,
+      "RMSE": 0.5031242649396276,
+      "WAPE_percent": 31.75002075882053
+    },
+    {
+      "feature_set": "full",
+      "Model": "Decision Tree Regressor",
+      "MAE": 0.3139349201263708,
+      "MSE": 0.2438320409593069,
+      "RMSE": 0.493793520572422,
+      "WAPE_percent": 32.410168119726116
+    },
+    {
+      "feature_set": "full",
+      "Model": "Random Forest Regressor",
+      "MAE": 0.29294911113322303,
+      "MSE": 0.21408112925253928,
+      "RMSE": 0.4626890200259125,
+      "WAPE_percent": 30.24362482048883
+    },
+    {
+      "feature_set": "full",
+      "Model": "HistGradientBoostingRegressor",
+      "MAE": 0.2891758676473495,
+      "MSE": 0.20634647919721727,
+      "RMSE": 0.4542537607958984,
+      "WAPE_percent": 29.854080848494263
+    },
+    {
+      "feature_set": "full",
+      "Model": "CatBoost Regressor",
+      "MAE": 0.28779722051829265,
+      "MSE": 0.2042182500297939,
+      "RMSE": 0.4519051338829798,
+      "WAPE_percent": 29.71175139622268
+    },
+    {
+      "feature_set": "without_target_promotion",
+      "Model": "Ridge Regression",
+      "MAE": 0.3084420629832904,
+      "MSE": 0.2741582512149799,
+      "RMSE": 0.5236012330151447,
+      "WAPE_percent": 31.843093824858837
+    },
+    {
+      "feature_set": "without_target_promotion",
+      "Model": "Decision Tree Regressor",
+      "MAE": 0.32160457162950384,
+      "MSE": 0.2744627333469004,
+      "RMSE": 0.523891909984207,
+      "WAPE_percent": 33.20197138435239
+    },
+    {
+      "feature_set": "without_target_promotion",
+      "Model": "Random Forest Regressor",
+      "MAE": 0.31060831991586674,
+      "MSE": 0.25960896236431336,
+      "RMSE": 0.509518363127683,
+      "WAPE_percent": 32.0667349264829
+    },
+    {
+      "feature_set": "without_target_promotion",
+      "Model": "HistGradientBoostingRegressor",
+      "MAE": 0.30790111959730265,
+      "MSE": 0.2577343160962775,
+      "RMSE": 0.5076754042656365,
+      "WAPE_percent": 31.78724764477776
+    },
+    {
+      "feature_set": "without_target_promotion",
+      "Model": "CatBoost Regressor",
+      "MAE": 0.3009870772189968,
+      "MSE": 0.24818405904159463,
+      "RMSE": 0.4981807493687353,
+      "WAPE_percent": 31.07345232765407
+    }
+  ],
+  "validation_selection_recomputed": true,
+  "selected_model": "Random Forest Regressor",
+  "ablation_recomputed": true,
+  "diagnostic_metric_rows_recomputed": 119,
+  "saved_selected_model_predictions_match": true,
+  "scenario_support_and_constraints_pass": true,
+  "notebook_executed_code_cells": 13,
+  "notebook_errors": 0,
+  "status": "PASS",
+  "verified_utc": "2026-10-07T08:56:25.876919+00:00",
+  "source_sha256": {
+    "train": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "eval": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e"
+  },
+  "notebook_sha256": "44d6d7117a27265b63c2d5b9b70bbe8f2b710f7f9538ca12070c441f9407f52b"
+}

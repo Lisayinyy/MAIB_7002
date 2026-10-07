@@ -1,0 +1,43 @@
+name: freshretail-project
+
+services:
+  report:
+    build: .
+    image: freshretail-project:local
+    ports:
+      - "127.0.0.1:${REPORT_PORT:-18080}:8000"
+    volumes:
+      - .:/workspace:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 5
+    init: true
+
+  lab:
+    build: .
+    image: freshretail-project:local
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    environment:
+      HOST_JUPYTER_PORT: "${JUPYTER_PORT:-18888}"
+      HOME: /tmp/freshretail-home
+      USER: freshretail
+    command:
+      - jupyter
+      - lab
+      - --ip=0.0.0.0
+      - --port=8888
+      - --no-browser
+      - --ServerApp.root_dir=/workspace
+      - --ServerApp.default_url=/lab/tree/01_freshretail_project.ipynb
+    ports:
+      - "127.0.0.1:${JUPYTER_PORT:-18888}:8888"
+    volumes:
+      - .:/workspace
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8888/login', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 5
+    init: true

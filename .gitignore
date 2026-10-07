@@ -1,0 +1,35 @@
+# Public source data are downloaded using scripts/download_public_data.py.
+/data/raw/
+
+# Local backups, generated model binaries, and submission packages.
+/outputs/backups/
+*.joblib
+*.pkl
+*.pickle
+*.zip
+
+# Notebook, Python, and operating-system caches.
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+*.log
+
+# Local environment configuration.
+.env
+.env.*
+!.env.example
+
+# Historical pilot outputs remain local; the current protocol and ensemble ship.
+/outputs/*.csv
+/outputs/*.json
+/outputs/*.png
+/outputs/*.md
+/outputs/teammate_protocol/
+/outputs/ensemble_reproduction_*/
+/data/metadata/selected_series.json
+/data/metadata/source_data_audit.json
+/tmp/
+*.tar
+*.tar.gz

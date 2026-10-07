@@ -1,0 +1,189 @@
+{
+  "created_utc": "2026-10-07T08:56:09.452619+00:00",
+  "features": [
+    "discount",
+    "weekday",
+    "holiday_flag",
+    "activity_flag",
+    "sales_lag1",
+    "sales_lag7",
+    "sales_mean7",
+    "discount_lag1",
+    "stockout_lag1",
+    "series_mean"
+  ],
+  "base_parameters": {
+    "Ridge Regression": {
+      "alpha": 100.0
+    },
+    "Decision Tree Regressor": {
+      "max_depth": 8,
+      "min_samples_leaf": 20
+    },
+    "Random Forest Regressor": {
+      "max_depth": 10,
+      "min_samples_leaf": 5,
+      "n_estimators": 200
+    },
+    "HistGradientBoostingRegressor": {
+      "learning_rate": 0.05,
+      "max_iter": 300,
+      "max_leaf_nodes": 15
+    },
+    "CatBoost Regressor": {
+      "depth": 4,
+      "iterations": 400,
+      "l2_leaf_reg": 5,
+      "learning_rate": 0.05
+    }
+  },
+  "methods": {
+    "Ridge": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Decision Tree": [
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Random Forest": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "HistGBR": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    "CatBoost": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "RF + CatBoost (50/50)": [
+      0.0,
+      0.0,
+      0.5,
+      0.0,
+      0.5
+    ],
+    "RF + HistGBR + CatBoost (equal)": [
+      0.0,
+      0.0,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "All five models (equal)": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+    ],
+    "HistGBR 25% + CatBoost 75%": [
+      0.0,
+      0.0,
+      0.0,
+      0.25,
+      0.75
+    ],
+    "HistGBR 50% + CatBoost 50%": [
+      0.0,
+      0.0,
+      0.0,
+      0.5,
+      0.5
+    ],
+    "HistGBR 75% + CatBoost 25%": [
+      0.0,
+      0.0,
+      0.0,
+      0.75,
+      0.25
+    ],
+    "RF 25% + CatBoost 75%": [
+      0.0,
+      0.0,
+      0.25,
+      0.0,
+      0.75
+    ],
+    "RF 25% + HistGBR 25% + CatBoost 50%": [
+      0.0,
+      0.0,
+      0.25,
+      0.25,
+      0.5
+    ],
+    "RF 25% + HistGBR 50% + CatBoost 25%": [
+      0.0,
+      0.0,
+      0.25,
+      0.5,
+      0.25
+    ],
+    "RF 25% + HistGBR 75%": [
+      0.0,
+      0.0,
+      0.25,
+      0.75,
+      0.0
+    ],
+    "RF 50% + HistGBR 25% + CatBoost 25%": [
+      0.0,
+      0.0,
+      0.5,
+      0.25,
+      0.25
+    ],
+    "RF 50% + HistGBR 50%": [
+      0.0,
+      0.0,
+      0.5,
+      0.5,
+      0.0
+    ],
+    "RF 75% + CatBoost 25%": [
+      0.0,
+      0.0,
+      0.75,
+      0.0,
+      0.25
+    ],
+    "RF 75% + HistGBR 25%": [
+      0.0,
+      0.0,
+      0.75,
+      0.25,
+      0.0
+    ]
+  },
+  "weight_column_order": [
+    "Ridge",
+    "Decision Tree",
+    "Random Forest",
+    "HistGBR",
+    "CatBoost"
+  ],
+  "selection": "lowest mean MAE over the existing five temporal validation folds; fixed insertion order resolves exact ties",
+  "status": "post-hoc exploratory extension; frozen main experiment and original model selection unchanged",
+  "caveats": [
+    "Base-model settings were already tuned on these five folds; ensemble CV is additional tuning evidence, not an independent nested evaluation.",
+    "The team already inspected the final week before proposing ensembles; final-week results are descriptive and not a fresh holdout.",
+    "No candidate or weight is chosen using final-week scores."
+  ]
+}

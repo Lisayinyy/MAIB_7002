@@ -1,0 +1,36 @@
+name: Docker and saved-results check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t freshretail-project:ci .
+      - name: Check dependencies and packaged scores
+        run: |
+          docker run --rm freshretail-project:ci python -m pip check
+          docker run --rm freshretail-project:ci python scripts/check_saved_results.py
+      - name: Check report and Jupyter
+        run: |
+          docker run -d --name freshretail-report -p 127.0.0.1:18080:8000 freshretail-project:ci
+          docker run -d --name freshretail-lab -p 127.0.0.1:18888:8888 freshretail-project:ci jupyter lab --ip=0.0.0.0 --no-browser
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:18080/ > /tmp/report.html && curl -fsS http://localhost:18888/login > /dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl -fsS http://localhost:18080/final_protocol/01_freshretail_project.html > /tmp/notebook.html
+          curl -fsS http://localhost:18888/login > /dev/null
+          python -c "from pathlib import Path; assert 'RF + CatBoost' in Path('/tmp/report.html').read_text(); h=Path('/tmp/notebook.html').read_text(); assert 'Supplementary' in h; assert h.count('data:image/png;base64,') >= 3"
+      - name: Stop CI containers
+        if: always()
+        run: docker rm -f freshretail-report freshretail-lab || true

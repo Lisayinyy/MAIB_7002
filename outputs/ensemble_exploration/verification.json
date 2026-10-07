@@ -1,0 +1,22 @@
+{
+  "verified_utc": "2026-10-07T08:56:19.321119+00:00",
+  "scope": "current ensemble run; no comparison with an earlier notebook release",
+  "base_model_fit_count": 25,
+  "validation_folds": 5,
+  "validation_rows": 10920,
+  "final_week_rows": 2184,
+  "candidate_count": 19,
+  "single_model_CV_reproduction_pass": true,
+  "validation_prediction_readback_pass": true,
+  "selection_matches_validation_minimum": true,
+  "selected_method": "RF + CatBoost (50/50)",
+  "selected_prediction_max_absolute_difference": 0.0,
+  "weights_sum_to_one": true,
+  "notebook_supplement_source_check": {
+    "section_present": true,
+    "runner_invocation_present": true,
+    "current_notebook_cell_count": 27,
+    "source_sha256": "971c67db49a8180d3cfbce6b636ce0635875cb8960906cfe656f73cabf45ee52",
+    "scope": "source integration only; notebook execution is verified by the notebook runner"
+  }
+}

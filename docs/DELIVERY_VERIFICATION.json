@@ -1,0 +1,47 @@
+{
+  "verified_utc": "2026-10-07T08:57:31.961179+00:00",
+  "platform": "Docker Linux arm64 on macOS Docker Desktop",
+  "python": "3.11.14",
+  "complete_pipeline": "PASS",
+  "main_validation_fits": 150,
+  "main_final_fits": 10,
+  "ensemble_validation_fits": 25,
+  "executed_code_cells": 13,
+  "embedded_figures": 3,
+  "independent_raw_feature_model_scenario_audit": "PASS",
+  "saved_score_check": "PASS",
+  "fresh_container_public_download_and_sha256": "PASS for train and eval",
+  "report_and_jupyter_http": "PASS",
+  "browser_rendered_report_and_navigation": "PASS",
+  "jupyter_authenticated_notebook_api": "PASS",
+  "default_and_custom_login_url_ports": "PASS",
+  "bind_mount_write": "PASS",
+  "arbitrary_uid_runtime_home": "PASS",
+  "main_model": "Random Forest Regressor",
+  "selected_ensemble": {
+    "method": "RF + CatBoost (50/50)",
+    "weights": {
+      "Ridge": 0.0,
+      "Decision Tree": 0.0,
+      "Random Forest": 0.5,
+      "HistGBR": 0.0,
+      "CatBoost": 0.5
+    },
+    "CV_mean_MAE": 0.3014047338421128,
+    "selection_uses_final_week": false
+  },
+  "selected_ensemble_scores": {
+    "Method": "RF + CatBoost (50/50)",
+    "CV_MAE": 0.3014047338421128,
+    "selected_by_validation": true,
+    "MAE": 0.28728787974114606,
+    "MSE": 0.20509761628187792,
+    "RMSE": 0.4528770432268321,
+    "WAPE_pct": 29.659167821859853
+  },
+  "limitations": [
+    "Full training verified on Linux arm64; other platforms may have small numerical differences.",
+    "The ensemble is post-hoc and the final week is already observed.",
+    "No real-world pricing policy or causal revenue/waste effect was evaluated."
+  ]
+}
