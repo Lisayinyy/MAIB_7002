@@ -74,3 +74,18 @@ def make_ensemble(members=None, weights=None):
 
     members = members or [("rf", make_rf()), ("catboost", make_catboost())]
     return VotingRegressor(members, weights=weights)
+
+
+def catboost_learning_curve(train, val, features=C.FEATURES, **params):
+    """Train and validation MAE after each boosting iteration, for one fold.
+
+    Returns a DataFrame indexed by iteration with columns ``train`` and ``validation``.
+    Shows how a boosted model improves tree by tree and when it starts to over-fit.
+    """
+    import pandas as pd
+
+    model = make_catboost(**params)
+    model.set_params(eval_metric="MAE")
+    model.fit(train[features], train[C.TARGET], eval_set=(val[features], val[C.TARGET]))
+    curves = model.get_evals_result()
+    return pd.DataFrame({"train": curves["learn"]["MAE"], "validation": curves["validation"]["MAE"]}).rename_axis("iteration")

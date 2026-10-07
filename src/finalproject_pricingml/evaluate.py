@@ -123,3 +123,34 @@ def mae_by(test, methods, group):
 def mean_by(test, methods, group):
     """Actual and predicted mean sales within each level of ``group``."""
     return test.groupby(group, observed=True)[[C.TARGET, *methods.values()]].mean()
+
+
+def oof_predictions(data, make_model, params=None, features=C.FEATURES, n_jobs=1):
+    """Out-of-fold predictions: fit on the rows before each validation week, predict that week.
+
+    Returns the validation rows with a ``pred`` column, so that several models' predictions can
+    be combined and scored without refitting (used for ensemble weight sweeps).
+    """
+    data = training_rows(data)
+
+    def one(fold):
+        train, val = fold_split(data, fold)
+        model = make_model(**(params or {})).fit(train[features], train[C.TARGET])
+        return val[C.ROW_KEY + ["val_fold", C.TARGET]].assign(pred=model.predict(val[features]))
+
+    return pd.concat(Parallel(n_jobs=n_jobs)(delayed(one)(f) for f in validation_folds(data))).reset_index(drop=True)
+
+
+def score_blend(predictions, weights):
+    """MAE per fold of a weighted average of out-of-fold predictions.
+
+    ``predictions`` maps a model name to its ``oof_predictions`` frame (same rows, same order);
+    ``weights`` maps the same names to weights that are normalised to sum to one.
+    """
+    names = list(predictions)
+    w = pd.Series(weights, index=names, dtype=float)
+    w = w / w.sum()
+    first = predictions[names[0]]
+    blend = sum(predictions[n].pred.values * w[n] for n in names)
+    rows = first[C.ROW_KEY + ["val_fold", C.TARGET]].assign(pred=blend)
+    return rows.groupby("val_fold").apply(lambda g: metrics(g[C.TARGET], g.pred)["mae"], include_groups=False)

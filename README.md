@@ -9,7 +9,7 @@ HKU MAIB 7002 final project. Should a category manager discount a perishable pro
 | Path | What |
 |---|---|
 | `discount_sales_prediction.ipynb` | The presentation notebook |
-| `src/finalproject_pricingml/` | Helper package the notebook calls: `data` (selection, features, splits), `evaluate` (metrics, time-ordered cross-validation, test-week scoring), `models` (one factory per model), `plots`, `config` |
+| `src/finalproject_pricingml/` | Helper package the notebook calls: `data` (selection, features, splits), `evaluate` (metrics, time-ordered cross-validation, out-of-fold predictions, test-week scoring), `models` (one factory per model: kNN, random forest, CatBoost, ensemble), `scenario` (phase 2 what-if discounts), `plots`, `config` |
 | `results/` | Every tuning grid and test-week prediction as CSV, plus the figures |
 | `docs/` | Original build-out notes for kNN and the random forest, with the numbers behind each decision |
 | `scripts/` | The original step-by-step scripts the package was extracted from (kept for reference) |
@@ -54,4 +54,4 @@ Then open the `http://127.0.0.1:8888/lab?token=...` link printed in the terminal
 2. Tune it with `evaluate.cross_validate(feat, factory, grid)` on the same five weekly folds.
 3. Score the locked design with `evaluate.fit_predict_test` and add it to the comparison in section 12 of the notebook.
 
-CatBoost and a forest + CatBoost ensemble already have factories and placeholder sections in the notebook.
+The notebook currently compares kNN, random forest, CatBoost and a 50/50 forest + CatBoost ensemble, and ends with a first draft of the phase 2 discount what-if.

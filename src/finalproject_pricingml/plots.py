@@ -139,3 +139,40 @@ def plot_model_comparison(validation, test, methods, colours, ylim=(0, 0.66), sa
     ax.legend(frameon=False, loc="upper left")
     _finish(fig, save)
     return fig, pd.DataFrame(groups, index=list(methods)).T
+
+
+def plot_learning_curves(curves, save=None):
+    """Train and validation MAE against boosting iteration, one panel per learning rate.
+
+    ``curves`` maps a label (e.g. "lr=0.03") to a DataFrame with ``train`` and ``validation`` columns.
+    """
+    fig, axes = _figure(1, len(curves), figsize=(4.5 * len(curves), 4.6), sharey=True)
+    for ax, (label, curve) in zip(axes, curves.items()):
+        ax.plot(curve.index, curve.train, color=C.MUTED, linewidth=1.5, label="Training rows")
+        ax.plot(curve.index, curve.validation, color=C.COLOURS["catboost"], linewidth=2, label="Validation week")
+        best = curve.validation.idxmin()
+        ax.axvline(best, color=C.AXIS, linewidth=1, linestyle="--")
+        ax.annotate(f"best {curve.validation.min():.4f}\nat {best} trees", (best, curve.validation.min()),
+                    textcoords="offset points", xytext=(8, 18), fontsize=9)
+        ax.set_title(label, loc="left", fontsize=11)
+        ax.set_xlabel("Boosting iteration (trees added)")
+    axes[0].set_ylabel("Mean absolute error")
+    axes[0].legend(frameon=False, loc="upper right")
+    fig.suptitle("CatBoost learning curves on the last validation week: training error keeps falling, validation error turns up",
+                 x=0.01, ha="left", fontsize=12, fontweight="bold")
+    return _finish(fig, save)
+
+
+def plot_weight_sweep(sweep, rf_mae, catboost_mae, save=None):
+    """Validation MAE of the RF + CatBoost blend as the forest's weight goes from 0 to 1."""
+    fig, ax = _figure(figsize=(10, 4.6))
+    ax.plot(sweep.index, sweep.mae, color=C.COLOURS["ensemble"], **MARKER, label="Weighted average")
+    ax.axhline(rf_mae, color=C.COLOURS["rf"], linewidth=1.5, linestyle="--", label=f"Random forest alone: {rf_mae:.4f}")
+    ax.axhline(catboost_mae, color=C.COLOURS["catboost"], linewidth=1.5, linestyle="--", label=f"CatBoost alone: {catboost_mae:.4f}")
+    best = sweep.mae.idxmin()
+    ax.annotate(f"best {sweep.mae.min():.4f} at RF {best:.0%}", (best, sweep.mae.min()), textcoords="offset points", xytext=(0, -16), ha="center", fontsize=9)
+    ax.set_xlabel("Weight on the random forest (the rest on CatBoost)")
+    ax.set_ylabel("Mean absolute error (5-week average)")
+    ax.set_title("Ensemble weight sweep on out-of-fold predictions", loc="left", fontsize=11)
+    ax.legend(frameon=False, loc="upper left", bbox_to_anchor=(1.01, 1.0))
+    return _finish(fig, save)
