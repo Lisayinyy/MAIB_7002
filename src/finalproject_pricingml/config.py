@@ -39,7 +39,7 @@ TEST_START = "2024-06-26"  # eval.parquet: the unseen week
 
 # Tomorrow's discount, grouped for the test-week breakdowns.
 DISCOUNT_BAND_EDGES = [0, 0.8, 0.95, 1.0]
-DISCOUNT_BAND_LABELS = ["deep (below 0.8)", "moderate (0.8-0.95)", "none (0.95-1.0)"]
+DISCOUNT_BAND_LABELS = ["deep (0.80 or lower)", "moderate (0.80-0.95]", "none (above 0.95)"]
 
 # --- Plot style -------------------------------------------------------------------------------
 COLOURS = {
