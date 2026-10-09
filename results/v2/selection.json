@@ -1,0 +1,26 @@
+{
+  "selected_model": "RF + validation best (25/75)",
+  "best_standalone": "CatBoost history + IDs MAE",
+  "blend_weights": {
+    "Teammate blend 50/50": {
+      "Teammate RF": 0.5,
+      "Teammate CatBoost": 0.5
+    },
+    "RF + validation best (25/75)": {
+      "Teammate RF": 0.25,
+      "CatBoost history + IDs MAE": 0.75
+    },
+    "RF + validation best (50/50)": {
+      "Teammate RF": 0.5,
+      "CatBoost history + IDs MAE": 0.5
+    },
+    "RF + validation best (75/25)": {
+      "Teammate RF": 0.75,
+      "CatBoost history + IDs MAE": 0.25
+    }
+  },
+  "validation_mae": 0.29401874825444896,
+  "selected_before_test_scoring_utc": "2026-10-09T17:48:26.124294+00:00",
+  "plan_sha256": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+  "interpretation": "Exploratory validation selection; repeated historical development is disclosed, not fresh holdout evidence."
+}

@@ -1,0 +1,23 @@
+{
+  "format": "A1 portrait, one page",
+  "width_mm": 594,
+  "height_mm": 841,
+  "selected_model": "RF + validation best (25/75)",
+  "output": "freshretail_group_q_A1.pdf",
+  "output_sha256": "4c3e114ff08edb98fdbafa518fdf8e3e848c6920a926d977d6daadc25ae60bc0",
+  "source_sha256": {
+    "results/v2/comparison.csv": "212f17b467481ba81b5b5a42ac3a19759375f0734cf0bfa8ce9e985fede419d8",
+    "results/v2/selection.json": "90e175436346a78370e146b47ec88e9f793aa29e4c16b8e71a1812aba3bfbf37",
+    "results/v2/policy_summary.json": "5a61768ad42b1ab9af17a6455c24572352a44a08c0c8219b5766521302094763",
+    "results/v2/recommendations.csv": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+    "results/v2/discount_response.csv": "f40755b3bb610d3a7252eaadf35e33fe0dfe600069a72f39657d8869f08f34de",
+    "results/v2/features.parquet": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "results/v2/experiment_plan.json": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+    "results/v2_transfer/summary.csv": "7c1d99541e6f75f1a12a845a7594f9e7bce71e7c963a964eb02ee65fdfa1af2c",
+    "results/v2_transfer/run_receipt.json": "3676ea63a0c3d4419052572dbfe4efc019e023c81f2f87c17ae3eba1c58cd8bb",
+    "results/v2_transfer/experiment_plan.json": "e061c4f5a5f4513181a5f1e9d30cf2239611f0df320e30c3016d53fb254f513b"
+  },
+  "generator_sha256": "4a97b26864a77c5c3cbde832dbb9dd588ed30a7890b3e0459b4b5cb5e833a364",
+  "reportlab_version": "4.4.9",
+  "status": "generated; inspect rendered PDF before submission"
+}

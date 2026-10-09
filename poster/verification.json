@@ -1,0 +1,20 @@
+{
+  "checked_at_hong_kong": "2026-10-10T01:50:00.761411+08:00",
+  "status": "passed",
+  "pages": 1,
+  "width_mm": 594.0001666666666,
+  "height_mm": 840.9999972222221,
+  "embedded_text_fonts": {
+    "/AAAAAA+BitstreamVeraSans-Bold": true,
+    "/AAAAAA+BitstreamVeraSans-Roman": true
+  },
+  "pdf_sha256": "4c3e114ff08edb98fdbafa518fdf8e3e848c6920a926d977d6daadc25ae60bc0",
+  "source_hashes_match": true,
+  "selected_model_and_metrics_text_checked": true,
+  "transfer_failure_and_metrics_text_checked": true,
+  "unsupported_glyphs_in_extracted_text": false,
+  "rendered_preview": "freshretail_group_q_A1_preview.png",
+  "visual_review": "Final 2000-pixel render inspected: no clipping, overlap or missing glyphs.",
+  "scope": "Poster format and source consistency; not an independent replication of model training.",
+  "submitted": false
+}

@@ -1,0 +1,122 @@
+{
+  "status": "PASS",
+  "test_rows": 2184,
+  "oof_rows": 10920,
+  "tuning_summary_rows_checked": 158,
+  "test_scores": {
+    "RF + CatBoost (50/50)": {
+      "mae": 0.28923224366438466,
+      "mse": 0.21092142295308935,
+      "rmse": 0.4592618239665576,
+      "wape": 0.29859901023546137
+    },
+    "CatBoost": {
+      "mae": 0.2896492486889251,
+      "mse": 0.21184327534109004,
+      "rmse": 0.4602643537588915,
+      "wape": 0.2990295199394053
+    },
+    "Random forest": {
+      "mae": 0.2923475600461689,
+      "mse": 0.21584814423578513,
+      "rmse": 0.4645946020303993,
+      "wape": 0.3018152159267276
+    },
+    "kNN (k=25)": {
+      "mae": 0.30398498168498167,
+      "mse": 0.24012122725274726,
+      "rmse": 0.49002165998325753,
+      "wape": 0.31382951467508713
+    },
+    "Baseline (7-day mean)": {
+      "mae": 0.31418498168498166,
+      "mse": 0.2713266707782014,
+      "rmse": 0.5208902675019004,
+      "wape": 0.32435984098246745
+    },
+    "Same weekday last week": {
+      "mae": 0.3997527472527473,
+      "mse": 0.3807744505494505,
+      "rmse": 0.6170692429131843,
+      "wape": 0.412698712827761
+    }
+  },
+  "validation": {
+    "rf": {
+      "mae": 0.30243616648504135,
+      "fold_mae": [
+        0.2898410514745157,
+        0.29083614130639346,
+        0.3356159683578427,
+        0.28974166318326844,
+        0.30614600810318665
+      ]
+    },
+    "catboost": {
+      "mae": 0.30330267860739746,
+      "fold_mae": [
+        0.28766407976933145,
+        0.2923377072313199,
+        0.3356244011217046,
+        0.29457393139534277,
+        0.30631327351928866
+      ]
+    },
+    "knn": {
+      "mae": 0.3119755677655678,
+      "fold_mae": [
+        0.29478260073260076,
+        0.29857399267399265,
+        0.35015970695970694,
+        0.3005820512820513,
+        0.31577948717948723
+      ]
+    },
+    "ensemble": {
+      "mae": 0.30125333244820623,
+      "fold_mae": [
+        0.2875881437336045,
+        0.2902242992071002,
+        0.334192169858013,
+        0.29022526277718286,
+        0.30403678666513073
+      ]
+    }
+  },
+  "weight_sweep_minimum": {
+    "rf_weight": 0.6,
+    "mae": 0.3011774501383697
+  },
+  "ensemble_beats_rf_folds": 4,
+  "ensemble_beats_catboost_folds": 5,
+  "v2_audit": {
+    "status": "PASS",
+    "models_checked": 17,
+    "blend_columns_checked": 4,
+    "recommended_discount_thresholds_and_mildness_checked": 1179,
+    "output_rows": 2184,
+    "winner": {
+      "model": "RF + validation best (25/75)",
+      "validation_mae": "0.2940187482544489",
+      "validation_rmse": "0.4566073603624005",
+      "fold_mae_std": "0.0199165767393867",
+      "test_mae": "0.2833894724023905",
+      "test_rmse": "0.45605143640907875",
+      "test_wape": "0.2925670212228944",
+      "n": "2184",
+      "selected": "True"
+    },
+    "independence": "Standard-library calculations; no calls to V2 scores(), choose_action() or verify_saved()."
+  },
+  "v2_feature_time_audit": {
+    "status": "PASS",
+    "store_id": 18,
+    "product_id": 11,
+    "changed_raw_rows_in_temporary_fixture": 4,
+    "cutoff": "2024-06-29",
+    "feature_rows_unchanged_through_cutoff": 87,
+    "later_features_changed_as_expected": true,
+    "actual_project_raw_files_modified": false,
+    "scope": "V2 new-history feature builder only; base features and static IDs held fixed. Uses temporary unit-test fixtures, not an experimental training dataset."
+  }
+}

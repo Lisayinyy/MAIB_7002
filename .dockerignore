@@ -6,3 +6,8 @@ data.nosync
 scripts/__pycache__
 **/__pycache__
 .ipynb_checkpoints
+tmp
+*.zip
+*.log
+.env
+.DS_Store

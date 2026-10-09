@@ -1,0 +1,31 @@
+name: freshretail-lisa
+services:
+  lab:
+    build: .
+    image: freshretail-lisa:local
+    init: true
+    environment:
+      HOST_JUPYTER_PORT: "${JUPYTER_PORT:-19888}"
+    ports:
+      - "127.0.0.1:${JUPYTER_PORT:-19888}:8888"
+    volumes:
+      - raw-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8888/login', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 5
+  report:
+    build: .
+    image: freshretail-lisa:local
+    init: true
+    command: ["python", "-m", "http.server", "8000", "--directory", "/app"]
+    ports:
+      - "127.0.0.1:${REPORT_PORT:-19080}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 5
+volumes:
+  raw-data:

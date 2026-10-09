@@ -1,0 +1,23 @@
+{
+  "rows": 2184,
+  "output_rows": 2184,
+  "status_counts": {
+    "recommend_discount": 1179,
+    "review_stockout": 967,
+    "review_model_disagreement": 38
+  },
+  "decision_coverage": 0.5398351648351648,
+  "manual_review_or_abstain_share": 0.46016483516483514,
+  "discount_recommendation_share_all_rows": 0.5398351648351648,
+  "observed_policy_outcomes": false,
+  "interpretation": "Model-based daily scenarios, not verified uplift, profit, waste reduction, inventory age or causal effects.",
+  "parameters": {
+    "min_support_days": 3,
+    "support_width": 0.025,
+    "min_sales_gain": 0.05,
+    "min_value_share": 0.95,
+    "near_optimal_sales_tolerance": 0.01,
+    "stockout_hours_review_threshold": 1,
+    "agreement": "selected model, teammate RF and teammate CatBoost"
+  }
+}
