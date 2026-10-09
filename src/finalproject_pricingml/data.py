@@ -88,6 +88,9 @@ def build_features(selected_keys, raw_dir=None):
     feat["humidity_t"] = g.avg_humidity.shift(1)
     feat[C.TARGET] = df.sale_amount
     feat["target_stockout_hours"] = df.stock_hour6_22_cnt  # NOT a feature: only for the stockout sensitivity check
+    # Stock history for the phase 2 guardrails (not a model feature): days with at least one stockout hour
+    # among the 7 days up to and including day t (fewer at the very start of a series).
+    feat["stockout_days7"] = g.stock_hour6_22_cnt.transform(lambda x: x.shift(1).gt(0).where(x.shift(1).notna()).rolling(7, min_periods=1).sum())
     feat = feat.dropna().reset_index(drop=True)
 
     # --- Splits ---
@@ -102,7 +105,7 @@ def build_features(selected_keys, raw_dir=None):
 def load_features(path=None, rebuild=False):
     """Load the feature table, building it from the raw parquet files if it does not exist yet."""
     path = path or C.PROCESSED / "features.parquet"
-    if rebuild or not path.exists():
+    if rebuild or not path.exists() or "stockout_days7" not in pd.read_parquet(path).columns:
         _, _, selected = select_series()
         path.parent.mkdir(parents=True, exist_ok=True)
         selected.to_csv(path.parent / "selected_series.csv")
