@@ -1,7 +1,15 @@
 {
-  "code_cells": 16,
-  "executed_code_cells": 16,
+  "completed_utc": "2026-10-10T18:50:45.056543+00:00",
+  "notebook_sha256": "a94807b1b7ed5c6129d0ffe185578e5be6a98346effb4510d3e3126d217a4211",
+  "builder_sha256": "3627b1d46f16da2b70f629d1b25ce82abdb1ce203184f8e1070ac2599c0ea5d9",
+  "helper_sha256": "7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca",
+  "cells": 89,
+  "code_cells": 31,
+  "executed_code_cells": 31,
   "errors": 0,
-  "inline_images": 3,
-  "collapsible_code_blocks": 16
+  "inline_images": 12,
+  "collapsible_code_blocks": 31,
+  "navigation_chapters": 18,
+  "live_demonstration_fits": 3,
+  "full_grid_retrained": false
 }

@@ -9,8 +9,8 @@ This branch extends Aashish's `pricing-ml-ap` commit `5b52099ab73e57c5afbb1915d0
 ## Start here
 
 1. **Learn the teammate version:** [逐行代码讲解](docs/TEAMMATE_CODE_WALKTHROUGH_ZH.md).
-2. **Understand Lisa's logic:** [新版 pipeline 及答辩准备](docs/LISA_PIPELINE_WALKTHROUGH_ZH.md).
-3. **Read the project story:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [executed HTML report](results/v2/02_lisa_pipeline.html). The narrative starts with the manager's decision, explains the data and five-store selection, and follows the forecast through to an actual discount recommendation. Python is expandable in HTML; model mechanics and full tables are in the technical appendix.
+2. **Understand Lisa's logic:** [中文故事与答辩讲解](docs/PROJECT_STORY_ZH.md), then [源码逐步说明](docs/LISA_PIPELINE_WALKTHROUGH_ZH.md).
+3. **Read the project story:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [executed HTML report](results/v2/02_lisa_pipeline.html). Follow the manager's question, public-data suitability, five-store selection, feature arithmetic, chronological evaluation, each model's investigation, controlled ablations, and a specific discount recommendation. The HTML has chapter navigation and expandable Python. Worked model calculations and full results remain in the technical appendix.
 4. **Review the A1 poster:** [single-page portrait PDF](poster/freshretail_group_q_A1.pdf), [preview](poster/freshretail_group_q_A1_preview.png), [editable generator](scripts/build_v2_poster.py).
 5. **Check submission requirements:** [brief checklist](docs/assignment_requirements.md) and [personal contribution/AI declarations](docs/CONTRIBUTIONS_TEMPLATE.md). Each member must complete and confirm their own paragraph.
 
@@ -37,11 +37,14 @@ Open the printed localhost link. It includes this server's random login token; d
 docker compose exec lab python scripts/run_v2.py --verify-only
 # Exercise decision edge cases using small unit-test fixtures, not synthetic training data.
 docker compose exec lab python -m unittest discover -s tests -v
-# Execute the presentation notebook in a fresh kernel (includes two live model fits).
+# Verify the new validation-only controlled experiment and saved-policy sensitivity.
+docker compose exec lab python scripts/run_story_ablation.py --verify-only
+docker compose exec lab python scripts/build_story_diagnostics.py --verify-only
+# Execute the presentation notebook in a fresh kernel (three modest example fits).
 docker compose exec lab python scripts/execute_lisa_notebook.py
 ```
 
-The default notebook uses saved public-data artifacts and refits only the selected members for a real worked example. It does **not** rerun the full tuning grid. These steps need no external data service once the image has been built. First image build requires Internet access to free public package registries.
+The default notebook uses saved public-data artifacts and refits the two selected members plus a fixed kNN reference for real worked examples. It does **not** rerun the full tuning grid or the 35-fit ablation. These steps need no external data service once the image has been built. First image build requires Internet access to free public package registries.
 
 To rebuild the full raw-data pipeline:
 
@@ -52,9 +55,14 @@ docker compose exec lab python scripts/download_public_data.py
 docker compose exec lab python scripts/run_v2.py
 # Repeat the locked transfer check without retuning; --force explicitly replaces that run's outputs.
 docker compose exec lab python scripts/run_v2_transfer_check.py --force
+# Seven fixed CatBoost designs × five validation weeks = 35 diagnostic fits.
+# No final-period scoring or new winner selection in this experiment.
+docker compose exec lab python scripts/run_story_ablation.py --force
 # Rebuild the selection funnel and scenario diagnostics against the new output hashes.
 docker compose exec lab python scripts/build_story_evidence.py
+docker compose exec lab python scripts/build_story_diagnostics.py
 # Update notebook output and poster after results change.
+docker compose exec lab python scripts/build_lisa_notebook.py
 docker compose exec lab python scripts/execute_lisa_notebook.py
 docker compose exec lab python scripts/build_v2_poster.py
 ```
@@ -72,7 +80,7 @@ docker compose down
 
 The report service serves the files saved in its image. Re-executing the notebook in `lab` does not update `report` automatically. To publish your regenerated artifacts locally, copy `lab:/app/results/.` into `./results/` and `lab:/app/poster/.` into `./poster/`, then run `docker compose up --build -d` again. Export notebook edits first as shown above. The default report already contains the delivered results.
 
-To change host ports, copy `.env.example` to `.env` and edit them before startup. For local Python development, `uv sync --frozen` uses the version-locked environment; run commands with `uv run`. Python and uv base images are pinned by digest in the Dockerfile. See [Docker verification](docs/DELIVERY_VERIFICATION.json) for exactly what was tested.
+To change host ports, copy `.env.example` to `.env` and edit them before startup. The [current refinement Docker check](docs/REFINEMENT_DOCKER_VERIFICATION.json) ran all 31 notebook code cells and three live examples without network or raw data, verified both new result sets, and rebuilt the poster. For local Python development, `uv sync --frozen` uses the version-locked environment; run commands with `uv run`. Python and uv base images are pinned by digest in the Dockerfile. See [Docker verification](docs/DELIVERY_VERIFICATION.json) for exactly what was tested.
 
 ## Measured result and scope
 
@@ -111,7 +119,9 @@ The thresholds are illustrative, not learned business optima. MAE training targe
 - `tests/test_v2_decisions.py`: support, value-floor, abstention and near-tie edge cases.
 - `scripts/build_lisa_notebook.py`, `scripts/build_v2_poster.py`: editable artifact generators.
 - `scripts/build_story_evidence.py`, `results/v2/story_evidence.json`: independently rebuilt selection-funnel counts and diagnostics from saved discount scenarios; no new model fitting. The narrative revision preserves the existing model scores and selection.
-- [Story revision verification](docs/STORY_REVISION_VERIFICATION.json): all 16 code cells executed on the host and in an offline Docker container; three figures and expandable Python verified in the report browser.
+- `scripts/run_story_ablation.py`, `results/story_ablation/`: seven fixed CatBoost designs, 35 validation-only fits and paired contrasts separating historical inputs, store/product IDs, training loss and discount/activity inputs. These diagnose the frozen design; they do not select a new winner or establish causal uplift.
+- `scripts/build_story_diagnostics.py`, `results/story_diagnostics/`: ten rule settings applied to the same saved forecasts, including a replay of the original policy. No model fits or observed policy outcomes; the delivered thresholds are unchanged.
+- [Expanded-story verification](docs/REFINEMENT_VERIFICATION.json): current notebook, controls, rendering and delivery checks. [Earlier narrative verification](docs/STORY_REVISION_VERIFICATION.json) remains the historical record of the shorter 16-code-cell version.
 - `DATA_LICENSE.md`: FreshRetailNet attribution. No raw data or login tokens are committed.
 
 Generative AI assisted substantially with this extension's code, review, experiments and presentation materials. Automated checks have been run; they do not replace each member's personal understanding, contribution declaration and final review. The group brief requires a one-page A1 portrait poster, runnable Docker project and personal declarations by the end of **14 October 2026**.

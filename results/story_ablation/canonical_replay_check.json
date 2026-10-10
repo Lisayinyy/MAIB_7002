@@ -1,0 +1,19 @@
+{
+  "note": "Replay diagnostic; small CPU/platform numerical differences are possible.",
+  "checks": [
+    {
+      "variant": "Full 20 / RMSE",
+      "canonical_model": "CatBoost history + IDs",
+      "maximum_absolute_prediction_difference": 4.440892098500626e-16,
+      "pooled_mae_difference": -5.551115123125783e-17,
+      "equal_within_1e_10": true
+    },
+    {
+      "variant": "Full 20 / MAE",
+      "canonical_model": "CatBoost history + IDs MAE",
+      "maximum_absolute_prediction_difference": 4.440892098500626e-16,
+      "pooled_mae_difference": 0.0,
+      "equal_within_1e_10": true
+    }
+  ]
+}

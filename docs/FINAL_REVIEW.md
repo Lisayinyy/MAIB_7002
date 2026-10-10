@@ -1,6 +1,6 @@
 # Final independent handoff review
 
-This is the review of the earlier technical delivery. The later business-first narrative revision expands the notebook to 47 cells (16 code cells); its current execution and browser checks are recorded separately in `STORY_REVISION_VERIFICATION.json`. Earlier cell counts and delivery snapshots below remain a historical record.
+This is the review of the earlier technical delivery. The first business-first revision had 47 cells (16 code cells), recorded in `STORY_REVISION_VERIFICATION.json`. The subsequent expanded investigation, controlled ablations, policy sensitivity and redesigned poster are recorded in `REFINEMENT_VERIFICATION.json`. Counts and delivery snapshots below remain a historical record, not a description of the latest notebook.
 
 Reviewed on 10 October 2026 (Hong Kong). Scope: README, the new notebook and its generator, Docker configuration, frozen V2/transfer outputs, artifact links, and the supplied project-brief checklist. This review changes no implementation or experiment result.
 

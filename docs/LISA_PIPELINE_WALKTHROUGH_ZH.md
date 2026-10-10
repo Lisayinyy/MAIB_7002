@@ -1,6 +1,6 @@
 # Lisa 的 V2 pipeline：自己的思路、代码与实际结果
 
-第一次了解项目，建议先读 [英文故事版 notebook](../02_lisa_pipeline.ipynb)：正文从经理的问题、公开数据和五家门店的筛选讲起，再走到预测、具体折扣与失败案例；算法细节和完整结果移到技术附录。本指南保留为源码逐行阅读的配套材料。叙述改写沿用相同实验结果，没有重新调参。
+第一次了解项目，建议先读 [中文故事与答辩说明](PROJECT_STORY_ZH.md) 和 [英文故事版 notebook](../02_lisa_pipeline.ipynb)：正文从经理的问题、公开数据和五家门店的筛选讲起，再展开各模型的调查、控制变量实验、具体折扣与失败案例。本指南保留为核心源码逐行阅读的配套材料。主实验结果和赢家保持不变；后续新增的35次验证期消融拟合与10组规则敏感性检查另存于 `results/story_ablation/` 和 `results/story_diagnostics/`，并未用来改选模型或规则。
 
 这份指南解释 `src/finalproject_pricingml/v2.py` 和 `results/v2/` 的已完成运行。队友原版的逐行说明另见 [TEAMMATE_CODE_WALKTHROUGH_ZH.md](TEAMMATE_CODE_WALKTHROUGH_ZH.md)。本文中的结果读取自本次V2保存文件，教学解释不会伪装成新实验。运行回执记录66次模型拟合、10,920条OOF预测、2,184条后期基准预测和2,184条推荐/复核记录。
 

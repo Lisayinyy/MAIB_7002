@@ -56,7 +56,7 @@ We separate the business ambition from what this dataset lets us measure:
 
 | What the manager ultimately cares about | What this project can check |
 |---|---|
-| Sell perishable goods without unnecessary discounting | Whether predicted next-day sales improve on a simple recent-sales average |
+| Sell perishable goods without unnecessary discounting | Whether next-day forecast accuracy improves on a simple recent-sales average |
 | Choose whether to discount and by how much | Whether a suggested rate has historical support and passes explicit sales/value checks |
 | Increase revenue and reduce waste | These are motivations; the dataset does not let us verify those outcomes for a new policy |
 
@@ -131,16 +131,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from IPython.display import display, Markdown
 from finalproject_pricingml import config as C, v2
+from finalproject_pricingml import storytelling as story
 OUT = ROOT / "results" / "v2"
 pd.set_option("display.precision", 5)
 %matplotlib inline
 
-# The default reads verified results; the live example later refits two models.
-# Set True only to repeat the full 66-fit experiment after downloading the raw files.
-RERUN_FULL_EXPERIMENT = False
-if RERUN_FULL_EXPERIMENT:
-    v2.run(OUT)
-    subprocess.run([sys.executable, str(ROOT / "scripts" / "build_story_evidence.py")], check=True)
+# Read verified saved results; the appendix performs three modest worked-example fits.
+# Full experiments use the explicit CLI recipe in appendix C, including dependent diagnostics.
 verification = v2.verify_saved(OUT)
 feat = pd.read_parquet(OUT / "features.parquet")
 plan = json.loads((OUT / "experiment_plan.json").read_text())
@@ -197,6 +194,32 @@ study should choose the cohort before the first validation period, or repeat sel
 training fold. We keep this same cohort here so the teammate and Lisa comparisons use the same cases.
 ''')
 md('''
+### 3.1 Is there enough variation to make this a useful study?
+
+The selection rules give us a workable sample; they do not yet show what trading looks like. Before
+modelling, we inspect the selected histories using **training-period rows only**. The following evidence
+connects discount frequency, observed sales and stock availability. If price barely changed, we would
+have little basis for comparing alternatives; if sales were often limited by stockouts, a low recorded
+sale would not necessarily mean low customer demand.
+
+Any sales-by-discount comparison here is descriptive. Discounts were chosen by managers, not randomly
+assigned by this project. A higher observed average on discounted days motivates including the price
+condition in a forecast; it does not measure what changing the price alone would cause.
+''')
+code('''
+eda_figure, eda_table = story.training_eda(feat)
+display(eda_table)
+plt.show()
+''')
+md('''
+> **Decision:** retain variation in price and recent trading context, while treating stockout signals
+> as evidence about availability. These observations support a forecasting investigation, not a causal
+> estimate of price elasticity. The five-store sample remains a deliberately narrow first study.
+
+The teammate's original exploratory table included all feature rows. This descriptive view restricts
+itself to the training period, so its counts or averages need not reproduce that earlier table exactly.
+''')
+md('''
 ## 4. Turn the business question into one prediction
 
 Imagine standing at the end of today with a particular store-product's record. We know how it sold
@@ -206,6 +229,10 @@ have a candidate discount that the manager could choose. What we do not know is 
 **Our prediction target, Y, is next-day normalized observed sales.** The discount is an input to the
 prediction, not the target. At this stage we learn to forecast sales under recorded conditions; the
 later decision step will replace that price input with alternative candidates.
+
+In the tables, **yesterday means the day immediately before the target date**—the trading day that has
+just ended when the manager makes the decision. This keeps the feature labels anchored to the date
+being forecast rather than accidentally introducing a two-day lag.
 
 | Information available by the decision time | Role in the forecast |
 |---|---|
@@ -232,6 +259,27 @@ readable = {
 display(pd.DataFrame(readable.items(), columns=["Case information", "Value"]))
 ''')
 md('''
+### 4.1 Build the input row by hand before fitting a model
+
+For the same store-product, look backwards from the target date. The previous day's observation becomes
+`sales_t`; the observation seven days earlier becomes `sales_lag7`; the average of the preceding seven
+observations becomes `sales_mean7`. None of these calculations uses the target day's outcome.
+
+The next tables expose those actual observations and check the arithmetic against the saved feature
+row. This is the bridge from a retail record to an ML input, and also the logic behind the seven-day
+baseline. A different store selling the same product has its own history and its own calculation.
+''')
+code('''
+case_history, feature_checks = story.feature_walkthrough(feat, example)
+display(case_history)
+display(feature_checks)
+''')
+md('''
+> **Decision:** construct sales history within each store-product and stop every window before the
+> target date. The model learns a mapping from these available inputs to observed sales; the future
+> outcome is retained separately so that we can check the prediction afterwards.
+''')
+md('''
 The date attached to each feature row is the day being predicted. Historical windows end before that
 date: the seven-day mean, for example, uses the seven preceding days. The selected raw records have no
 invalid price-rate or missing-value removals; the first seven days of each series are dropped to build
@@ -242,6 +290,30 @@ does not normalize it a second time.
 In a daily workflow, yesterday's observed sales become available before predicting today. We therefore
 make rolling one-day-ahead forecasts, updating the history within each evaluation week while keeping
 the model fitted at that week's start. This does not claim to forecast a whole week before any of it occurs.
+''')
+md('''
+### 4.2 What cleaning actually changed
+
+A cleaning rule is not evidence that a defect was present. The inherited pipeline checks duplicate
+store-product dates, continuous daily history and missing values; it also handles zero and above-one
+price rates before feature construction. In this selected cohort, the raw-data audit found no such
+price-rate or missing-value removals. The actual row reduction comes from the first seven dates of
+each series, where the required lag history is not yet available.
+
+The table below distinguishes source checks from rows removed. We retain stockout days: dropping them
+would change the population under study, while keeping them means our target remains observed sales,
+which can be below unmet customer demand.
+''')
+code('''
+cleaning = evidence["cleaning"]
+display(pd.DataFrame([
+    ["Selected raw store-product-day rows", cleaning["raw_selected_rows"]],
+    ["Selected raw price rates above one", cleaning["raw_selected_discount_above_one_rows"]],
+    ["Selected raw zero price rates", cleaning["raw_selected_zero_discount_rows"]],
+    ["Missing values in audited selected columns", cleaning["raw_selected_missing_values_in_audited_columns"]],
+    ["Rows removed before complete features", cleaning["rows_removed_before_saved_features"]],
+    ["Saved feature rows", cleaning["saved_feature_rows"]],
+], columns=["Audit item", "Count"]))
 ''')
 md('''
 ## 5. Start with a decision a manager could make without ML
@@ -263,10 +335,23 @@ week is an already-viewed benchmark, not an untouched holdout. Recording the new
 its final scoring prevents new choices within this run, but cannot undo earlier exposure.
 ''')
 code('''
-display(pd.DataFrame([
-    {"Round": k, "Train on": "All feature dates before " + dates[0],
-     "Validate from": dates[0], "Validate through": dates[1]}
-    for k, dates in plan["folds"].items()]))
+timeline_figure, timeline_table = story.split_timeline(feat, plan)
+display(timeline_table)
+plt.show()
+''')
+md('''
+### 5.1 A future-like comparison, with a known limitation
+
+Randomly mixing neighboring dates would put highly related histories on both sides of the comparison.
+Instead, each validation model sees only feature rows before its validation week. Standardization for
+distance-based or linear models is fitted again using that round's training rows. Every candidate sees
+the same target dates and is scored against the same observations.
+
+The calendar still has two limitations: the working cohort was chosen from the whole original training
+period, and earlier project development already viewed the final week. We therefore describe the final
+week as a shared benchmark, even though the model fits themselves follow time order.
+''')
+code('''
 display(comparison[comparison.model.isin(["7-day mean", "Same weekday"])][
     ["model", "validation_mae", "test_mae", "test_rmse"]].rename(columns={"test_mae":"final_period_mae", "test_rmse":"final_period_rmse"}))
 ''')
@@ -301,9 +386,127 @@ display(metrics.loc[reference_names, ["validation_mae", "test_mae", "test_rmse"]
 ''')
 md('''
 All four learned reference methods improve on the seven-day average in this comparison. The blend's
-advantage over its individual tree models is small. That suggests a useful next question for Lisa's
-extension: can a better description of recent trading, and a training objective aligned with our chosen
-error metric, help more than simply adding another model?
+advantage over its individual tree models is small. Before extending that design, we follow the key
+questions that led to these reference models. The next three sections use the teammate's saved tuning
+artifacts; their charts can be recreated without claiming to perform a new tuning run.
+''')
+md('''
+### 6.1 kNN: are comparable past days enough?
+
+**Question.** Can we predict tomorrow by finding past days with similar recent sales, price conditions
+and calendar context? k-nearest neighbours finds the closest training rows after scaling their features,
+then averages their observed sales. It does not build a tree or update weights through gradient descent.
+
+**Technical choice.** A small neighborhood can chase noise; a large one can average over days that are
+not sufficiently comparable. Scaling matters because distance adds differences across features. A weather
+measurement with a large numerical range should not dominate distance merely because of its units.
+
+**Evidence.** The inherited comparison varies the number of neighbors and feature sets on the same five
+validation weeks. The following chart makes the effect of including weather visible instead of simply
+announcing a final feature list.
+''')
+code('''
+knn_figure, knn_table = story.teammate_knn(ROOT)
+display(knn_table)
+plt.show()
+''')
+md('''
+For equal feature weights and 25 neighbors, the saved validation MAE falls from about **0.32668 with
+weather to 0.31198 without weather**. The seven-day baseline is about 0.32840. This is evidence that
+those weather inputs did not help this particular setup; it does not imply that weather never affects
+food demand. After weather is removed, the useful neighborhood-size region is relatively broad.
+
+> **Inherited choice:** 25 neighbors, uniform neighbor averaging, equal feature weights, Euclidean distance and a training-fitted
+> standard scaler, using the ten base inputs. The technical appendix demonstrates actual neighbors
+> and the averaging calculation for our real case.
+''')
+md('''
+### 6.2 Random Forest: can many conditional rules improve on similarity?
+
+**Question.** Two trading days need not be close in every feature to share a useful sales pattern.
+Could rules such as “recent average above this level, then a particular price range” capture those
+patterns better? A regression tree partitions training rows with feature thresholds and predicts a
+leaf's mean sales. A Random Forest averages many such trees, trained with resampled rows and feature subsets.
+
+**Technical choice.** Deep trees and tiny leaves can memorize peculiar days. Limiting depth or requiring
+more observations per leaf makes a prediction depend on a broader group. The teammate compared these
+controls; the color scale below is deliberately labeled because the score differences are small.
+''')
+code('''
+forest_figure, forest_table = story.teammate_rf(ROOT)
+display(forest_table)
+plt.show()
+''')
+md('''
+The saved depth/leaf grid selects **depth 10 and at least three rows per leaf**, with validation MAE
+about **0.30244**. The earlier leaf/features comparison also favored leaving out weather. These results
+justify a useful nonlinear reference, while the small gaps between nearby settings discourage a claim
+that one setting is universally best.
+
+> **Inherited choice:** 300 trees, depth 10, minimum leaf size three, half the input features considered
+> at a split and squared-error splitting. Adding forest trees averages more estimates; it is not the
+> sequential error-correction process that we test next.
+''')
+md('''
+### 6.3 CatBoost: can small corrections outperform a forest?
+
+**Question.** Instead of averaging independently built trees, what if each new tree improves the
+current prediction? CatBoost adds shallow trees sequentially, taking a smaller step controlled by the
+learning rate. This makes it suitable for interactions in tabular data, but also creates a point at
+which extra fitting can follow training noise rather than improve a later week's forecasts.
+
+**Technical choice.** Depth controls each tree's complexity; learning rate controls the step size;
+iterations control how many steps are taken. The teammate's first grid tested 12 settings, then a
+27-setting grid explored shallower, slower designs. The saved learning curve is a diagnostic from one
+validation fold, not a fresh set of independent test weeks.
+''')
+code('''
+cat_figure, cat_table = story.teammate_catboost(ROOT)
+display(cat_table)
+plt.show()
+''')
+md('''
+The inherited reference uses **depth 5, learning rate 0.03 and 500 iterations**, with validation MAE
+about **0.30330**. Its score is close to the forest's. The learning curves show why more iterations are
+not automatically better: a decreasing training error can coexist with a later rise in validation error.
+That is a useful overfitting demonstration, not proof that every product has reached a prediction ceiling.
+
+> **Inherited choice:** retain the small, regularized CatBoost reference and examine whether it adds
+> something to the forest. It uses ten numeric inputs; the store/product categorical IDs are introduced
+> in Lisa's extension, so the original reference does not test their benefit.
+''')
+md('''
+### 6.4 Keep simpler and alternative models in the comparison
+
+Our shared project also asks whether different model families behave differently. The matched V2
+experiment therefore retains **Ridge, one decision tree and HistGradientBoosting**, rather than comparing
+only two closely related tree ensembles. These are declared reference designs, not freshly optimized
+settings. They answer different questions:
+
+| Reference | What it tests | Important choice |
+|---|---|---|
+| Ridge | Whether a regularized linear relationship is sufficient | Scale inputs; penalize large coefficients |
+| Decision tree | Whether a small collection of conditional rules is sufficient | Depth and leaf-size limits |
+| HistGradientBoosting | Whether another sequential tree implementation competes | Learning rate, number of stages and leaf count |
+| Monotonic HistGradientBoosting | Whether imposing a non-increasing response to price rate helps | Higher price rate cannot raise the prediction when other inputs are held fixed |
+
+The monotonic constraint is a modeling assumption that can make scenario behavior easier to interpret.
+It does not remove confounding, and it should not be declared successful without checking forecast error.
+''')
+code('''
+other_references = ["7-day mean", "Ridge", "Decision tree", "HistGradientBoosting", "Monotonic HistGBR"]
+display(metrics.loc[other_references, ["validation_mae", "test_mae", "test_rmse"]].rename(
+    columns={"test_mae":"final_period_mae", "test_rmse":"final_period_rmse"}))
+''')
+md('''
+Ridge improves on the recent-sales baseline, while the single tree's final-period MAE is worse than
+that baseline. HistGradientBoosting is competitive, but neither it nor its monotonic variant wins the
+declared validation comparison. A visually appealing or theoretically sensible constraint is not enough
+to justify selecting it over the measured alternatives.
+
+> **Decision:** keep these comparisons as evidence of what the added complexity buys. The close forest
+> and CatBoost scores motivate a more specific question: can we improve the description of recent
+> trading, and align learning with the error measure we actually use to choose a model?
 ''')
 md('''
 ## 7. Lisa's extension: give the model a better account of recent trading
@@ -344,6 +547,91 @@ MAE training estimates a conditional median. Later, when we multiply its forecas
 product will be a decision proxy, not a claim about mathematically expected revenue.
 ''')
 md('''
+### 7.1 Separate the reasons: history, identity, price and activity
+
+The original V2 package changed several things together. To explain it more carefully, we add a
+**validation-only diagnostic experiment** with the same five expanding folds and fixed CatBoost depth,
+iterations, learning rate, regularization and seed. It compares ten base inputs, added history, added
+categorical IDs, and alternative loss functions. It then removes the proposed discount, previous-day
+activity, or both from the full MAE design.
+
+Our expectations are explicit: recent-history features may capture changes that a seven-day mean misses;
+IDs may capture recurring store-product context; and the proposed discount may add predictive information
+beyond recent sales. Removing activity tests whether yesterday's activity adds anything after those other
+inputs are present. A result in the opposite direction is useful evidence too.
+
+This is a new explanatory check on already-used validation weeks. It does **not** score the final period,
+change the canonical 17-method comparison, select new blend weights or create an untouched evaluation.
+''')
+code('''
+ablation_dir = ROOT / "results" / "story_ablation"
+subprocess.run([sys.executable, str(ROOT / "scripts" / "run_story_ablation.py"), "--verify-only"],
+               check=True, capture_output=True, text=True)
+ablation = pd.read_csv(ablation_dir / "summary.csv")
+ablation_contrasts = pd.read_csv(ablation_dir / "contrasts.csv")
+display(ablation[["variant", "n_features", "loss", "validation_mae", "validation_rmse", "folds"]])
+display(ablation_contrasts[["contrast", "reference", "changed", "mae_delta",
+                            "relative_mae_change_pct", "weeks_changed_lower_mae", "folds"]])
+print("Contrast convention: changed minus reference; a negative MAE difference is an improvement.")
+print("Input/output provenance and validation metrics verified; no final-period scoring or reselection.")
+''')
+code('''
+ablation_by_variant = ablation.set_index("variant")
+explanatory_pairs = [
+    ("Base 10 / RMSE", "History 18 / RMSE", "Adding recent-history features"),
+    ("History 18 / RMSE", "Full 20 / RMSE", "Adding store and product IDs after history"),
+    ("Full 20 / RMSE", "Full 20 / MAE", "Changing the full design from RMSE to MAE training"),
+    ("Full 20 / MAE", "No proposed discount / MAE", "Removing tomorrow's proposed discount"),
+    ("Full 20 / MAE", "No previous activity / MAE", "Removing yesterday's activity flag"),
+]
+findings = []
+for reference, changed, label in explanatory_pairs:
+    before = float(ablation_by_variant.loc[reference, "validation_mae"])
+    after = float(ablation_by_variant.loc[changed, "validation_mae"])
+    direction = "lower" if after < before else "higher" if after > before else "unchanged"
+    relative = abs(after-before)/before*100
+    findings.append(f"- **{label}:** average validation MAE moves from {before:.5f} to {after:.5f} "
+                    f"({relative:.2f}% {direction}).")
+display(Markdown("\\n".join(findings)))
+''')
+md('''
+Read each contrast as a narrow question. Adding history while other settings are fixed estimates the
+predictive effect of that feature group under this protocol. Adding IDs then tests their extra contribution
+conditional on that history. Removing a price or activity input tests the information it contributes to
+the fitted prediction; it is **not** a causal estimate of a discount's effect on sales.
+
+> **Decision:** use this diagnostic to explain which parts of the design have evidence behind them,
+> and which do not. Retain the previously selected model for the reported benchmark and policy examples.
+> Reusing validation folds limits how strongly we can generalize these additional findings.
+''')
+md('''
+### 7.2 Derive the blend instead of guessing its weights
+
+Averaging helps only when the models make sufficiently different errors. If both underpredict the same
+sales spike, their average will also miss it. We examine errors from validation rows predicted by models
+that were fitted on earlier dates, and then compare only the declared blend choices.
+
+There are two distinct pieces of evidence. In the teammate's original sweep, 50/50 was a simple near-best
+choice: the exact lowest saved validation MAE occurs at 60% RF. In V2, we combine the validation-best
+non-RF standalone design with RF at three declared weights: 25%, 50% and 75% RF. These are different
+experiments with different CatBoost components.
+''')
+code('''
+blend_figure, blend_table = story.blend_diagnostics(ROOT)
+display(blend_table)
+plt.show()
+''')
+md('''
+The V2 validation comparison favors **25% RF and 75% extended MAE CatBoost** among those declared
+choices. This places more weight on the stronger standalone forecast while retaining a contribution
+from the forest. The weights are selected by validation performance; they are not inferred from
+feature importance, and they do not represent discount percentages.
+
+> **Decision:** lock that blend for the final-period comparison. The small differences between neighboring
+> candidates are a reason to avoid describing the weights as universally optimal. The later worked
+> example shows the two member predictions and the exact weighted-average arithmetic.
+''')
+md('''
 ## 8. Did the extension improve the forecast?
 
 The validation rule selects a blend of **25% Random Forest and 75% extended CatBoost trained with MAE**.
@@ -368,7 +656,8 @@ ax.barh(pos+width/2, metrics.loc[plot_names,"validation_mae"], width, label="Val
 ax.barh(pos-width/2, metrics.loc[plot_names,"test_mae"], width, label="Final-period benchmark", color="#127263")
 ax.set_yticks(pos, ["7-day mean", "kNN", "Teammate RF", "Teammate CatBoost", "Teammate 50/50", "Lisa 25/75"])
 ax.invert_yaxis(); ax.set_xlim(0,.36); ax.set_xlabel("MAE (normalized observed sales)")
-ax.legend(frameon=False); ax.spines[["top","right"]].set_visible(False)
+ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(0, 1.02), ncol=2)
+ax.spines[["top","right"]].set_visible(False)
 fig.tight_layout(); plt.show()
 ''')
 md('''
@@ -395,6 +684,27 @@ slices = pd.read_csv(OUT / "error_slices.csv")
 display(slices[slices["slice"] == "discount"][["value","model","mae","rmse","n"]])
 largest = pd.read_csv(OUT / "largest_errors.csv")
 display(largest[C.ROW_KEY + [C.TARGET,"discount_next","target_stockout_hours",winner,"selected_abs_error"]].head(3))
+''')
+md('''
+### 9.1 Are the difficult cases concentrated somewhere?
+
+A manager needs to understand how a forecast can fail, not just its average score. The diagnostic below
+keeps the same final-period cases and examines errors across relevant groups. A large absolute miss
+on a high-sales day can dominate RMSE; a small average improvement can coexist with weak performance
+in a particular store or discount band.
+
+These groups are inspected after the outcome is known. They help explain reliability and future data
+needs; they do not become additional inputs that were somehow available before the original forecast.
+''')
+code('''
+error_figure, error_table = story.error_diagnostics(feat, test_predictions, winner)
+display(error_table)
+plt.show()
+''')
+md('''
+> **Decision:** report the error slices and a mechanically chosen failure alongside the overall result.
+> Better average prediction does not justify removing manual review from the decision process. We also
+> avoid treating a few stores or one unusually hard week as evidence about every future location.
 ''')
 md('''
 These errors matter because a recommendation based on an understated sales spike or censored history
@@ -459,6 +769,11 @@ not values learned to be optimal. Model agreement is a sensitivity check, not a 
 This also explains what we changed in the teammate's stock rules. A stockout does not prove tomorrow's
 stock is fresh, and a week without a stockout does not prove the stock is a week old. We request a supply
 review when necessary and do not infer inventory age from these signals.
+''')
+code('''
+decision_figure, decision_table = story.decision_flow()
+display(decision_table)
+plt.show()
 ''')
 md('''
 ## 12. Follow one real case to a 10% discount
@@ -537,6 +852,30 @@ receive a discount recommendation**, and none of the current cases select keep-f
 make the process more explicit, but have not established that it reliably identifies days when a
 discount is genuinely beneficial. Agreement among models trained on similar observational data can
 preserve the same bias.
+''')
+md('''
+### 13.1 Would different thresholds tell a different story?
+
+The 5% gain hurdle, 95% value floor and previous-day stockout threshold are explicit assumptions.
+They were not learned to be business-optimal. We therefore replay a small sensitivity comparison on
+the **same saved scenario forecasts**, changing policy checks rather than fitting another sales model.
+
+This asks whether recommendation coverage and discount depth depend heavily on those choices. It does
+not discover a better policy by observing what customers would have done. No alternative-policy sales,
+profit or waste outcomes are available for these historical cases.
+''')
+code('''
+subprocess.run([sys.executable, str(ROOT / "scripts" / "build_story_diagnostics.py"), "--verify-only"],
+               check=True, capture_output=True, text=True)
+sensitivity_figure, sensitivity_table = story.policy_sensitivity(ROOT)
+display(sensitivity_table)
+plt.show()
+''')
+md('''
+> **Decision:** keep the canonical thresholds and expose their influence. The sensitivity table is a
+> discussion aid for a manager deciding what additional evidence is needed; it is not a leaderboard
+> of realized business returns. A threshold that recommends fewer discounts is not automatically
+> better, just as a threshold that recommends more is not evidence of higher sales.
 ''')
 md('''
 ## 14. The improvement has a boundary: other stores
@@ -631,6 +970,35 @@ if forest is not None:
             print(f"{C.FEATURES[feature]} = {value:.4f} {'<=' if value <= threshold else '>'} {threshold:.4f}")
 ''')
 md(r'''
+### A.1 A second worked example: actual kNN neighbors
+
+The kNN reference answers the same prediction question using a different mechanism. For numeric input
+feature $j$, standardize $x_j$ as $z_j=(x_j-\mu_j)/s_j$, where $\mu_j$ and $s_j$ are the training-set
+mean and standard deviation. Compare the target row with training row $i$ using Euclidean distance
+$d_i=\sqrt{\sum_j(z_j-z_{ij})^2}$, where $z_{ij}$ is training row $i$'s standardized value of feature $j$.
+
+If $N_{25}(x)$ denotes the 25 closest training rows to target input $x$, the prediction is
+$\hat y(x)=\frac{1}{25}\sum_{i\in N_{25}(x)}y_i$, where $y_i$ is neighbor $i$'s observed sales.
+The neighbors can come from other store-products because the reference compares their numeric trading
+features. Its scaler is fitted only on the original training rows, never on the target outcome.
+
+The following calculation uses the same real target case. It makes distance, neighbor selection and
+the average visible, without claiming that similar observed days identify a causal price effect.
+Only the first five neighbors are shown; the sum and prediction use all 25.
+''')
+code('''
+neighbors, neighbor_calculation = story.live_knn_example(feat, example)
+display(neighbors)
+display(neighbor_calculation)
+''')
+md('''
+The result can now be explained in two ways: the forest/boosting blend combines learned conditional
+predictions, whereas kNN averages selected historical outcomes. Both ultimately produce the same type
+of output—normalized observed sales—so they can be compared against the same target and baseline.
+The earlier validation results decide which prediction design to use, not how persuasive an individual
+worked example looks.
+''')
+md(r'''
 ## Technical appendix B. Metrics, inputs and the full comparison
 
 For $n$ evaluated rows with observed sales $y_i$ and forecasts $\hat y_i$:
@@ -651,6 +1019,55 @@ display(pd.DataFrame({"Group":["Base"]*len(C.FEATURES)+["Additional history"]*le
                       "Feature":C.FEATURES+v2.EXTRA+v2.IDS}))
 display(pd.DataFrame(plan["candidates"]).fillna("—"))
 display(paired)
+''')
+md(r'''
+### B.1 What is optimized, and which settings matter?
+
+For a linear model, $\hat y_i=b+\sum_j\beta_j z_{ij}$, where $b$ is the intercept, $\beta_j$ a learned
+coefficient and $z_{ij}$ a standardized input. Ridge chooses these coefficients to reduce
+$\sum_i(y_i-\hat y_i)^2+\alpha\sum_j\beta_j^2$. The first term penalizes squared prediction error;
+the second shrinks large coefficients, with strength $\alpha$. The intercept is not in that penalty.
+
+A squared-error regression tree chooses feature thresholds that reduce the sum of within-leaf squared
+deviations. For leaf $L$, this quantity is $\sum_{i\in L}(y_i-\bar y_L)^2$, where $\bar y_L$ is the mean
+training target in that leaf. A split is useful when the two child leaves reduce that total. A forest
+uses the same kind of split repeatedly, with resampling and feature subsampling, then averages trees.
+
+Boosting updates an existing prediction by adding a tree that reduces its chosen training loss.
+For squared error, large residuals receive more influence; absolute error gives each error magnitude
+linear influence. RMSE and squared-error loss have the same minimizer for a fixed set of predictions,
+but the chosen implementation and optimization procedure still matter. CatBoost also uses
+regularization and, in the extended design, category-specific machinery for the store/product IDs.
+The selected mixed-loss blend is neither a guaranteed conditional mean nor an exact conditional median.
+
+| Design | Main settings in the recorded experiment | Why the settings matter |
+|---|---|---|
+| Ridge | StandardScaler; alpha 10 | Make the coefficient penalty meaningful across input scales |
+| Decision tree | Depth 6; minimum 20 rows per leaf | Limit narrow, unstable rules |
+| kNN reference | StandardScaler; 25 neighbors; equal weights | Control distance comparability and local averaging |
+| Random Forest | 300 trees; depth 10; minimum leaf 3; half the features per split | Average varied trees while limiting each tree's complexity |
+| HistGradientBoosting | 300 stages; learning rate 0.05; at most 15 leaves; minimum leaf 20; L2 1 | Balance sequential corrections against complexity |
+| Monotonic HistGBR | Same settings; non-increasing prediction in proposed price rate | Test an explicit price-response shape restriction |
+| Reference CatBoost | 500 stages; depth 5; learning rate 0.03; L2 3; RMSE loss | Preserve the teammate's locked reference |
+| Extended CatBoost | Same depth/stages/rate; L2 5; 18 numeric inputs and two IDs; RMSE or MAE | Test richer context and a controlled loss contrast |
+
+All compared forecasts are clipped at zero according to the recorded common postprocessing rule.
+This avoids negative predicted sales; it does not guarantee appropriate price-response behavior.
+The full candidate table above includes the additional main-branch CatBoost reference and loss variants.
+''')
+md('''
+### B.2 Why these comparisons do not all answer the same question
+
+The baseline comparison asks whether fitting a model improves forecasting at all. A fixed-family
+comparison asks whether another representation helps under its declared settings. The inherited tuning
+grids vary settings within a family. The controlled extended-loss comparison changes only the loss.
+The new validation-only diagnostic isolates feature groups more carefully, while the original V2
+history/ID package also changed regularization. Keeping these distinctions visible prevents a broad
+claim such as “CatBoost is best” from replacing the actual evidence.
+
+The final choice remains **minimum average validation MAE under the declared protocol**, with final-period
+RMSE, slices and transfer results used to describe strengths and weaknesses. None of those forecast
+comparisons is a direct evaluation of the business reward from deploying the discount policy.
 ''')
 md('''
 Ridge uses standardized numeric inputs with a coefficient penalty. The single decision tree is a simple
@@ -673,7 +1090,9 @@ md('''
 This is a narrative revision of the saved experiment, not a new tuning round. The forecast target,
 cohort, fitted-design selection and reported benchmark scores are unchanged. The selection-funnel
 artifact can be rebuilt from the verified public raw files with `scripts/build_story_evidence.py`.
-The default notebook reads saved evidence and performs only the two live worked-example fits above.
+The default notebook reads saved evidence, refits the two selected blend members for the live worked
+example, and fits the fixed kNN reference for its neighbor calculation. It does not rerun the historical tuning grids
+or the separate validation-only feature diagnostic.
 
 From a complete repository copy:
 ```bash
@@ -688,7 +1107,9 @@ To regenerate the complete experiment and story evidence:
 docker compose exec lab python scripts/download_public_data.py
 docker compose exec lab python scripts/run_v2.py
 docker compose exec lab python scripts/run_v2_transfer_check.py --force
+docker compose exec lab python scripts/run_story_ablation.py --force
 docker compose exec lab python scripts/build_story_evidence.py
+docker compose exec lab python scripts/build_story_diagnostics.py
 docker compose exec lab python scripts/build_lisa_notebook.py
 docker compose exec lab python scripts/execute_lisa_notebook.py
 ```
@@ -710,6 +1131,18 @@ The supplied brief requires each member's factual contribution and generative-AI
 `docs/CONTRIBUTIONS_TEMPLATE.md`, the requirements checklist and the Chinese code walkthroughs.
 Generative AI assisted substantially with code, review and presentation; automated verification does
 not replace the authors' personal understanding. Nothing in this notebook represents a Moodle submission.
+''')
+md('''
+### Personal understanding and declarations before submission
+
+Each member should be able to explain the business question, the five-store selection, one input row,
+the validation rule, the selected blend, and the reason for either the example discount or a review
+decision. A successful automated run checks execution; it does not establish personal understanding.
+
+The final submitted notebook or report must include each member's own short paragraph stating their
+actual contribution, the generative-AI assistance used and how they checked it. The linked template is
+still a place for those factual accounts, not a substitute for them. Any discussion of feasibility
+with teaching staff should likewise be recorded only if it actually occurred.
 ''')
 
 nb = nbf.v4.new_notebook(cells=cells, metadata={

@@ -1,18 +1,28 @@
 # Group Q A1 poster
 
-The editable source is `scripts/build_v2_poster.py`. It builds a single-page, portrait **594 × 841 mm** PDF using ReportLab, embedded Bitstream Vera fonts and vector graphics. The layout uses horizontal sections and ample reading space, rather than a grid of cards.
+The editable source is `scripts/build_v2_poster.py`. It creates one **594 x 841 mm portrait A1 PDF**, with embedded Bitstream Vera fonts and vector artwork. The 11 October revision uses a business question, a produce illustration, a cohort funnel, a four-step decision flow, a compact three-method chart and one real worked example. Main explanations are approximately 22-28 pt; references and supporting notes are smaller.
 
-The generator reads verified V2 evidence from `results/v2/comparison.csv`, `selection.json`, `policy_summary.json`, `features.parquet`, `recommendations.csv`, `discount_response.csv`, and `experiment_plan.json`. It chooses the first recommended-discount case by store, SKU and date, with an explicit first-row fallback when no recommendation exists. Missing metrics or a missing real worked example stop the build. It also includes the frozen transfer check from `results/v2_transfer/` when present. It does not train models, select them by test score, or invent poster numbers.
+## Rebuild from saved evidence
 
-After the analysis has completed:
+Only the Python standard library and ReportLab are required; the poster does not import the model-training environment or refit a model.
 
 ```bash
 python -m pip install reportlab==4.4.9
 python scripts/build_v2_poster.py
 ```
 
-Run the command in the project environment, which already needs pandas and pyarrow for reading the actual feature data. The PDF is `poster/freshretail_group_q_A1.pdf`. The generator records source hashes and page specifications in `poster/build_manifest.json`. The final `freshretail_group_q_A1_preview.png` is a 2,000-pixel preview; the PDF itself contains vector text and charts suitable for A1 printing. `poster_text.txt` is an extracted text copy for proofreading. `verification.json` records the latest format, metric and rendered-layout checks. Re-render after any source or result change; an earlier verification does not apply to a changed PDF.
+The generator reads the saved V2 comparison, selection, policy summary, experiment plan, story evidence, row-level validation/test predictions, recommendation table and scenario table. The worked example is the first recommended-discount row ordered by store, SKU and date. Its previous-day observed sales come from the corresponding prior dated target in the saved predictions. The frozen transfer check is included when its saved evidence exists. Missing evidence stops generation rather than introducing invented values.
 
-The poster covers the business question, public data, chronological evaluation, forecast-to-decision pipeline, a model comparison, a real-data what-if example, the failed transfer improvement and the difference between prediction evidence and demonstrated business effects. The poster is supported by the explanatory notebook; it is not a substitute for each member's required contribution and AI-use statement.
+## Files
+
+- `freshretail_group_q_A1.pdf`: the print-ready PDF.
+- `freshretail_group_q_A1_preview.png`: a 2,200-pixel preview; print the PDF, not the PNG.
+- `poster_text.txt`: extracted text for proofreading.
+- `build_manifest.json`: PDF, generator and result-source hashes.
+- `verification.json`: the latest page-size, text, font, source-consistency and rendered-layout checks.
+
+Render and inspect after every change; an earlier verification does not apply to a changed PDF. The PDF must remain exactly one A1 page. Check that names, selected models, rounded scores, case values and limitations agree with the saved evidence. The poster's compact comparison covers the simple baseline, original 50/50 blend and selected 25/75 blend; the explanatory notebook retains all models and detailed experiments.
+
+The poster does not claim observed gains from price changes. It includes the previously viewed benchmark, the failed cross-store improvement and the high frequency of discount recommendations. Each member must separately confirm their required contribution and generative-AI-use statement in the notebook/report.
 
 No poster has been submitted or sent for printing by this script.

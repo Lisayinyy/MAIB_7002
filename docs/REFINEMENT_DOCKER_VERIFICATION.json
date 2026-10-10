@@ -1,0 +1,191 @@
+{
+  "status": "passed",
+  "recorded_utc": "2026-10-10T18:55:19.341016+00:00",
+  "scope": "Isolated image build and offline saved-data verification of the refined narrative, explanations, policy diagnostics and poster. Canonical 66-fit selection was not rerun; the 35-fit ablation was verified from its saved predictions and receipts.",
+  "build": {
+    "command": "docker build --progress plain -t freshretail-lisa:story-20261011 /private/tmp/freshretail-refinement-20261011",
+    "source_copy": "Git HEAD archive plus the finalized authorized refinement files in /private/tmp; host .venv/raw data excluded by .dockerignore",
+    "exit_code": 0,
+    "image_tag": "freshretail-lisa:story-20261011",
+    "id": "sha256:d1d1c1ac025357b3e464fac41d812893ec45995cafff93f571ea59d73c024281",
+    "created": "2026-10-10T18:53:10.14402946Z",
+    "os": "linux",
+    "architecture": "arm64",
+    "dependency_layers_cached": true,
+    "context_transferred_bytes_approx": 19970000,
+    "not_a_cold_dependency_download_test": true,
+    "input_notebook_sha256": "a94807b1b7ed5c6129d0ffe185578e5be6a98346effb4510d3e3126d217a4211",
+    "root_refinement_receipt_added_after_image_build": true,
+    "old_local_tag_preserved": "sha256:2f1f59f18344b52354a88b1729ba7baaeb743fc2dd4d24522d9d96ce75b26485",
+    "index_navigation_links_added_after_image_build": true
+  },
+  "isolation": {
+    "container_name": "freshretail-story-verify-20261011",
+    "network_mode": "none",
+    "host_mounts": [],
+    "container_user": "freshretail",
+    "uid": 1000,
+    "published_ports": [],
+    "raw_train_eval_in_image": false,
+    "original_services_not_started_or_replaced": true,
+    "canonical_host_outputs_not_copied_from_container": true
+  },
+  "checks": [
+    {
+      "name": "canonical_v2",
+      "command": [
+        "python",
+        "scripts/run_v2.py",
+        "--verify-only"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6819035419999864,
+      "output": "{'status': 'passed', 'models_checked': 17, 'oof_rows': 10920, 'test_rows': 2184, 'recommendation_rows': 2184, 'raw_sha256': {'train': '6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d', 'eval': '1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e'}, 'checked_utc': '2026-10-10T18:53:52.909672+00:00', 'retrained_here': False}\n"
+    },
+    {
+      "name": "validation_ablation",
+      "command": [
+        "python",
+        "scripts/run_story_ablation.py",
+        "--verify-only"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4434647509999934,
+      "output": "{\n  \"status\": \"passed\",\n  \"variants\": 7,\n  \"folds\": 5,\n  \"fitted_estimators\": 35,\n  \"validation_rows\": 10920,\n  \"final_period_scored\": false,\n  \"selected_model_changed\": false,\n  \"plan_sha256\": \"1c8123c527e951b7dd185e3737a40c5e8f76b532fa3b7b1e8a6a9693852bd5a9\"\n}\n"
+    },
+    {
+      "name": "policy_diagnostics",
+      "command": [
+        "python",
+        "scripts/build_story_diagnostics.py",
+        "--verify-only"
+      ],
+      "exit_code": 0,
+      "seconds": 1.3762971670000184,
+      "output": "{\"status\": \"passed\", \"scenarios\": 10, \"model_fits\": 0}\n"
+    },
+    {
+      "name": "eight_unit_tests",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 1.482514626000011,
+      "output": "test_invalid_predictions_not_used (test_v2_decisions.DecisionTests.test_invalid_predictions_not_used) ... ok\ntest_metric_calculation_rejects_nonfinite (test_v2_decisions.DecisionTests.test_metric_calculation_rejects_nonfinite) ... ok\ntest_milder_discount_wins_near_tie (test_v2_decisions.DecisionTests.test_milder_discount_wins_near_tie) ... ok\ntest_no_baseline_is_explicit_abstention (test_v2_decisions.DecisionTests.test_no_baseline_is_explicit_abstention) ... ok\ntest_no_evidence_of_inventory_age_forces_discount (test_v2_decisions.DecisionTests.test_no_evidence_of_inventory_age_forces_discount) ... ok\ntest_reference_disagreement_abstains (test_v2_decisions.DecisionTests.test_reference_disagreement_abstains) ... ok\ntest_stockout_requests_supply_review_not_automatic_full_price (test_v2_decisions.DecisionTests.test_stockout_requests_supply_review_not_automatic_full_price) ... ok\ntest_value_floor_survives_screening (test_v2_decisions.DecisionTests.test_value_floor_survives_screening) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.010s\n\nOK\n"
+    },
+    {
+      "name": "full_notebook",
+      "command": [
+        "python",
+        "scripts/execute_lisa_notebook.py"
+      ],
+      "exit_code": 0,
+      "seconds": 11.87979033900001,
+      "output": "[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.\n{'completed_utc': '2026-10-10T18:54:09.128115+00:00', 'notebook_sha256': 'da6853a588002c6ff0e02559969fc5269e5c9ef33ed43a7fda7179a779454441', 'builder_sha256': '3627b1d46f16da2b70f629d1b25ce82abdb1ce203184f8e1070ac2599c0ea5d9', 'helper_sha256': '7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca', 'cells': 89, 'code_cells': 31, 'executed_code_cells': 31, 'errors': 0, 'inline_images': 12, 'collapsible_code_blocks': 31, 'navigation_chapters': 18, 'live_demonstration_fits': 3, 'full_grid_retrained': False}\n"
+    },
+    {
+      "name": "poster_build",
+      "command": [
+        "python",
+        "scripts/build_v2_poster.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3495550829999843,
+      "output": "/app/poster/freshretail_group_q_A1.pdf\n"
+    }
+  ],
+  "runtime_environment": {
+    "python": "3.12.13",
+    "platform": "Linux-7.0.12-linuxkit-aarch64-with-glibc2.36",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "catboost": "1.2.10",
+    "pyarrow": "25.0.1",
+    "reportlab": "4.4.9"
+  },
+  "notebook": {
+    "input_total_cells": 89,
+    "input_code_cells": 31,
+    "completed_utc": "2026-10-10T18:54:09.128115+00:00",
+    "notebook_sha256": "da6853a588002c6ff0e02559969fc5269e5c9ef33ed43a7fda7179a779454441",
+    "builder_sha256": "3627b1d46f16da2b70f629d1b25ce82abdb1ce203184f8e1070ac2599c0ea5d9",
+    "helper_sha256": "7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca",
+    "cells": 89,
+    "code_cells": 31,
+    "executed_code_cells": 31,
+    "errors": 0,
+    "inline_images": 12,
+    "collapsible_code_blocks": 31,
+    "navigation_chapters": 18,
+    "live_demonstration_fits": 3,
+    "full_grid_retrained": false,
+    "source_cells_unchanged_by_execution": true
+  },
+  "poster": {
+    "sha256": "457e50b60d37b7f13b933d9659d397108dc8ca681058c966693c5370f39bc239",
+    "bytes": 47463,
+    "pages": 1,
+    "width_mm": 594.0001666666666,
+    "height_mm": 840.9999972222221,
+    "manifest": {
+      "format": "A1 portrait, one page",
+      "width_mm": 594,
+      "height_mm": 841,
+      "selected_model": "RF + validation best (25/75)",
+      "output": "freshretail_group_q_A1.pdf",
+      "output_sha256": "457e50b60d37b7f13b933d9659d397108dc8ca681058c966693c5370f39bc239",
+      "source_sha256": {
+        "results/v2/comparison.csv": "212f17b467481ba81b5b5a42ac3a19759375f0734cf0bfa8ce9e985fede419d8",
+        "results/v2/selection.json": "90e175436346a78370e146b47ec88e9f793aa29e4c16b8e71a1812aba3bfbf37",
+        "results/v2/policy_summary.json": "5a61768ad42b1ab9af17a6455c24572352a44a08c0c8219b5766521302094763",
+        "results/v2/recommendations.csv": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+        "results/v2/discount_response.csv": "f40755b3bb610d3a7252eaadf35e33fe0dfe600069a72f39657d8869f08f34de",
+        "results/v2/test_predictions.csv": "9ac3699b39fe582de8cc9606d4d44ad6835c3aaf7660e6fd222dee60c6d4c516",
+        "results/v2/validation_predictions.csv": "a8b2415f9508c5c6017c04e32d47096c0f1a6f6e05e551bc37f7a34a16feb8ac",
+        "results/v2/experiment_plan.json": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+        "results/v2/story_evidence.json": "d543a1c6c465290f2362147a1a86125f023e05f64448391fbc3aae039757a28b",
+        "results/v2_transfer/summary.csv": "7c1d99541e6f75f1a12a845a7594f9e7bce71e7c963a964eb02ee65fdfa1af2c",
+        "results/v2_transfer/run_receipt.json": "3676ea63a0c3d4419052572dbfe4efc019e023c81f2f87c17ae3eba1c58cd8bb",
+        "results/v2_transfer/experiment_plan.json": "e061c4f5a5f4513181a5f1e9d30cf2239611f0df320e30c3016d53fb254f513b"
+      },
+      "generator_sha256": "861f870eb642081e70812a5faff3d81a6de75cf74b5ac918782518de0af60f44",
+      "reportlab_version": "4.4.9",
+      "status": "generated; inspect rendered PDF before submission"
+    }
+  },
+  "canonical_inputs_unchanged_in_container": true,
+  "canonical_input_hashes_match_live_repository_after_run": true,
+  "protected_sha256": {
+    "results/v2/features.parquet": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "results/v2/experiment_plan.json": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+    "results/v2/selection.json": "90e175436346a78370e146b47ec88e9f793aa29e4c16b8e71a1812aba3bfbf37",
+    "results/v2/comparison.csv": "212f17b467481ba81b5b5a42ac3a19759375f0734cf0bfa8ce9e985fede419d8",
+    "results/v2/validation_predictions.csv": "a8b2415f9508c5c6017c04e32d47096c0f1a6f6e05e551bc37f7a34a16feb8ac",
+    "results/v2/test_predictions.csv": "9ac3699b39fe582de8cc9606d4d44ad6835c3aaf7660e6fd222dee60c6d4c516",
+    "results/v2/discount_response.csv": "f40755b3bb610d3a7252eaadf35e33fe0dfe600069a72f39657d8869f08f34de",
+    "results/v2/recommendations.csv": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+    "results/v2/policy_summary.json": "5a61768ad42b1ab9af17a6455c24572352a44a08c0c8219b5766521302094763",
+    "results/story_ablation/experiment_plan.json": "1c8123c527e951b7dd185e3737a40c5e8f76b532fa3b7b1e8a6a9693852bd5a9",
+    "results/story_ablation/summary.csv": "0b305e950ed36fb76358126907085b4a7b3e0c6d61f48754b64c1cb64687ca50",
+    "results/story_ablation/validation_predictions.csv": "e9e4deabf6bedc5ed87353014e1073d2131149736728243695e01ba6b3af9355",
+    "src/finalproject_pricingml/v2.py": "820af368255c8a0e86380b86a7b962bc92cf84682c5d30ad02eee3cefcb19970"
+  },
+  "container_exit_code": 0,
+  "started_utc": "2026-10-10T18:53:51.363793+00:00",
+  "completed_utc": "2026-10-10T18:54:09.605611+00:00",
+  "verification_boundaries": [
+    "Network disabled for every runtime check; image construction used existing dependency layers and can require network on a new machine.",
+    "Three worked-example models were fitted inside the notebook. The canonical 66-fit grid and 35-fit explanatory ablation were not repeated by this Docker check.",
+    "Docker-generated notebook HTML, notebook execution outputs and PDF remained inside the isolated container; canonical repository outputs were not overwritten.",
+    "Poster generation, PDF page count and A1 portrait dimensions were checked. Rendered visual review and browser/UI review are separate checks owned by the main task.",
+    "Root docs/REFINEMENT_VERIFICATION.json was produced after this image build; the new Docker receipt is likewise external verification metadata, not claimed present in the already-built image.",
+    "The main task added index.html navigation links after this build. Those static link edits are outside this image snapshot; algorithm, notebook source, saved predictions and executed checks were unchanged."
+  ]
+}
