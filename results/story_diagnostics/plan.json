@@ -1,0 +1,84 @@
+{
+  "created_utc": "2026-10-10T18:46:27.499150+00:00",
+  "base_parameters": {
+    "min_support_days": 3,
+    "support_width": 0.025,
+    "min_sales_gain": 0.05,
+    "min_value_share": 0.95,
+    "near_optimal_sales_tolerance": 0.01,
+    "stockout_hours_review_threshold": 1,
+    "agreement": "selected model, teammate RF and teammate CatBoost"
+  },
+  "scenarios": [
+    {
+      "name": "Saved policy",
+      "changed_parameters": {}
+    },
+    {
+      "name": "Sales gain >=10%",
+      "changed_parameters": {
+        "min_sales_gain": 0.1
+      }
+    },
+    {
+      "name": "Sales gain >=20%",
+      "changed_parameters": {
+        "min_sales_gain": 0.2
+      }
+    },
+    {
+      "name": "Value floor >=100%",
+      "changed_parameters": {
+        "min_value_share": 1.0
+      }
+    },
+    {
+      "name": "Value floor >=105%",
+      "changed_parameters": {
+        "min_value_share": 1.05
+      }
+    },
+    {
+      "name": "Support >=5 days",
+      "changed_parameters": {
+        "min_support_days": 5
+      }
+    },
+    {
+      "name": "Support >=10 days",
+      "changed_parameters": {
+        "min_support_days": 10
+      }
+    },
+    {
+      "name": "Milder within 5%",
+      "changed_parameters": {
+        "near_optimal_sales_tolerance": 0.05
+      }
+    },
+    {
+      "name": "Review at >=4h stockout",
+      "changed_parameters": {
+        "stockout_hours_review_threshold": 4
+      }
+    },
+    {
+      "name": "Review at >=8h stockout",
+      "changed_parameters": {
+        "stockout_hours_review_threshold": 8
+      }
+    }
+  ],
+  "purpose": "Describe rule sensitivity without selecting a policy from hypothetical gains.",
+  "default_policy_changed": false,
+  "model_fits": 0,
+  "observed_policy_outcomes": false,
+  "inputs_sha256": {
+    "results/v2/features.parquet": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "results/v2/discount_response.csv": "f40755b3bb610d3a7252eaadf35e33fe0dfe600069a72f39657d8869f08f34de",
+    "results/v2/recommendations.csv": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+    "results/v2/experiment_plan.json": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+    "src/finalproject_pricingml/v2.py": "820af368255c8a0e86380b86a7b962bc92cf84682c5d30ad02eee3cefcb19970"
+  },
+  "script_sha256": "50432d7e29cbd2fd08fc9d2307c6efce07b4a8499c6ba06ddd88ae2b436ff0e8"
+}

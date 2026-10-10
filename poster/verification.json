@@ -1,0 +1,21 @@
+{
+  "checked_at_hong_kong": "2026-10-11T02:43:07.314988+08:00",
+  "status": "passed",
+  "design": "Business-first illustrated editorial poster; compact three-method chart",
+  "pages": 1,
+  "width_mm": 594.0001666666666,
+  "height_mm": 840.9999972222221,
+  "embedded_text_fonts": {
+    "/AAAAAA+BitstreamVeraSans-Bold": true,
+    "/AAAAAA+BitstreamVeraSans-Roman": true
+  },
+  "pdf_sha256": "f0642a92cbaeaf533f261c4328ecaf72f0b0a784f3871875ef4bd0482224e1e5",
+  "source_hashes_match": true,
+  "cohort_funnel_and_current_results_checked": true,
+  "real_case_and_transfer_failure_checked": true,
+  "unsupported_glyphs_in_extracted_text": false,
+  "rendered_preview": "freshretail_group_q_A1_preview.png",
+  "visual_review": "Latest 2200-pixel render inspected: no clipping, overlap or missing glyphs. Main explanatory text is 22-28pt, with smaller labels and footnotes.",
+  "scope": "Poster format and saved-source consistency; no model training or policy validation performed.",
+  "submitted": false
+}

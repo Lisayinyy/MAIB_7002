@@ -1,0 +1,26 @@
+name: Reproduce V2 delivery checks
+on:
+  push:
+    branches: [codex/freshretail-review-v2]
+  pull_request:
+    branches: [pricing-ml-ap]
+jobs:
+  docker-offline-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the pinned environment
+        run: docker build -t freshretail-v2-ci .
+      - name: Verify saved experiments without network or raw files
+        run: docker run --rm --network none freshretail-v2-ci python scripts/run_v2.py --verify-only
+      - name: Verify controlled experiments and policy sensitivity
+        run: |
+          docker run --rm --network none freshretail-v2-ci python scripts/run_story_ablation.py --verify-only
+          docker run --rm --network none freshretail-v2-ci python scripts/build_story_diagnostics.py --verify-only
+      - name: Exercise decision failures and fallbacks
+        run: docker run --rm --network none freshretail-v2-ci python -m unittest discover -s tests -v
+      - name: Execute the notebook and live example without external data
+        run: docker run --rm --network none freshretail-v2-ci python scripts/execute_lisa_notebook.py
+      - name: Rebuild the poster from saved evidence
+        run: docker run --rm --network none freshretail-v2-ci python scripts/build_v2_poster.py
