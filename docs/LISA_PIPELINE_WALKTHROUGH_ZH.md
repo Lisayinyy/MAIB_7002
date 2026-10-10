@@ -1,5 +1,7 @@
 # Lisa 的 V2 pipeline：自己的思路、代码与实际结果
 
+第一次了解项目，建议先读 [英文故事版 notebook](../02_lisa_pipeline.ipynb)：正文从经理的问题、公开数据和五家门店的筛选讲起，再走到预测、具体折扣与失败案例；算法细节和完整结果移到技术附录。本指南保留为源码逐行阅读的配套材料。叙述改写沿用相同实验结果，没有重新调参。
+
 这份指南解释 `src/finalproject_pricingml/v2.py` 和 `results/v2/` 的已完成运行。队友原版的逐行说明另见 [TEAMMATE_CODE_WALKTHROUGH_ZH.md](TEAMMATE_CODE_WALKTHROUGH_ZH.md)。本文中的结果读取自本次V2保存文件，教学解释不会伪装成新实验。运行回执记录66次模型拟合、10,920条OOF预测、2,184条后期基准预测和2,184条推荐/复核记录。
 
 本文行号对应阅读时的V2源码（`run`函数位于403行），后续编辑可能移动行号。运行证据以 `experiment_plan.json → selection.json → comparison.csv → run_receipt.json` 为准。本版本仍使用已经查看过的历史基准周，不是全新、从未见过的外部测试。可直接打开[源码](../src/finalproject_pricingml/v2.py)，重点读[特征](../src/finalproject_pricingml/v2.py#L98)、[验证](../src/finalproject_pricingml/v2.py#L171)和[推荐逻辑](../src/finalproject_pricingml/v2.py#L285)。

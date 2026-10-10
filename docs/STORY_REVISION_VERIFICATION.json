@@ -1,0 +1,82 @@
+{
+  "revision": "Business-first notebook narrative; existing experiment preserved",
+  "verified_at_utc": "2026-10-10T01:29:17.778411+00:00",
+  "previous_delivery_commit": "cacfe48c067d5bf5ef1a04a6d483188dae394bde",
+  "scope": "47 notebook cells; business motivation, exact five-store funnel, forecast-to-decision story, real recommendation and limitations; technical appendix retained.",
+  "notebook_execution": {
+    "total_cells": 47,
+    "code_cells": 16,
+    "executed_code_cells": 16,
+    "errors": 0,
+    "inline_images": 3,
+    "collapsible_code_blocks": 16,
+    "code_execution_counts_in_order": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "generator_sources_match": true,
+    "full_experiment_rerun": false,
+    "live_example_fits": 2
+  },
+  "docker_offline": {
+    "image_id": "sha256:528b043da8d5d71e4cdfc7bb9d51b5b71e56e9512116afed6e8271877c305efb",
+    "platform": "linux/arm64",
+    "network": "none",
+    "raw_data_mounted": false,
+    "command": "docker run --rm --network none freshretail-lisa:local python scripts/execute_lisa_notebook.py",
+    "exit_code": 0,
+    "executed_code_cells": 16,
+    "errors": 0,
+    "inline_images": 3,
+    "collapsible_code_blocks": 16
+  },
+  "browser": {
+    "url": "http://localhost:19080/results/v2/02_lisa_pipeline.html",
+    "title": "Should we discount tomorrow? — FreshRetail project story",
+    "first_screen_business_before_code": true,
+    "selection_funnel_and_five_store_counts_visible": true,
+    "all_three_images_loaded": true,
+    "code_expand_and_collapse_verified": true,
+    "real_case_table_and_plot_visible": true,
+    "case_recommends": "10% off (price rate 0.90)",
+    "running_lab_and_report_story_files_updated": true,
+    "services_restarted": false,
+    "previous_lab_notebook_sources_equal_previous_commit": true
+  },
+  "unchanged_experiment_sha256": {
+    "src/finalproject_pricingml/v2.py": "820af368255c8a0e86380b86a7b962bc92cf84682c5d30ad02eee3cefcb19970",
+    "src/finalproject_pricingml/data.py": "30826ef542cd0f40daa2fcb27684d9bcafc8585f07f582d19ba20ac7ce7f76a4",
+    "src/finalproject_pricingml/config.py": "09d0b7570702345200772acd39ac96a099b881dda20468a4927db46ab8d32f94",
+    "results/v2/comparison.csv": "212f17b467481ba81b5b5a42ac3a19759375f0734cf0bfa8ce9e985fede419d8",
+    "results/v2/test_predictions.csv": "9ac3699b39fe582de8cc9606d4d44ad6835c3aaf7660e6fd222dee60c6d4c516",
+    "results/v2/selection.json": "90e175436346a78370e146b47ec88e9f793aa29e4c16b8e71a1812aba3bfbf37",
+    "results/v2/features.parquet": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "results/v2/discount_response.csv": "f40755b3bb610d3a7252eaadf35e33fe0dfe600069a72f39657d8869f08f34de",
+    "results/v2/recommendations.csv": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+    "results/v2/policy_summary.json": "5a61768ad42b1ab9af17a6455c24572352a44a08c0c8219b5766521302094763"
+  },
+  "narrative_sha256": {
+    "scripts/build_lisa_notebook.py": "c96206bfcae1434bf243707d29c850d6dac0301d04539fa9b30ea13e1939e2cb",
+    "scripts/execute_lisa_notebook.py": "eede5cdfcc341e9cbf0c64c4accdf388775c57ef524ab531b8ca8fe6471abfe0",
+    "scripts/build_story_evidence.py": "db66592b5b4223aa2cf5ebae599b467375fdfea25dd4b8e7bc2ec4ceee8da3bb",
+    "results/v2/story_evidence.json": "d543a1c6c465290f2362147a1a86125f023e05f64448391fbc3aae039757a28b",
+    "02_lisa_pipeline.ipynb": "dbc3d9b16a3f23d1399b5941a79d0e1c9195ee1d32bc74df3caf446b94a3e90d",
+    "results/v2/02_lisa_pipeline.html": "eb51faca5492fac1a7c306550f4faf90b36f1c8f53e9ce04a1ec735c475247ff"
+  },
+  "review": "Independent read-only narrative, data selection and scenario audits passed. The previous technical delivery receipts remain historical.",
+  "limitation": "Historical observational benchmark and previously viewed final period; no new causal, revenue, profit or waste-effect evidence."
+}

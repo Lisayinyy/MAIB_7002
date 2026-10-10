@@ -10,7 +10,7 @@ This branch extends Aashish's `pricing-ml-ap` commit `5b52099ab73e57c5afbb1915d0
 
 1. **Learn the teammate version:** [逐行代码讲解](docs/TEAMMATE_CODE_WALKTHROUGH_ZH.md).
 2. **Understand Lisa's logic:** [新版 pipeline 及答辩准备](docs/LISA_PIPELINE_WALKTHROUGH_ZH.md).
-3. **Read the executed notebook:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [HTML export](results/v2/02_lisa_pipeline.html).
+3. **Read the project story:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [executed HTML report](results/v2/02_lisa_pipeline.html). The narrative starts with the manager's decision, explains the data and five-store selection, and follows the forecast through to an actual discount recommendation. Python is expandable in HTML; model mechanics and full tables are in the technical appendix.
 4. **Review the A1 poster:** [single-page portrait PDF](poster/freshretail_group_q_A1.pdf), [preview](poster/freshretail_group_q_A1_preview.png), [editable generator](scripts/build_v2_poster.py).
 5. **Check submission requirements:** [brief checklist](docs/assignment_requirements.md) and [personal contribution/AI declarations](docs/CONTRIBUTIONS_TEMPLATE.md). Each member must complete and confirm their own paragraph.
 
@@ -52,6 +52,8 @@ docker compose exec lab python scripts/download_public_data.py
 docker compose exec lab python scripts/run_v2.py
 # Repeat the locked transfer check without retuning; --force explicitly replaces that run's outputs.
 docker compose exec lab python scripts/run_v2_transfer_check.py --force
+# Rebuild the selection funnel and scenario diagnostics against the new output hashes.
+docker compose exec lab python scripts/build_story_evidence.py
 # Update notebook output and poster after results change.
 docker compose exec lab python scripts/execute_lisa_notebook.py
 docker compose exec lab python scripts/build_v2_poster.py
@@ -108,6 +110,8 @@ The thresholds are illustrative, not learned business optima. MAE training targe
 - `scripts/audit_teammate_saved_results.py`, `docs/*audit*.json`: independent numerical and feature-timing checks.
 - `tests/test_v2_decisions.py`: support, value-floor, abstention and near-tie edge cases.
 - `scripts/build_lisa_notebook.py`, `scripts/build_v2_poster.py`: editable artifact generators.
+- `scripts/build_story_evidence.py`, `results/v2/story_evidence.json`: independently rebuilt selection-funnel counts and diagnostics from saved discount scenarios; no new model fitting. The narrative revision preserves the existing model scores and selection.
+- [Story revision verification](docs/STORY_REVISION_VERIFICATION.json): all 16 code cells executed on the host and in an offline Docker container; three figures and expandable Python verified in the report browser.
 - `DATA_LICENSE.md`: FreshRetailNet attribution. No raw data or login tokens are committed.
 
 Generative AI assisted substantially with this extension's code, review, experiments and presentation materials. Automated checks have been run; they do not replace each member's personal understanding, contribution declaration and final review. The group brief requires a one-page A1 portrait poster, runnable Docker project and personal declarations by the end of **14 October 2026**.

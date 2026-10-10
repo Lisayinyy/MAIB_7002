@@ -1,5 +1,7 @@
 # Final independent handoff review
 
+This is the review of the earlier technical delivery. The later business-first narrative revision expands the notebook to 47 cells (16 code cells); its current execution and browser checks are recorded separately in `STORY_REVISION_VERIFICATION.json`. Earlier cell counts and delivery snapshots below remain a historical record.
+
 Reviewed on 10 October 2026 (Hong Kong). Scope: README, the new notebook and its generator, Docker configuration, frozen V2/transfer outputs, artifact links, and the supplied project-brief checklist. This review changes no implementation or experiment result.
 
 **Technical handoff passes: the analysis, teaching artifacts and recorded Docker checks are ready for group review, and the implementation branch is published and independently read back. A final documentation commit follows this review. Formal assignment submission additionally requires each member's personal contribution/AI declaration and human review.**
