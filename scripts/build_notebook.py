@@ -193,6 +193,26 @@ display(data.split_summary(feat))
 """)
 
 md(r"""
+### When does each model learn, and when is it evaluated?
+
+The fitting window grows before each validation week. The final model uses all training-period rows, then makes daily next-day predictions during the test week. This timeline shows the dates and row counts behind the split table.
+""")
+
+code(r"""
+from finalproject_pricingml import evaluation_visuals as evaluation_viz
+
+fig, timeline = evaluation_viz.split_timeline(feat)
+fig.savefig(VISUALS / "evaluation_timeline.png", dpi=180, bbox_inches="tight")
+timeline.to_csv(VISUALS / "evaluation_timeline.csv", index=False)
+display(fig)
+plt.close(fig)
+""")
+
+md(r"""
+**Takeaway.** Every validation prediction is evaluated on dates later than the rows used to fit that fold's model. The final model is fitted before the test week; observed earlier test days can supply the historical features for later next-day predictions. This is not a single seven-day-ahead forecast. The test week has already been viewed during development, so it is a shared benchmark rather than a new untouched holdout.
+""")
+
+md(r"""
 **Why not random splits.** Neighbouring days of the same product share most of their history, so random splits put near-copies on both sides and flatter the model. Mean kNN MAE over five rounds, all 13 original features (one-off check, not scripted):
 
 | k | Time-ordered | Random, no overlap | Random with replacement |
@@ -774,6 +794,24 @@ for name, rec in recs.items():
 """)
 
 md(r"""
+### How much historical evidence supports the response curve?
+
+The upper panel compares the same prediction cases under every candidate price. Each line is the **mean prediction divided by the mean prediction at full price**, not an average of individual percentage gains. The lower panel asks a different question: what share of store-product histories has enough training observations near that candidate?
+""")
+
+code(r"""
+fig, response_evidence = evaluation_viz.response_and_support(response, support)
+fig.savefig(VISUALS / "discount_response_and_support.png", dpi=180, bbox_inches="tight")
+response_evidence.to_csv(VISUALS / "discount_response_and_support.csv", index=False)
+display(fig)
+plt.close(fig)
+""")
+
+md(r"""
+**Takeaway.** The model predicts stronger sales under deep discounts, just where fewer product histories support those prices. This is why the decision rule restricts candidates to each product's history. Historical support reduces extrapolation; it does not remove the effects of managers choosing when to discount, or establish that a new discount would cause the predicted increase.
+""")
+
+md(r"""
 **Reading the tables.**
 
 - **The model wants a discount almost every day.** Both rules recommend one on more than 98% of days, including 98% of the days on which the manager chose none (Table 3, bottom row). The predicted lift at the recommended discount averages 44–51% over no discount.
@@ -928,6 +966,28 @@ so = train.stockout_hours_t[train.stockout_hours_t > 0]
 print(f"Training days with a stockout: {len(so):,} ({len(so) / len(train):.0%}); median stockout hours on those days: {so.median():.0f} of 16")
 print("\nTable 13. Unit cost and minimum gain (sold out = 1 stockout hour)")
 display(pd.DataFrame([policy_summary(1, c, g) for c in [0.0, 0.5, 0.7] for g in [0.0, 0.05, 0.10]]).set_index(["unit cost", "min gain"]).drop(columns="sold-out hours").round(1))
+""")
+
+md(r"""
+### How much do the business assumptions change the policy?
+
+Hold the stockout threshold at one hour and vary the two financial assumptions in Table 13. Each cell reports the share of the same test-week cases that receives a discount. Cost is a **hypothetical fraction of the regular price**; the minimum-gain hurdle compares predicted value with the full-price option when that option remains available.
+""")
+
+code(r"""
+policy_grid = pd.DataFrame([policy_summary(1, cost, gain)
+                           for cost in [0.0, 0.5, 0.7]
+                           for gain in [0.0, 0.05, 0.10]])
+policy_grid["cases"] = len(test)
+fig, policy_pivot = evaluation_viz.policy_sensitivity(policy_grid)
+fig.savefig(VISUALS / "policy_sensitivity.png", dpi=180, bbox_inches="tight")
+policy_grid.to_csv(VISUALS / "policy_sensitivity.csv", index=False)
+display(fig)
+plt.close(fig)
+""")
+
+md(r"""
+**Takeaway.** The recommended discount share depends substantially on the assumed cost and required gain. There is no single best cell in this chart: it describes policy sensitivity, not observed profitability. A manager would need actual unit costs and a business objective to choose these settings. The minimum-gain hurdle does not apply where the stock rule has already removed the full-price option.
 """)
 
 md(r"""

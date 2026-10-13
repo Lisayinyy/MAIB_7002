@@ -1,14 +1,15 @@
 {
-  "checked_at_utc": "2026-10-13T11:16:03.638793+00:00",
+  "checked_at_utc": "2026-10-13T11:27:59.329083+00:00",
   "base_branch": "pricing-ml-ap",
   "base_commit": "5b52099ab73e57c5afbb1915d0bc4a0adbde9032",
   "branch": "codex/freshretail-final-visuals",
   "execution": "All cells executed top to bottom with RERUN_TUNING=False; final models refitted; saved tuning grids reused.",
-  "cells": 73,
-  "executed_code_cells": 34,
+  "cells": 82,
+  "executed_code_cells": 37,
   "error_outputs": 0,
-  "embedded_figures": 9,
+  "embedded_figures": 12,
   "original_cells_preserved_in_order": 65,
+  "previous_visual_edition_commit": "e2e344f0f34551a421ec8adb89b4ed76255999a2",
   "original_model_data_and_policy_modules_unchanged": true,
   "baseline_comparison": {
     "test_summary.csv": {
@@ -17,7 +18,7 @@
     },
     "test_predictions.csv": {
       "rows": 2184,
-      "max_absolute_difference": 0.0
+      "max_absolute_difference": 1.7763568394002505e-15
     }
   },
   "prediction_csv_note": "Original CSV bytes retained after confirming rerun differences below 1e-12.",
@@ -50,15 +51,18 @@
     "catboost": "1.2.10",
     "nbclient": "0.11.0"
   },
-  "notebook_sha256": "dad099768d0a9cc5b4a444a8fbeb07c79f1ab011d4bd4d99af4be034ec182bac",
+  "notebook_sha256": "38832067441ee6862ab7fe6fec19c3039458831c1216d34f808d9801305c181c",
   "raw_sha256": {
     "train.parquet": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
     "eval.parquet": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e"
   },
-  "visual_checks": "All three exported figures visually inspected; case footer spacing corrected and notebook re-executed.",
+  "visual_checks": "All six added figures visually inspected; original charts retained; notebook executed top to bottom.",
   "figure_sha256": {
     "sample_selection.png": "ffa6da7f851d30e18d5a65be9b1629764ef3cbcba6937bb5254ae8487a672f6a",
     "one_product_discount_decision.png": "8e2117719723ddb5d90886cdc0c40f0d4842fa4a7c358dac809b8832580a4068",
-    "recommendation_distribution.png": "3ab23d1b054fc4c9a50f66cf23ea37697666006a3d7042b02d1e95d54255eea0"
+    "recommendation_distribution.png": "3ab23d1b054fc4c9a50f66cf23ea37697666006a3d7042b02d1e95d54255eea0",
+    "policy_sensitivity.png": "53ad10c732c3b12b88454ac6236b8275fdec5764aedeb00f497d67fc852c8748",
+    "discount_response_and_support.png": "9897f89ed6d66645a26f72541d4f02047906ec54371dd8680528029c36e4b9aa",
+    "evaluation_timeline.png": "4bfdc7f346d31c9c97c133a25db3f8ebf6266ee21809c221dfee1319bf780556"
   }
 }
