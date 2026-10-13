@@ -1,0 +1,31 @@
+{
+  "final_notebook_commit": "a7e26dd979af88b4c14f98a7f029f6a64bffaedf",
+  "final_notebook_url": "https://github.com/Lisayinyy/MAIB_7002/blob/a7e26dd979af88b4c14f98a7f029f6a64bffaedf/discount_sales_prediction.ipynb",
+  "paper": {
+    "width_mm": 594,
+    "height_mm": 841,
+    "orientation": "portrait",
+    "pages": 1
+  },
+  "group": "Q",
+  "members": [
+    "Aashish Omprakash Pareek",
+    "Yuanyuan Yin",
+    "Lingyu Chen"
+  ],
+  "mae": 0.28923224366438466,
+  "rmse": 0.4592618239665576,
+  "baseline_mae": 0.3141849816849817,
+  "mae_reduction_percent": 7.942053081842082,
+  "selection": "50/50 for simplicity within a flat validation weight range; not the exact minimum",
+  "source_file_hashes": {
+    "results/test_summary.csv": "1de8d62040251f0672bdd0ec23bf9d702d09adf650ff418a114a4223369c0b97",
+    "results/ensemble_weight_sweep.csv": "12e1d2828134c8df68ef21b6eba1d29df884aa5054b0a9651ab1abd2c20a07ba",
+    "results/visuals/one_product_discount_decision.csv": "0c11efe47a2739c815a5cf872ee9f6d646a0d5b0be36f99f0681ed5de0f0177c",
+    "results/visuals/sample_selection.csv": "06940658ef6247f86053c40016e1a18fdf2fa339b5e154cea50f94bff7d49178",
+    "results/visuals/recommendation_distribution.csv": "4b4ad8ff82f62857cc8417581bab3f89b7f5de3db17442592097202638b2842c"
+  },
+  "poster_pdf_sha256": "6afbaeeee39946850ea070dbe5121730cda6b8f49c5b799b307def1a108060a7",
+  "claims": "Forecast accuracy and model scenarios only; no causal sales, revenue or waste benefit established.",
+  "example": "First date/store/product with model-decides state and at least two supported rates including full price."
+}

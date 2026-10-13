@@ -19,6 +19,10 @@ The figures are embedded in the notebook. Separate PNGs and the plotted data are
 
 ## Layout
 
+The print-ready [A1 portrait poster](output/pdf/freshretail_a1_poster.pdf) and its
+[preview and source notes](output/pdf/README.md) present the final 50/50 model,
+the discount-decision experiment and the project limitations.
+
 | Path | What |
 |---|---|
 | `discount_sales_prediction.ipynb` | The presentation notebook |
