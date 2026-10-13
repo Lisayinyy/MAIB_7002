@@ -1,0 +1,7 @@
+strategy,band,count,cases,percent,discount_share_percent
+Supported model only,Full price,38,2184,1.73992673992674,98.26007326007326
+Supported model only,Moderate discount,1441,2184,65.97985347985347,98.26007326007326
+Supported model only,Deep discount,705,2184,32.28021978021978,98.26007326007326
+With stock rules,Full price,983,2184,45.00915750915751,54.990842490842496
+With stock rules,Moderate discount,799,2184,36.58424908424908,54.990842490842496
+With stock rules,Deep discount,402,2184,18.40659340659341,54.990842490842496

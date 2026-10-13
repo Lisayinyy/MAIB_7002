@@ -4,6 +4,16 @@ HKU MAIB 7002 final project. Should a category manager discount a perishable pro
 
 **Start with the notebook:** [`discount_sales_prediction.ipynb`](discount_sales_prediction.ipynb). It walks through the data, the feature design, each model's tuning, the decisions taken, and the comparison on an unseen week. GitHub renders it with all outputs, so nothing needs to be installed to read it.
 
+## Visual edition
+
+This independent branch, `codex/freshretail-final-visuals`, adds three figures to the `pricing-ml-ap` notebook (base commit `5b52099`). It keeps the same features, model settings, 50/50 Random Forest + CatBoost ensemble, evaluation periods and stock rules.
+
+- **Section 3 — sample selection:** shows the sequential filters from the full dataset to the five-store cohort. Counts are recalculated from the raw training file.
+- **Section 16 — recommendations before and after stock rules:** compares price-band shares over the same test-week cases.
+- **Section 16 — one product's decision:** shows predicted sales, the sales-value proxy, historical support and the selected candidate. The example is chosen by date/store/product order, not by its predicted gain.
+
+The figures are embedded in the notebook. Separate PNGs and the plotted data are in [`results/visuals/`](results/visuals/). They are regenerated when the notebook runs. The original model-comparison figure is retained. Scenario figures describe predictions and policy choices, not observed causal sales or revenue gains.
+
 ## Layout
 
 | Path | What |

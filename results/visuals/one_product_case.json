@@ -1,0 +1,13 @@
+{
+  "store_id":18,
+  "product_id":11,
+  "target_date":"2024-06-26",
+  "chosen_rate":0.95,
+  "chosen_percent_off":5.0,
+  "stockout_hours_t":0.0,
+  "stockout_days7":2,
+  "decided_by":"model",
+  "objective":"maximum predicted sales-value proxy",
+  "selection":"First date\/store\/product with model-decides state and at least two supported rates including full price",
+  "support_rule":"At least 3 training days within \u00b10.025 of the candidate rate"
+}

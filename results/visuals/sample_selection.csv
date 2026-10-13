@@ -1,0 +1,6 @@
+stage,histories,rule,retained_from_previous_pct
+All histories,50000,One history per store-product pair,100.0
+Discount variation,28219,15%–85% of days with a discount,56.438
+Repeated changes,17693,At least 6 switches in discount status,62.69889081824303
+Regular sales,16684,Zero-sales days below 20%,94.29717967557791
+Selected cohort,312,Top 5 stores by eligible histories,1.8700551426516423

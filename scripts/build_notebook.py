@@ -99,6 +99,32 @@ print(f"Working set: {len(selected)} series, {selected.product_id.nunique()} pro
 """)
 
 md(r"""
+### How we reach the five-store sample
+
+The selection below applies the same rules as the model pipeline, in order. Counts refer to **store-product histories**, not daily rows. We keep histories with enough discount variation and few zero-sales days, then choose the five stores with the most eligible histories. City is not a selection rule.
+""")
+
+code(r"""
+%matplotlib inline
+import matplotlib.pyplot as plt
+from finalproject_pricingml import decision_visuals as visuals
+
+VISUALS = C.RESULTS / "visuals"
+VISUALS.mkdir(parents=True, exist_ok=True)
+series_audit, store_audit, selected_audit = data.select_series()
+assert set(map(tuple, selected[C.KEY].to_numpy())) == set(selected_audit.index), "Selection differs from the model sample"
+fig, selection_steps = visuals.selection_funnel(series_audit, selected)
+fig.savefig(VISUALS / "sample_selection.png", dpi=180, bbox_inches="tight")
+selection_steps.to_csv(VISUALS / "sample_selection.csv", index=False)
+display(fig)
+plt.close(fig)
+""")
+
+md(r"""
+**Takeaway.** The final 312 histories provide repeated daily observations of 122 products across five stores. They are a focused sample for this experiment, not a representative sample of all 898 stores. The filters use the full original training period, including the validation dates, so this is a retrospective cohort.
+""")
+
+md(r"""
 ## 4. Does discount carry signal?
 
 Before modelling: do deeper discounts go with higher sales in these series? Sales are expressed relative to each series' own average so that products of different size can be pooled.
@@ -839,6 +865,42 @@ display((pd.DataFrame({"Manager": versus(test.discount_next.values).value_counts
                        "Without rules": versus(unguarded.discount.values).value_counts(normalize=True),
                        "With stock rules": versus(guarded.discount.values).value_counts(normalize=True)}).reindex(["continue", "deepen", "lighten", "stop"]).T * 100).round(1))
 print(f"Days with a discount running: {running_test.sum():,}, of which sold out today: {(guarded.state[running_test.values] == scenario.STATES[0]).mean():.0%}")
+""")
+
+md(r"""
+### What changes when we add the stock rules?
+
+Both bars use the same test-week store-product-days and the same historically supported candidates. Only the stock rules change. Here **full price means exactly 1.00**; moderate discounts are above 0.80 and below 1.00, and deep discounts are 0.80 or lower. These are recommendation shares, not measured sales gains.
+""")
+
+code(r"""
+fig, recommendation_shares = visuals.recommendation_distribution(unguarded, guarded)
+fig.savefig(VISUALS / "recommendation_distribution.png", dpi=180, bbox_inches="tight")
+recommendation_shares.to_csv(VISUALS / "recommendation_distribution.csv", index=False)
+display(fig)
+plt.close(fig)
+""")
+
+md(r"""
+**Takeaway.** Historical support alone still permits a discount on almost every day. The stock rules make the recommendation more selective. This demonstrates how the policy changes; it does not establish that the revised policy improves revenue or waste. Stockout history does not reveal inventory age or tomorrow's freshness.
+
+### One product, one day: how do we choose the discount?
+
+To make the decision concrete, take the first case sorted by date, store and product where the stock rules leave the choice to the model and at least two rates (including full price) have historical support. We do not select the case by its predicted gain or actual sales. The model compares candidates using the same **50/50 Random Forest + CatBoost** ensemble; the chosen candidate maximises predicted sales multiplied by its price rate, among allowed rates.
+""")
+
+code(r"""
+fig, case_candidates, case_info = visuals.discount_case(response, supported, test, train)
+fig.savefig(VISUALS / "one_product_discount_decision.png", dpi=180, bbox_inches="tight")
+case_candidates.to_csv(VISUALS / "one_product_discount_decision.csv", index=False)
+pd.Series(case_info).to_json(VISUALS / "one_product_case.json", indent=2)
+display(fig)
+plt.close(fig)
+display(case_candidates.round(4))
+""")
+
+md(r"""
+**Takeaway.** The highest predicted sales need not give the highest sales-value proxy: a deeper discount also lowers the price rate. Grey candidates are excluded and the amber marker identifies the actual policy choice. The sales axis is normalised; the value proxy is not currency, measured profit or a proven causal effect.
 """)
 
 md(r"""

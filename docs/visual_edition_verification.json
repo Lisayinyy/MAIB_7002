@@ -1,0 +1,64 @@
+{
+  "checked_at_utc": "2026-10-13T11:16:03.638793+00:00",
+  "base_branch": "pricing-ml-ap",
+  "base_commit": "5b52099ab73e57c5afbb1915d0bc4a0adbde9032",
+  "branch": "codex/freshretail-final-visuals",
+  "execution": "All cells executed top to bottom with RERUN_TUNING=False; final models refitted; saved tuning grids reused.",
+  "cells": 73,
+  "executed_code_cells": 34,
+  "error_outputs": 0,
+  "embedded_figures": 9,
+  "original_cells_preserved_in_order": 65,
+  "original_model_data_and_policy_modules_unchanged": true,
+  "baseline_comparison": {
+    "test_summary.csv": {
+      "rows": 6,
+      "max_absolute_difference": 0.0
+    },
+    "test_predictions.csv": {
+      "rows": 2184,
+      "max_absolute_difference": 0.0
+    }
+  },
+  "prediction_csv_note": "Original CSV bytes retained after confirming rerun differences below 1e-12.",
+  "selection_counts": [
+    50000,
+    28219,
+    17693,
+    16684,
+    312
+  ],
+  "test_cases": 2184,
+  "case": {
+    "store_id": 18,
+    "product_id": 11,
+    "target_date": "2024-06-26",
+    "chosen_rate": 0.95,
+    "chosen_percent_off": 5.0,
+    "stockout_hours_t": 0.0,
+    "stockout_days7": 2,
+    "decided_by": "model",
+    "objective": "maximum predicted sales-value proxy",
+    "selection": "First date/store/product with model-decides state and at least two supported rates including full price",
+    "support_rule": "At least 3 training days within \u00b10.025 of the candidate rate"
+  },
+  "versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2",
+    "scikit-learn": "1.9.1",
+    "catboost": "1.2.10",
+    "nbclient": "0.11.0"
+  },
+  "notebook_sha256": "dad099768d0a9cc5b4a444a8fbeb07c79f1ab011d4bd4d99af4be034ec182bac",
+  "raw_sha256": {
+    "train.parquet": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "eval.parquet": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e"
+  },
+  "visual_checks": "All three exported figures visually inspected; case footer spacing corrected and notebook re-executed.",
+  "figure_sha256": {
+    "sample_selection.png": "ffa6da7f851d30e18d5a65be9b1629764ef3cbcba6937bb5254ae8487a672f6a",
+    "one_product_discount_decision.png": "8e2117719723ddb5d90886cdc0c40f0d4842fa4a7c358dac809b8832580a4068",
+    "recommendation_distribution.png": "3ab23d1b054fc4c9a50f66cf23ea37697666006a3d7042b02d1e95d54255eea0"
+  }
+}
