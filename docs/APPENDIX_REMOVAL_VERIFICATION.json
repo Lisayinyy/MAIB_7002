@@ -1,0 +1,25 @@
+{
+  "completed_utc": "2026-10-13T09:23:06.861324+00:00",
+  "scope": "Remove all technical appendices and stale references; retain sections 1-14.",
+  "source_notebook_sha256": "3b9cec6439c321e039c4e102788b213df346849aef2fcbc7f01652d216cb7ce7",
+  "removed_cells": 15,
+  "cells": 83,
+  "code_cells": 29,
+  "inline_images": 15,
+  "navigation_chapters": 14,
+  "retained_outputs_unchanged": true,
+  "retained_executable_code_unchanged": true,
+  "generator_sources_match": true,
+  "html_cell_ids_match": true,
+  "html_anchor_targets_valid": true,
+  "notebook_reexecuted": false,
+  "models_refitted": false,
+  "source_execution_completed_utc": "2026-10-13T05:38:05.217717+00:00",
+  "sha256": {
+    "02_lisa_pipeline.ipynb": "ba3ffa4ebf2a7041d490269f52069f0feca0f26dd477b38ddd4c2834790080e9",
+    "results/v2/02_lisa_pipeline.html": "d8a9a35e966b99fd511f75e3c299e9060ea2d4532414d8f959a60eb124e00d57",
+    "scripts/build_lisa_notebook.py": "4ee485dcf98faca2f3c37c32ddfef1c66f1a9a5f95409b9f74f6257c12e9e612",
+    "scripts/execute_lisa_notebook.py": "6fed8c39b42fd7916ead5f777d8a2b7ccf720df20aec42d626131b5af9f0c2b9",
+    "results/v2/notebook_execution.json": "208ccbaf17b9cbd9f3acf83864280f4079bad6adc43c2ee9e5539e0cfa078c0d"
+  }
+}

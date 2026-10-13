@@ -89,7 +89,7 @@ receipt = {"completed_utc": datetime.now(timezone.utc).isoformat(),
     "executed_code_cells": sum(c.cell_type == "code" and c.execution_count is not None for c in nb.cells),
     "errors": len(errors), "inline_images": sum("image/png" in o.get("data", {}) for c in nb.cells for o in c.get("outputs", [])),
     "collapsible_code_blocks": code_toggles, "navigation_chapters": len(headings),
-    "live_demonstration_fits": 3, "full_grid_retrained": False}
+    "live_demonstration_fits": 0, "full_grid_retrained": False}
 (out / "notebook_execution.json").write_text(json.dumps(receipt, indent=2))
 print(receipt)
 if errors:

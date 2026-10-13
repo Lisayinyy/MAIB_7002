@@ -8,7 +8,7 @@ This branch extends Aashish's `pricing-ml-ap` commit `5b52099ab73e57c5afbb1915d0
 
 ## Start here
 
-1. **Read the current group report:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [executed HTML report](results/v2/02_lisa_pipeline.html). Follow the manager's question, Data + EDA, five-store selection, data cleaning and feature arithmetic, then **baselines → individual models → feature and loss comparisons → ensembles**, chronological results, and a specific discount recommendation. The HTML has chapter navigation and expandable Python. Worked model calculations and full results remain in the technical appendix.
+1. **Read the current group report:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [executed HTML report](results/v2/02_lisa_pipeline.html). Follow the manager's question, Data + EDA, five-store selection, data cleaning and feature arithmetic, then **baselines → individual models → feature and loss comparisons → ensembles**, chronological results, and a specific discount recommendation. The HTML has chapter navigation and expandable Python. The notebook ends with the findings and limits; full experiment results remain in `results/v2/`.
 2. **Understand the project logic:** [中文故事与答辩讲解](docs/PROJECT_STORY_ZH.md), then [源码逐步说明](docs/LISA_PIPELINE_WALKTHROUGH_ZH.md). These earlier guides document the extension's development.
 3. **Learn the original implementation:** [逐行代码讲解](docs/TEAMMATE_CODE_WALKTHROUGH_ZH.md), covering Aashish's original work.
 4. **Review the A1 poster:** [single-page portrait PDF](poster/freshretail_group_q_A1.pdf), [preview](poster/freshretail_group_q_A1_preview.png), [editable generator](scripts/build_v2_poster.py).
@@ -40,11 +40,11 @@ docker compose exec lab python -m unittest discover -s tests -v
 # Verify the new validation-only controlled experiment and saved-policy sensitivity.
 docker compose exec lab python scripts/run_story_ablation.py --verify-only
 docker compose exec lab python scripts/build_story_diagnostics.py --verify-only
-# Execute the presentation notebook in a fresh kernel (three modest example fits).
+# Execute the presentation notebook in a fresh kernel using saved experiment artifacts.
 docker compose exec lab python scripts/execute_lisa_notebook.py
 ```
 
-The default notebook uses saved public-data artifacts and refits the two selected members plus a fixed kNN reference for real worked examples. It does **not** rerun the full tuning grid or the 35-fit ablation. These steps need no external data service once the image has been built. First image build requires Internet access to free public package registries.
+The default notebook uses saved public-data artifacts to reproduce the EDA, model comparison and discount-decision analysis. It does **not** refit models or rerun the full tuning grid or the 35-fit ablation; use the commands below to rebuild those experiments. These steps need no external data service once the image has been built. First image build requires Internet access to free public package registries.
 
 To rebuild the full raw-data pipeline:
 
@@ -84,7 +84,7 @@ The report service serves the files saved in its image. Re-executing the noteboo
 
 To change host ports, copy `.env.example` to `.env` and edit them before startup. The [earlier refinement Docker check](docs/REFINEMENT_DOCKER_VERIFICATION.json), recorded on 10 October 2026 UTC, ran that version's 31 notebook code cells and three live examples without network or raw data, verified both new result sets, and rebuilt the poster. It predates the current EDA and model-label revisions. For local Python development, `uv sync --frozen` uses the version-locked environment; run commands with `uv run`. Python and uv base images are pinned by digest in the Dockerfile. See the [earlier Docker delivery verification](docs/DELIVERY_VERIFICATION.json) for its exact tested scope.
 
-The [current notebook execution](results/v2/notebook_execution.json), completed on **13 October 2026 UTC**, records 98 cells, all 34 code cells executed, zero errors, 15 inline images and three live example fits. [Model-label verification](docs/MODEL_LABEL_REVISION.json) matches the current notebook, HTML and source hashes; [EDA chart revision](docs/EDA_CHART_REVISION.json) records the preceding chart changes. These revisions retain the saved experiment results and use model/configuration names in the group report.
+The current notebook has **83 cells, 29 code cells, 15 inline images and 14 chapters**, ending with findings and limits. [Appendix-removal verification](docs/APPENDIX_REMOVAL_VERIFICATION.json) confirms that its retained executable code and saved outputs are unchanged from the **13 October 2026 UTC** execution, with zero recorded errors. This presentation edit was not a new execution or training run; [the execution record](results/v2/notebook_execution.json) distinguishes the original execution time from the later edit. [Model-label verification](docs/MODEL_LABEL_REVISION.json) and [EDA chart revision](docs/EDA_CHART_REVISION.json) document the preceding versions.
 
 ## Measured result and scope
 
@@ -130,7 +130,7 @@ The thresholds are illustrative, not learned business optima. MAE training targe
 - `scripts/build_story_evidence.py`, `results/v2/story_evidence.json`: independently rebuilt selection-funnel counts and diagnostics from saved discount scenarios; no new model fitting. The narrative revision preserves the existing model scores and selection.
 - `scripts/run_story_ablation.py`, `results/story_ablation/`: seven fixed CatBoost designs, 35 validation-only fits and paired contrasts separating historical inputs, store/product IDs, training loss and discount/activity inputs. These diagnose the frozen design; they do not select a new winner or establish causal uplift.
 - `scripts/build_story_diagnostics.py`, `results/story_diagnostics/`: ten rule settings applied to the same saved forecasts, including a replay of the original policy. No model fits or observed policy outcomes; the delivered thresholds are unchanged.
-- [Current notebook and model-label verification](docs/MODEL_LABEL_REVISION.json): 13 October 2026 execution and hashes, with 62 frozen experiment files unchanged. [EDA chart revision](docs/EDA_CHART_REVISION.json) records the earlier chart update. [Expanded-story verification](docs/REFINEMENT_VERIFICATION.json) records the previous 31-code-cell notebook, controls, rendering and delivery checks; [earlier narrative verification](docs/STORY_REVISION_VERIFICATION.json) records the shorter 16-code-cell version.
+- [Current notebook verification](docs/APPENDIX_REMOVAL_VERIFICATION.json): all technical appendices removed, with retained code and outputs unchanged. [Earlier model-label verification](docs/MODEL_LABEL_REVISION.json): 13 October 2026 execution and hashes, with 62 frozen experiment files unchanged. [EDA chart revision](docs/EDA_CHART_REVISION.json) records the earlier chart update. [Expanded-story verification](docs/REFINEMENT_VERIFICATION.json) records the previous 31-code-cell notebook, controls, rendering and delivery checks; [earlier narrative verification](docs/STORY_REVISION_VERIFICATION.json) records the shorter 16-code-cell version.
 - `DATA_LICENSE.md`: FreshRetailNet attribution. No raw data or login tokens are committed.
 
 Generative AI assisted substantially with this extension's code, review, experiments and presentation materials. Automated checks have been run; they do not replace each member's personal understanding, contribution declaration and final review. The group brief requires a one-page A1 portrait poster, runnable Docker project and personal declarations by the end of **14 October 2026**.

@@ -30,7 +30,6 @@ We use FreshRetailNet-50K to predict next-day sales for a store-product, then co
 | 1–4 | Goal, data exploration, features and evaluation |
 | 5–8 | Model comparisons, extension and error analysis |
 | 9–14 | Discount recommendations, sensitivity checks and limits |
-| Appendices | Worked model calculations, full results and reproduction commands |
 
 Code and saved outputs are included throughout. The HTML copy has expandable code blocks.
 ''')
@@ -84,8 +83,8 @@ OUT = ROOT / "results" / "v2"
 pd.set_option("display.precision", 5)
 %matplotlib inline
 
-# Read verified saved results; the appendix performs three modest worked-example fits.
-# Full experiments use the explicit CLI recipe in appendix C, including dependent diagnostics.
+# Read verified saved results to reproduce the analysis without refitting models.
+# Full training and dependent diagnostics use the explicit CLI recipe in README.md.
 verification = v2.verify_saved(OUT)
 feat = pd.read_parquet(OUT / "features.parquet")
 plan = model_labels.structure(json.loads((OUT / "experiment_plan.json").read_text()))
@@ -431,7 +430,7 @@ plt.show()
 md(r'''
 With 25 neighbours and equal feature weights, removing weather reduced validation MAE from about 0.32668 to 0.31198, against a seven-day baseline of 0.32840. This result applies to these inputs and this setup; weather may still matter for food demand. The neighbour-count curve is fairly flat after weather is removed.
 
-The reference keeps ten inputs, 25 neighbours, uniform averaging, equal feature weights, Euclidean distance and a standard scaler fitted on training rows. The appendix shows the actual neighbours and their average for our example.
+The reference keeps ten inputs, 25 neighbours, uniform averaging, equal feature weights, Euclidean distance and a standard scaler fitted on training rows.
 ''')
 
 md(r'''
@@ -508,7 +507,7 @@ Two products can have the same seven-day average while one is rising and the oth
 
 The added history includes sales two and three days ago, three- and fourteen-day averages, seven-day variation, a short-versus-long trend, previous discount averages and recent stockout-day counts. All use earlier observations. The extended model has 18 numeric inputs and two categorical IDs.
 
-The full experiment compares eleven standalone designs, four blends and two baselines, retaining Ridge, the decision tree and HistGradientBoosting. The full table is in the appendix. Candidates and blend rules were recorded before this run's final-period scoring.
+The full experiment compares eleven standalone designs, four blends and two baselines, retaining Ridge, the decision tree and HistGradientBoosting. The full comparison is saved in `results/v2/comparison.csv`. Candidates and blend rules were recorded before this run's final-period scoring.
 
 The initial history-and-ID package also changed regularization, so its result cannot isolate each feature's contribution. We can isolate the loss comparison: the two extended CatBoost models below have the same inputs and other settings, but train with RMSE or MAE loss. After this, we compare the best standalone design with three declared RF blend weights.
 ''')
@@ -844,205 +843,6 @@ The extension improves forecast error within the original five-store cohort and 
 A business pilot needs availability, replenishment, expiry and cost data, plus prospective pricing evidence to test the recommendations. Forecast errors and scenario curves do not demonstrate realized profit or waste reduction, or justify automatic rollout across stores.
 
 The project progresses from baselines and individual forecasting models to richer history, categorical IDs, loss comparisons and forecast combinations. We then use the chosen forecast in discount scenarios, apply review rules and check transfer to other stores. The saved experiments and helper modules document each step.
-''')
-
-md(r'''
-## Technical appendix A. How the model produces a number
-
-For an input row $x$, Random Forest averages predictions from trees trained on bootstrap samples. Each tree follows feature thresholds to a leaf and predicts the mean training target in that leaf.
-
-CatBoost adds trees one at a time: $F_m(x)=F_{m-1}(x)+\eta h_m(x)$, where $F_m$ is the prediction after step $m$, $h_m$ is the new tree and $\eta$ is the learning rate. The extended model treats store and product IDs as categories.
-
-Our forecast is $\hat y=w\hat y_{RF}+(1-w)\hat y_{CB}$, where $w=0.25$, $\hat y_{RF}$ is the forest forecast and $\hat y_{CB}$ is the extended CatBoost forecast. The output is normalized observed sales.
-
-Below, we refit the two selected models on the original training rows and predict the earlier case at its recorded price. The output shows each model's prediction, the blend calculation and the first forest tree's path. It uses the included feature table, so no raw-data download is needed.
-''')
-
-code(r'''
-training = feat[feat.split == "train"]
-specs = {s["name"]: s for s in plan["candidates"]}
-members = selection["blend_weights"].get(winner,{winner:1.})
-live_models = {}; example_values = []
-from threadpoolctl import threadpool_limits
-for name, weight in members.items():
-    spec = specs[name]
-    with threadpool_limits(limits=4):
-        model = v2.estimator(spec).fit(training[v2.columns(spec)],training[C.TARGET])
-    live_models[name] = model
-    prediction = float(v2.predict(model,example,spec)[0])
-    example_values.append({"Member":name,"Weight":weight,"Prediction":prediction,"Weighted part":weight*prediction})
-example_table = pd.DataFrame(example_values); display(example_table)
-live_prediction = example_table["Weighted part"].sum()
-saved_case = test_predictions[(test_predictions.store_id == case_key.store_id) &
-    (test_predictions.product_id == case_key.product_id) & (test_predictions.dt == case_key["dt"])].iloc[0]
-print(f"Blend: {live_prediction:.6f}; observed outcome: {case_key[C.TARGET]:.6f}")
-print("Replay difference from saved forecast:",abs(live_prediction-saved_case[winner]))
-assert np.isclose(live_prediction,saved_case[winner],atol=1e-6)
-forest = live_models.get("Random Forest")
-if forest is not None:
-    x = example[C.FEATURES].to_numpy(); tree = forest.estimators_[0]; leaf = tree.apply(x)[0]
-    print("First forest tree's leaf prediction:",float(tree.tree_.value[leaf,0,0]))
-    print("Forest mean across",len(forest.estimators_),"trees:",float(np.mean([t.predict(x)[0] for t in forest.estimators_])))
-    for node in tree.decision_path(x).indices:
-        feature = tree.tree_.feature[node]
-        if feature >= 0:
-            value, threshold = x[0,feature],tree.tree_.threshold[node]
-            print(f"{C.FEATURES[feature]} = {value:.4f} {'<=' if value <= threshold else '>'} {threshold:.4f}")
-''')
-
-md(r'''
-### A.1 A second worked example: actual kNN neighbors
-
-kNN first standardizes numeric feature $j$: $z_j=(x_j-\mu_j)/s_j$, where $x_j$ is its input value and $\mu_j$ and $s_j$ are the training mean and standard deviation. The Euclidean distance to training row $i$ is $d_i=\sqrt{\sum_j(z_j-z_{ij})^2}$, where $z_{ij}$ is that row's standardized value of feature $j$.
-
-Let $N_{25}(x)$ be the 25 closest training rows to input $x$. The prediction is $\hat y(x)=\frac{1}{25}\sum_{i\in N_{25}(x)}y_i$, where $y_i$ is neighbor $i$'s observed sales. Neighbors can come from other store-products because distance uses their numeric trading features. We fit the scaler on the original training rows only.
-
-The calculation below uses the same real case. It shows the distances and how the neighbor average produces a forecast. Only the first five neighbors are displayed; the sum and prediction use all 25. Similar trading days do not by themselves identify a causal price effect.
-''')
-
-code(r'''
-neighbors, neighbor_calculation = story.live_knn_example(feat, example)
-display(neighbors)
-display(neighbor_calculation)
-''')
-
-md(r'''
-The blend combines tree predictions; kNN averages sales from nearby historical cases. Both predict normalized observed sales and are scored against the same target and baselines. We use the validation results to choose between designs.
-''')
-
-md(r'''
-## Technical appendix B. Metrics, inputs and the full comparison
-
-For $n$ evaluated rows, let $y_i$ be observed sales and $\hat y_i$ the forecast for row $i$:
-
-$$MAE=\frac1n\sum_i|y_i-\hat y_i|,\qquad RMSE=\sqrt{\frac1n\sum_i(y_i-\hat y_i)^2}.$$
-
-WAPE is $\sum_i|y_i-\hat y_i|/\sum_i|y_i|$. Lower is better for all three. We select by validation MAE and report RMSE and WAPE as additional checks. Both baselines appear first in the table.
-
-Rolling features are shifted before aggregation to exclude the target day's sales. The ten base inputs include yesterday's activity flag. The older main-branch version used target-day planned activity. Its matching baseline scores do not imply that every input is defined the same way.
-''')
-
-code(r'''
-display(comparison[["model","validation_mae","test_mae","test_rmse","test_wape","selected"]])
-display(pd.DataFrame({"Group":["Base"]*len(C.FEATURES)+["Additional history"]*len(v2.EXTRA)+["Categorical ID"]*len(v2.IDS),
-                      "Feature":C.FEATURES+v2.EXTRA+v2.IDS}))
-display(pd.DataFrame(plan["candidates"]).fillna("—"))
-display(paired)
-''')
-
-md(r'''
-### B.1 Training objectives and settings
-
-The linear model is $\hat y_i=b+\sum_j\beta_j z_{ij}$, where $b$ is the intercept, $\beta_j$ is a learned coefficient and $z_{ij}$ is a standardized input. Ridge minimizes $\sum_i(y_i-\hat y_i)^2+\alpha\sum_j\beta_j^2$: squared prediction error plus a penalty on large coefficients. The penalty strength is $\alpha$; the intercept is not penalized.
-
-A squared-error tree chooses thresholds that reduce variation within its leaves. For leaf $L$, the quantity is $\sum_{i\in L}(y_i-\bar y_L)^2$, where $\bar y_L$ is the mean training target in that leaf. A split is useful when the two child leaves have a lower combined total. Random Forest repeats this process with resampled rows and subsets of features, then averages the trees.
-
-Boosting adds trees to reduce the chosen training loss. Squared error penalizes large misses more heavily; absolute error grows linearly with the size of a miss. RMSE and squared-error loss have the same minimizer for a fixed set of predictions, although their implementation and optimization can differ. CatBoost also regularizes the trees and handles the store and product categories in the extended model.
-
-MAE training targets a conditional median. Combining that CatBoost forecast with the forest does not guarantee either a conditional mean or an exact conditional median.
-
-| Design | Main settings in the recorded experiment | Why the settings matter |
-|---|---|---|
-| Ridge | StandardScaler; alpha 10 | Make the coefficient penalty meaningful across input scales |
-| Decision tree | Depth 6; minimum 20 rows per leaf | Limit narrow, unstable rules |
-| kNN | StandardScaler; 25 neighbors; equal weights | Control distance comparability and local averaging |
-| Random Forest | 300 trees; depth 10; minimum leaf 3; half the features per split | Average varied trees while limiting each tree's complexity |
-| HistGradientBoosting | 300 stages; learning rate 0.05; at most 15 leaves; minimum leaf 20; L2 1 | Balance sequential corrections against complexity |
-| Histogram Gradient Boosting (monotonic) | Same settings; non-increasing prediction in proposed price rate | Test an explicit price-response shape restriction |
-| CatBoost (base, RMSE) | 500 stages; depth 5; learning rate 0.03; L2 3; RMSE loss | Keep the base-feature RMSE configuration fixed |
-| CatBoost (history + IDs) | Same depth/stages/rate; L2 5; 18 numeric inputs and two IDs; RMSE or MAE | Test richer context and a controlled loss contrast |
-
-We clip every model's forecast at zero. This prevents negative predicted sales but does not ensure an appropriate response to price changes. The full candidate table above also includes the depth-4 CatBoost configuration and loss variants.
-''')
-
-md(r'''
-### B.2 What each comparison tests
-
-The baseline comparison asks whether a learned model improves the forecast. Comparisons between model families test different representations at the declared settings; the recorded tuning grids compare settings within a family. The matched loss experiment changes only the training loss. The validation-only ablation holds other settings fixed while changing feature groups. The initial history/ID comparison also changed regularization, so it cannot isolate the feature effect.
-
-We keep the design with the lowest average validation MAE under the declared protocol. Final-period RMSE, error slices and transfer results describe where it works and where it fails. These forecast comparisons do not measure the business return from deploying the discount policy.
-''')
-
-md(r'''
-The models use the recorded settings, with kNN scaling fitted within each validation fold. This notebook runs no new parameter search.
-
-The paired bootstrap below resamples store-product series, keeping each series' seven final observations together. It does not adjust for shocks shared by a store or optimism from repeated model selection. With five stores and one week, we treat the intervals as descriptive.
-''')
-
-code(r'''
-display(model_labels.structure(json.loads((OUT/"paired_comparison.json").read_text())))
-display(slices[(slices["slice"] == "store") & (slices.model == winner)][["value","mae","rmse","n"]])
-''')
-
-md(r'''
-## Technical appendix C. Reproduce the evidence
-
-The target, cohort, selected design and benchmark scores are unchanged from the saved experiment. By default, this notebook reads the saved results and fits three models for the worked examples: the two blend members and the fixed kNN reference. It does not repeat the historical tuning grids or the separate validation-only feature experiment. The selection funnel can be rebuilt from the verified public raw files with `scripts/build_story_evidence.py`.
-
-From a complete repository copy:
-
-```bash
-docker compose up --build -d
-docker compose exec lab python scripts/jupyter_v2_url.py
-docker compose exec lab python scripts/run_v2.py --verify-only
-docker compose exec lab python scripts/execute_lisa_notebook.py
-```
-
-To regenerate the complete experiment and story evidence:
-
-```bash
-docker compose exec lab python scripts/download_public_data.py
-docker compose exec lab python scripts/run_v2.py
-docker compose exec lab python scripts/run_v2_transfer_check.py --force
-docker compose exec lab python scripts/run_story_ablation.py --force
-docker compose exec lab python scripts/build_story_evidence.py
-docker compose exec lab python scripts/build_dataset_eda.py
-docker compose exec lab python scripts/build_story_diagnostics.py
-docker compose exec lab python scripts/build_lisa_notebook.py
-docker compose exec lab python scripts/execute_lisa_notebook.py
-```
-
-The raw files are downloaded once, verified and reused. The first image build needs network access; the saved-data demonstration runs offline. The report and lab use separate image snapshots. Export changes from the lab container before recreating it, then rebuild the report image to display regenerated output. The README gives the full export and data-volume instructions.
-
-### C.1 Dataset reference
-
-Source: [Dingdong's FreshRetailNet-50K](https://huggingface.co/datasets/Dingdong-Inc/FreshRetailNet-50K), licensed CC BY 4.0. These are public retail records, not simulated demand. They provide repeated observations of sales and discounts, with calendar, activity and stockout information.
-
-| Item | Scope |
-|---|---|
-| Observation | One store-product-date |
-| Series | One store-product's history across dates |
-| Full dataset | 50,000 series, 898 stores, 18 cities |
-| Original training file | 28 March–25 June 2024, 90 days |
-| Evaluation file | 26 June–2 July 2024, seven days |
-
-The same product in two stores has two separate sales histories. The source sales field is already normalized: 1.2 does not mean 1.2 items, kilograms or dollars. We use it directly as the target. Stockouts can make these recorded sales lower than customer demand.
-
-The column `discount` is a price rate. A value of 0.90 means charging 90% of the regular price, or 10% off; 1.00 is full price and 0.80 is 20% off. Lower rates mean deeper discounts.
-
-For a tomorrow forecast, we use past sales, discounts, stockout hours and activity, plus tomorrow's calendar and proposed rate. Stockout hours do not tell us the stock quantity, batch age or tomorrow's freshness. The anonymized identifiers also give no store names, customer profiles or product shelf lives.
-
-The download script retrieves a fixed Hugging Face revision, verifies it and caches it locally. Small derived files are included so the notebook and its worked examples can run offline.
-''')
-
-code(r'''
-display(pd.DataFrame(plan["environment"].items(),columns=["Package","Recorded experiment version"]))
-print("Saved experiment verification:",verification["status"])
-print("Feature rows:",len(feat),"; validation predictions:",verification["oof_rows"],"; final-period cases:",verification["test_rows"])
-print("Selection was recorded before this run's final scoring:",selection["selected_before_test_scoring_utc"])
-print("Original full experiment fits:",json.loads((OUT/"run_receipt.json").read_text()).get("fitted_models"))
-''')
-
-md(r'''
-Generative AI assisted substantially with the code, review and presentation. The submission requires each member's own short paragraph stating their actual contribution, the AI assistance used and how they checked it. `docs/CONTRIBUTIONS_TEMPLATE.md` is still a template for those accounts. See also the requirements checklist and Chinese code walkthroughs.
-''')
-
-md(r'''
-### Before submission
-
-Each member should be able to explain the business question, the five-store selection, an input row, the validation rule, the selected blend and the reason for the example discount or review decision. Automated checks verify execution; personal understanding still needs to be demonstrated.
-
-Record a feasibility discussion with teaching staff only if it took place. Moodle submission is a separate step.
 ''')
 
 nb = nbf.v4.new_notebook(cells=cells, metadata={
