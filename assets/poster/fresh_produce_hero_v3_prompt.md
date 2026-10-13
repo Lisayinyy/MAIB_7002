@@ -1,0 +1,7 @@
+# Fresh produce hero
+
+Created with the built-in image generation tool for the poster header. Decorative artwork only; it does not depict a real store or project data. Transparent alpha is preserved in the supplied PNG.
+
+## Final prompt
+
+Use case: ads-marketing. Asset type: decorative hero cutout for an academic fresh-food retail A1 poster, to place on a deep forest-green header. Primary request: a beautifully composed, premium editorial still life of fresh vegetables and a little fruit. Subject: one rich green broccoli crown, graceful leafy bok choy or lettuce, two slender carrots with delicate tops, one ripe orange tomato, a small radish pair, and one golden pear. Style: refined photorealistic food editorial photography with subtle painterly art direction, realistic textures, natural matte surfaces, elegant rather than supermarket advertising. Composition: a compact asymmetrical crescent arrangement, broccoli and leaves toward the back, roots and pear in front, all produce entirely within frame, balanced gentle diagonals with negative space between forms; avoid a crowded giant heap. Landscape 3:2 composition. Soft directional studio daylight, dimensional but no heavy ground shadow, lively green foliage with restrained warm orange accents. Transparent background, a true clean alpha cutout; no background panel, no circle, no table, no basket, no price tags, no text, no lettering, no logo, no watermark. All plant forms anatomically coherent, polished high detail suitable for a large printed poster.
