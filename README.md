@@ -54,4 +54,4 @@ Then open the `http://127.0.0.1:8888/lab?token=...` link printed in the terminal
 2. Tune it with `evaluate.cross_validate(feat, factory, grid)` on the same five weekly folds.
 3. Score the locked design with `evaluate.fit_predict_test` and add it to the comparison in section 12 of the notebook.
 
-The notebook currently compares kNN, random forest, CatBoost and a 50/50 forest + CatBoost ensemble, then drafts phase 2: the discount what-if (section 15) and stock guardrails around it (section 16: no discount after a sell-out, a discount required after a week without one, plus cost and minimum-gain parameters).
+The notebook compares kNN, random forest, CatBoost and a 50/50 forest + CatBoost ensemble, then builds phase 2 (section 14): the discount what-if, restricted to discounts each series has run, with stock guardrails (no discount after a sell-out, a discount required after a week without one) and cost and minimum-gain parameters.

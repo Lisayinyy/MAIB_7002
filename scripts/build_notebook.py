@@ -24,9 +24,9 @@ It is written to be read top to bottom. Each section states what was done, shows
 | 9 | Random forest: tuning, locked design |
 | 10–11 | CatBoost and a forest + CatBoost ensemble (next models to test) |
 | 12 | Comparison on the validation weeks and the unseen test week |
-| 13–14 | Findings, limits, comparison with the main branch |
-| 15–16 | Phase 2: the discount what-if, then stock guardrails |
-| 17 | Next steps |
+| 13 | Findings and limits |
+| 14 | Phase 2: from a forecast to a discount recommendation |
+| 15 | Next steps |
 """)
 
 code(r"""
@@ -96,6 +96,9 @@ selected = pd.read_csv(C.PROCESSED / "selected_series.csv")
 stores = selected.groupby("store_id").agg(city=("city_id", "first"), usable_series=("product_id", "size"))
 display(stores.sort_values("usable_series", ascending=False))
 print(f"Working set: {len(selected)} series, {selected.product_id.nunique()} products, {len(feat):,} rows after building features")
+fig = plots.plot_selection_funnel([("50,000", "store-product series\nin the dataset"), ("16,684", "pass the three\nselection rules"),
+                                   ("5", "stores with the most\nusable series"), (f"{len(selected)}", "series in the\nworking set")],
+                                  save=C.RESULTS / "selection_funnel.png")
 """)
 
 md(r"""
@@ -108,7 +111,9 @@ code(r"""
 rel = feat.assign(relative_sales=feat[C.TARGET] / feat.groupby(C.KEY)[C.TARGET].transform("mean"))
 bands = pd.cut(rel.discount_next, [0, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0],
                labels=["below 0.6", "0.6–0.7", "0.7–0.8", "0.8–0.9", "0.9–0.95", "0.95–1.0 (none)"])
-display(rel.groupby(bands, observed=True).agg(rows=("relative_sales", "size"), relative_sales=("relative_sales", "mean")).round(2))
+signal = rel.groupby(bands, observed=True).agg(rows=("relative_sales", "size"), relative_sales=("relative_sales", "mean"))
+display(signal.round(2))
+fig = plots.plot_discount_signal(signal, save=C.RESULTS / "discount_signal.png")
 """)
 
 md(r"""
@@ -164,6 +169,7 @@ Splits are by time. For each validation week the model trains on every row dated
 
 code(r"""
 display(data.split_summary(feat))
+fig = plots.plot_split_timeline(feat, save=C.RESULTS / "splits.png")
 """)
 
 md(r"""
@@ -258,12 +264,16 @@ else:
 knn_summary = ev.summarise(knn_folds, ["weighting", "k"], baseline)
 display(knn_summary.mae.unstack("weighting").round(4).T)
 
-fig = plots.plot_knn_tuning(knn_folds, baseline, {"equal": ("Equal weights", C.COLOURS["knn"]), "sales_t": ("Sales on day t ×2", C.COLOURS["rf"])},
+with_weather = pd.read_csv(C.RESULTS / "knn_stage1_with_weather_folds.csv")
+with_weather = with_weather[(with_weather.weighting == "equal") & (with_weather.k > 0)].assign(weighting="equal_weather")
+fig = plots.plot_knn_tuning(pd.concat([knn_folds, with_weather]), baseline,
+                            {"equal_weather": ("Equal weights, with weather (13 features)", C.COLOURS["extra"]),
+                             "equal": ("Equal weights, 10 features", C.COLOURS["knn"]), "sales_t": ("Sales on day t ×2, 10 features", C.COLOURS["rf"])},
                             save=C.RESULTS / "knn_stage1.png")
 """)
 
 md(r"""
-Small k follows noise; large k averages over products that are too different. The bottom is flat from 15 to 60, and MSE also picks k=25.
+Small k follows noise; large k averages over products that are too different. The bottom is flat from 15 to 60, and MSE also picks k=25. The with-weather curve (round 1) is drawn for comparison: at every k it sits about 0.015 higher, and at k=25 it barely clears the baseline.
 
 ### Further checks (one-off runs, k=25, change against 0.3120)
 
@@ -354,11 +364,11 @@ rf_summary = ev.summarise(rf_folds, ["max_depth", "min_leaf"], baseline, extra={
 display(rf_summary.mae.unstack("min_leaf").reindex(RF_DEPTHS).round(4))
 display(rf_summary.deepest_tree.unstack("min_leaf").reindex(RF_DEPTHS))
 
-fig = plots.plot_rf_tuning(rf_summary, RF_DEPTHS, RF_LEAVES, save=C.RESULTS / "rf_tuning.png")
+fig = plots.plot_rf_heatmap(rf_summary.mae.unstack("min_leaf").reindex(RF_DEPTHS), save=C.RESULTS / "rf_tuning.png")
 """)
 
 md(r"""
-- The whole grid spans 0.003, about a seventh of the week-to-week variation (0.02). The plot's vertical axis covers only that range, so the lines look further apart than they are.
+- The whole grid spans 0.003, about a seventh of the week-to-week variation (0.02). The colour scale covers only that range, so the cells look more different than they are.
 - Depth and leaf size trade off: with small leaves a depth cap helps slightly; with leaves of 10 it makes no difference.
 - Without a limit, trees grow to 27–41 levels depending on leaf size.
 
@@ -527,7 +537,7 @@ fig = plots.plot_weight_sweep(sweep, rf_val.mae.mean(), cat_val.mae.mean(), save
 
 md(r"""
 - The forest's and CatBoost's errors correlate at 0.97: they are mostly wrong on the same rows in the same direction. That caps what averaging can do.
-- The sweep is a shallow U. Anything from 40% to 70% forest is within 0.0002 of the best; **50/50 is taken** as the simplest choice, and it is also what the main branch selected.
+- The sweep is a shallow U. Anything from 40% to 70% forest is within 0.0002 of the best; **50/50 is taken** as the simplest choice.
 - The gain is about 0.001 MAE over the forest alone. Small, but it shows up in the week-by-week view below. Adding kNN as a third member does not help (equal-weight three-way blend: 0.3015).
 
 ### Locked ensemble design
@@ -570,7 +580,7 @@ The baseline and kNN sit clearly above the three tree models, which are bunched 
 
 ### The unseen test week (June 26 – July 2)
 
-Each locked model is fitted once on all training rows (April 4 – June 25) and scored on the test week. Every design choice above was made without looking at it. (One caveat shared with the main branch: this week has now been scored several times as models were added, so it is a shared benchmark rather than a never-seen set.)
+Each locked model is fitted once on all training rows (April 4 – June 25) and scored on the test week. Every design choice above was made without looking at it. (One caveat: this week has now been scored several times as models were added, so it is a reused benchmark rather than a never-seen set.)
 """)
 
 code(r"""
@@ -607,6 +617,11 @@ print("MAE by tomorrow's discount")
 display(ev.mae_by(test, methods, test.discount_band).round(3))
 print("\nMean sales by tomorrow's discount: actual and predicted")
 display(ev.mean_by(test, methods, test.discount_band).round(3))
+
+diagnostic = {label: col for label, col in methods.items() if col != "pred_same_weekday"}
+fig = plots.plot_test_errors(test, diagnostic, {"RF + CatBoost (50/50)": C.COLOURS["ensemble"], "CatBoost": C.COLOURS["catboost"], "Random forest": C.COLOURS["rf"],
+                                                "kNN (k=25)": C.COLOURS["knn"], "Baseline (7-day mean)": C.COLOURS["baseline"]},
+                             highlight="RF + CatBoost (50/50)", save=C.RESULTS / "test_errors.png")
 """)
 
 md(r"""
@@ -662,233 +677,159 @@ md(r"""
 8. **Selection optimism.** Many options were compared on the same five weeks, and the test week has now been scored for four models. The test figures are the honest ones but no longer pristine.
 9. **Scope.** Five stores in one city, one test week. Results may not carry to other cities or seasons.
 
-## 14. Comparison with the main branch
+## 14. Phase 2: from a forecast to a discount recommendation
 
-Yuanyuan Yin's project on `main` (`01_freshretail_project.ipynb`, results under `outputs/`) reconstructs this protocol independently from the written notes: the same 312 series, the same five weekly folds, the same ten inputs under different names, and the same baselines. It compares five models (Ridge, decision tree, random forest, HistGradientBoosting, CatBoost) and then explores blends. Side by side, from `outputs/final_protocol/model_comparison_test.csv`, `chosen_parameters.csv` and `outputs/ensemble_exploration/*.csv`:
+The models above answer "how much will sell under a given discount". The manager's question is "which discount". This section turns the ensemble from section 12 into a recommendation and checks it against what managers actually did on the 2,184 test-week store-product-days.
 
-| Model | Main branch design | Main: validation / test MAE | This branch design | This branch: validation / test MAE |
-|---|---|---|---|---|
-| 7-day average baseline | – | 0.3284 / 0.3142 | – | 0.3284 / 0.3142 |
-| Random forest | depth 10, leaf ≥ 5, 200 trees | 0.3037 / 0.2929 | depth 10, leaf ≥ 3, 300 trees, half the features per split | 0.3024 / 0.2923 |
-| CatBoost | depth 4, lr 0.05, 400 trees, l2 = 5 | 0.3038 / 0.2878 | depth 5, lr 0.03, 500 trees | 0.3033 / 0.2896 |
-| RF + CatBoost (50/50) | equal weights | 0.3014 / 0.2873 | equal weights | 0.3013 / 0.2892 |
-| HistGradientBoosting | lr 0.05, 300 iterations, 15 leaves | 0.3055 / 0.2892 | not run | – |
+**Goals**
 
-**What agrees.** The baselines are identical to four decimals, which confirms the two feature pipelines produce the same rows. Every shared model lands within 0.002 on both validation and test, and both branches pick the 50/50 blend as the best validation design. The deep-discount diagnostics agree too: the forest beats the baseline there by a few percent and under-predicts the spike.
+- **Use the model as a what-if engine.** For each store-product on the evening of day t, hold every feature fixed, vary only tomorrow's discount over the candidates 1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7 and 0.6, and pick the candidate with the highest predicted value. Value is predicted sales × discount rate, a proxy, because `sale_amount` is normalised and there is no unit price.
+- **Stay inside each series' own history.** A candidate is allowed only if that series had at least three training days within 0.025 of it, so the model is never asked about a discount the product has never run.
+- **Put stock before price.** Three rules from the stockout record, applied before the model is consulted: (1) *sold out today* (at least one stockout hour on day t): no discount tomorrow, the shelf is clear and tomorrow's stock is fresh; (2) *a discount is running and did not clear the shelf*: it may continue, and the model, which sees today's discount, decides how deep; (3) *no stockout in the seven days up to day t*: a discount is required, assuming a shelf life of about a week, and the model picks the depth.
+- **Two business dials.** A unit cost (as a share of full price) inside the value objective, so that deep discounts are penalised, and a minimum-gain hurdle, so that a discount is recommended only when its predicted value clearly beats no discount.
+- **Judge by agreement with the manager, not by realised outcome.** The data records what sold under the discount the manager chose, never what would have sold under another one. The honest checks are how often the policy lands in the manager's discount band and where it departs.
 
-**What differs.** The main branch's CatBoost is slightly better on the test week (0.2878 against 0.2896) with a smaller, more regularised design; given seed noise of 0.0005 on validation and one week of test data, this is not a meaningful gap. The main branch frames the final week as *already viewed* rather than unseen, which is the stricter and more accurate description now that several models have been scored on it. Its discount scenario (section 15) restricts candidates to rates the series has historically had, the same fix arrived at independently below.
+### How a recommendation is produced
 
-**What this branch adds.** The tuning record for each model (why depth 10, why 500 trees, the learning curves), the error-correlation argument for why the ensemble gains so little, and the phase 2 draft on all 2,184 test rows rather than one illustrative store-product.
-
-## 15. Phase 2, first draft: using the model to choose tomorrow's discount
-
-**The idea.** For a store-product on the evening of day t, hold every known feature fixed and vary only tomorrow's discount. The model's prediction under each candidate is a what-if. Two decision rules are tried:
-
-- *Max value*: pick the discount with the highest predicted sales × discount rate. This is a sales-value proxy, since `sale_amount` is normalised and there is no unit price.
-- *Max sales within value*: pick the highest predicted sales among candidates whose predicted value is at least 95% of the value at no discount. This is the rule the main branch uses: "sell more, as long as it does not give away more than 5% of value".
-
-The ensemble fitted in section 12 is the engine. Candidates: 1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.6. Discount bands follow the convention used in the test-week tables and on the main branch: **deep** is 0.80 or lower, **moderate** is above 0.80 up to 0.95, **none** is above 0.95. So the 0.80 candidate counts as deep and 0.95 as moderate.
+Rule 2 needs no box of its own: a running discount that did not clear the shelf reaches step 3, where today's discount is one of the model's inputs.
 """)
 
 code(r"""
 from finalproject_pricingml import scenario
 
-response = scenario.discount_response(fitted["ensemble"], test)
-curve = scenario.response_curve(response)
-display(curve.round(3))
-print(f"Rows whose predicted sales never fall as the discount deepens: {scenario.monotonicity(response):.1%}")
-print("\nUnrestricted 'max value' rule: recommended discount, count of store-product-days")
-display(scenario.recommend(response, "max_value").discount.value_counts().sort_index(ascending=False).to_frame("rows").T)
+fig = plots.plot_decision_flow([
+    ("1  SOLD OUT TODAY?", "At least one stockout hour on day t.\nNo discount tomorrow: the shelf is clear\nand recorded sales understate demand."),
+    ("2  A WEEK WITHOUT A STOCKOUT?", "Nothing has cleared the shelf in 7 days.\nA discount is required;\nthe model picks how deep."),
+    ("3  WHAT-IF", "Otherwise: predict tomorrow's sales\nunder each candidate discount\nthe series has actually run."),
+    ("4  CHOOSE", "Highest predicted value\n(sales × rate, minus unit cost),\nonly if the gain clears the hurdle."),
+], save=C.RESULTS / "decision_flow.png")
 """)
 
 md(r"""
-**The trap.** Taken at face value the model says: discount everything, deeply. Predicted sales at 0.6 are 2.3× the no-discount level and the value proxy is 39% higher, so the unrestricted rule picks 0.6 for 70% of rows. This is extrapolation. Fewer than 1% of training rows have a discount below 0.6, and those rows are not ordinary days: they are the occasions on which a manager chose a deep discount, often clearance, where sales spiked. The model has learned that correlation faithfully. It has not learned what would happen if *any* product were discounted to 0.6 on an ordinary day, because that never happened in the data.
-
-**First fix: stay inside each series' own history.** A candidate is allowed for a store-product only if that series had at least three training days within 0.025 of it. This is what the main branch's scenario does ("historically supported rates"), and it is the minimum needed to keep the what-if on ground the model has seen.
+### The what-if on its own
 """)
 
 code(r"""
+response = scenario.discount_response(fitted["ensemble"], test)
+curve = scenario.response_curve(response)
 support = scenario.supported_candidates(train, min_days=3)
-print("Share of the 312 series supporting each candidate discount, %")
-display((support.mean() * 100).round(0).to_frame("series supporting it, %").T)
 supported = scenario.restrict(response, support)
+unrestricted = scenario.recommend(response, "max_value")
+
+fig = plots.plot_response_curve(curve, support.mean(), save=C.RESULTS / "discount_response.png")
+print(f"Rows whose predicted sales never fall as the discount deepens: {scenario.monotonicity(response):.1%}")
+print(f"Unrestricted max-value rule: picks 0.60 on {(unrestricted.discount == 0.6).mean():.0%} of days; training rows with a discount below 0.60: {(train.discount_next < 0.6).mean():.1%}")
 print(f"What-if rows: {len(response):,} unrestricted, {len(supported):,} supported (median {support.sum(axis=1).median():.0f} candidates per series)")
 
 BANDS = ["deep", "moderate", "none"]
-band = lambda d: pd.cut(d, C.DISCOUNT_BAND_EDGES, labels=BANDS)
+band = lambda d: pd.cut(d, C.DISCOUNT_BAND_EDGES, labels=BANDS).astype(str)
 actual = test.set_index(C.ROW_KEY).discount_next
-at_no_discount = response[response.discount == 1.0].set_index(C.ROW_KEY).pred_sales.reindex(actual.index)
-deepest_supported = supported.groupby(C.ROW_KEY).discount.min().reindex(actual.index)
-RULES = {"Max value": ("max_value", {}), "Max sales, value ≥ 95% of no-discount": ("max_sales_within_value", {"min_value_share": 0.95})}
-recs = {name: scenario.recommend(supported, rule, **kw).set_index(C.ROW_KEY).reindex(actual.index) for name, (rule, kw) in RULES.items()}
-
-print("\nTable 1. Recommended discount under each rule, % of the 2,184 store-product-days in the test week")
-display((pd.DataFrame({n: r.discount.value_counts(normalize=True) for n, r in recs.items()}).reindex(scenario.CANDIDATES).fillna(0).T * 100).round(1))
-
-print("\nTable 2. What the recommendations amount to, % of days")
-summary = {}
-for name, rec in recs.items():
-    a, b = band(actual).cat.codes, band(rec.discount).cat.codes  # 0 = deep, 1 = moderate, 2 = none
-    summary[name] = {
-        "recommends some discount": (rec.discount < 1).mean(),
-        "picks the deepest supported candidate": (rec.discount.values == deepest_supported.values).mean(),
-        "deeper band than the manager chose": (b < a).mean(),
-        "same band as the manager": (b == a).mean(),
-        "lighter band than the manager": (b > a).mean(),
-        "mean predicted sales lift over no discount": (rec.pred_sales / at_no_discount).mean() - 1,
-    }
-display((pd.DataFrame(summary) * 100).round(1))
-
-for name, rec in recs.items():
-    print(f"\nTable 3. {name}: where the model's band lands, given what the manager actually did (rows sum to 100%)")
-    ct = pd.crosstab(band(actual), band(rec.discount), normalize="index") * 100
-    ct.index = [f"manager chose {b} ({(band(actual) == b).sum():,} days)" for b in ct.index]
-    ct.columns = [f"model: {b}" for b in ct.columns]
-    display(ct.round(0).astype(int))
+unguarded = scenario.recommend(supported, "max_value").set_index(C.ROW_KEY).reindex(actual.index)
+within_value = scenario.recommend(supported, "max_sales_within_value", min_value_share=0.95).set_index(C.ROW_KEY).reindex(actual.index)
+deepest = supported.groupby(C.ROW_KEY).discount.min().reindex(actual.index)
+print("\nTable 1. The what-if alone, supported candidates only, % of the 2,184 test-week days")
+display((pd.DataFrame({"Max value": {"recommends a discount": (unguarded.discount < 1).mean(), "picks the deepest supported candidate": (unguarded.discount.values == deepest.values).mean(),
+                                     "same band as the manager": (band(unguarded.discount) == band(actual)).mean(), "discounts when the manager chose none": (unguarded.discount[actual > 0.95] < 1).mean()},
+                       "Max sales within 95% of no-discount value": {"recommends a discount": (within_value.discount < 1).mean(), "picks the deepest supported candidate": (within_value.discount.values == deepest.values).mean(),
+                                     "same band as the manager": (band(within_value.discount) == band(actual)).mean(), "discounts when the manager chose none": (within_value.discount[actual > 0.95] < 1).mean()}}) * 100).round(1))
 """)
 
 md(r"""
-**Reading the tables.**
+- **Taken at face value the model says: discount everything, deeply.** Predicted sales at 0.6 are 2.3× the no-discount level and the value proxy is 39% higher, so the unrestricted rule picks 0.6 on 71% of days. This is extrapolation. Fewer than 1% of training rows carry a discount below 0.6, and those are clearance days on which sales spiked; the model has learned that correlation, not what a 0.6 discount would do on an ordinary day.
+- **Support restriction decides where, not whether.** Only 5% of series have ever run 0.6 and the median series supports four candidates, so the mass moves to 0.95 and 0.85. The rule still recommends a discount on 98% of days, including 98% of the days on which the manager chose none, and lands in the manager's band on only 31% (Table 1). Managers discount selectively, using information about the product and the day that the what-if does not see.
+- **A value floor does not constrain.** Predicted value rises with the discount on nearly every row (98% are monotone), so "the most sales as long as value stays within 95% of no discount" never binds: it picks the deepest supported candidate on 98% of days. The max-value rule is used from here on.
 
-- **The model wants a discount almost every day.** Both rules recommend one on more than 98% of days, including 98% of the days on which the manager chose none (Table 3, bottom row). The predicted lift at the recommended discount averages 44–51% over no discount.
-- **The value constraint does not constrain.** Under the 95%-of-value rule the model picks the deepest candidate the product has ever run on 98% of days (Table 2). The model predicts value *rising* with discount for nearly every row (the response curve above), so a floor at 95% of the no-discount value is never reached, and the rule collapses to "go as deep as this product has gone before". The max-value rule is more moderate only because its objective trades volume against price: it settles on 0.95 or 0.85 for most days.
-- **Support restriction decides where, not whether.** Compared with the unrestricted result (0.60 on 70% of days), restriction moves the mass to 0.85–0.95 under the max-value rule and 0.80–0.90 under the value rule. The 0.60 candidate is still recommended on nearly every day where it is supported; it is only supported for 5% of series.
-- **The model's advice barely depends on what the manager did.** Each row of Table 3 looks much like the others: under the max-value rule the model recommends a deep discount on 37% of the days the manager went deep, 25% of moderate days and 36% of no-discount days. Managers clearly discount selectively, using information about the product and the day. The what-if does not see that information, so it cannot reproduce their selectivity, and agreement with their actual band is only 25–31%.
-
-**Why this is not evidence that the managers are wrong.** In the training data, discounts were applied on days when managers expected or observed demand, so part of the lift the model has learned is manager judgement rather than the effect of the discount. The what-if then attributes all of it to the discount and recommends discounting everywhere. Without an experiment, or at least a within-series check (next list), the response curve is a description of past co-occurrence, not a forecast of what a new discount would do.
-
-**What this first draft is missing.** The what-if knows nothing about the product's stock: whether it sold out today, whether a discount is already running, or how long the stock has been sitting. For a perishable those facts decide most of the question before the model is consulted. Section 16 adds them as guardrails, together with a margin parameter (sales × discount rewards volume; with a unit cost the objective penalises deep discounts). Two further items remain open after that: a within-series causal check (does the model's predicted lift match the lift each series actually showed on its own discounted days, or is it inherited from manager timing?) and prediction uncertainty from the forest's 300 trees, so that the rule does not act on differences of 0.001.
-
-## 16. Phase 2, second draft: stock guardrails around the what-if
-
-**Why stock comes first.** The products are perishable and the data records, hour by hour, when the shelf was empty. Three facts are known on the evening of day t, before any model runs:
-
-1. **Sold out today** (at least one stockout hour on day t). The shelf was cleared, so tomorrow's stock is fresh. A discount would give away margin on stock that is already selling, and the model's inputs understate demand on such a day because recorded sales are censored. *Rule: no discount tomorrow.*
-2. **A discount is running and did not clear the shelf.** Continuing, or deepening, is a reasonable outcome. The model sees today's discount (`discount_t`) and decides among the supported candidates. If the running discount *did* clear the shelf, rule 1 applies: the discount has done its job.
-3. **No stockout for a week.** The data does not say how long stock has been on the shelf, but most fresh goods go bad within about a week, so a product that has not been cleared in the seven days up to day t is a clearance case. *Rule: a discount is required; the model picks how deep.* (`stockout_days7` counts the days with a stockout hour among the seven up to day t; it is a guardrail input, not a model feature.)
-
-Rules 1 and 3 cannot both fire: a stockout today means the week was not stockout-free. Everything else ("stock turning over": no stockout today, at least one in the past week) is left to the model. Stockout hours are frequent in this data (44% of days), so rule 1 is a strong brake; the threshold in hours is a parameter and is varied below.
-
-**Do managers already behave this way?** Before applying the rules, check what the managers did in each state during the training period, and what followed.
-
+### Do managers already follow the stock rules?
 """)
 
 code(r"""
-state_train = scenario.stock_state(train)  # sold-out threshold: 1 stockout hour on day t
-t = train.assign(state=state_train.values, band=band(train.discount_next),
-                 relative_sales=train[C.TARGET] / train.groupby(C.KEY)[C.TARGET].transform("mean"),
-                 stockout_next=train.target_stockout_hours > 0)
-print("Table 4. Stock state on the evening of day t (training rows) and what the manager did tomorrow, %")
-by_state = t.groupby("state").agg(days=("band", "size"), discount_running_today=("discount_t", lambda x: (x < C.DISCOUNT_DAY).mean() * 100),
-                                  manager_discounts_tomorrow=("band", lambda x: (x != "none").mean() * 100))
-by_state.insert(1, "share_of_days", by_state.days / len(t) * 100)
-display(by_state.reindex(scenario.STATES).round(1))
+t = train.assign(state=scenario.stock_state(train).values, discounted=train.discount_next < C.DISCOUNT_DAY,
+                 relative_sales=train[C.TARGET] / train.groupby(C.KEY)[C.TARGET].transform("mean"), stockout_next=train.target_stockout_hours > 0)
+print("Table 2. Stock state on the evening of day t (training rows): what the manager did tomorrow, and what followed")
+display(t.groupby("state").apply(lambda x: pd.Series({
+    "share of days, %": len(x) / len(t) * 100, "manager discounts tomorrow, %": x.discounted.mean() * 100,
+    "sales vs series mean, discounted": x.relative_sales[x.discounted].mean(), "sales vs series mean, not discounted": x.relative_sales[~x.discounted].mean(),
+    "stockout next day, discounted, %": x.stockout_next[x.discounted].mean() * 100, "stockout next day, not discounted, %": x.stockout_next[~x.discounted].mean() * 100,
+}), include_groups=False).reindex(scenario.STATES).round(2))
 
-print("\nTable 5. What followed on day t+1, by state and by tomorrow's discount band (training rows)")
-following = t.pivot_table(index="state", columns="band", values=["relative_sales", "stockout_next"], aggfunc="mean", observed=True).reindex(scenario.STATES)
-following.columns = [f"{'sales vs series mean' if a == 'relative_sales' else 'stockout next day, share'}: {b}" for a, b in following.columns]
-display(following.round(2))
-
-print("\nTable 6. A discount is running today: what followed when the manager continued it or stopped it (training rows)")
+print("\nTable 3. A discount is running today: what followed when the manager continued it or stopped it (training rows)")
 running = t[t.discount_t < C.DISCOUNT_DAY].assign(today=lambda d: np.where(d.state == scenario.STATES[0], "shelf cleared today", "shelf not cleared today"),
-                                                   tomorrow=lambda d: np.where(d.band != "none", "discount continued", "discount stopped"))
-display(running.groupby(["today", "tomorrow"]).agg(days=("band", "size"), sales_vs_series_mean=("relative_sales", "mean"),
-                                                    stockout_next_day_share=("stockout_next", "mean")).round(2))
+                                                   tomorrow=lambda d: np.where(d.discounted, "discount continued", "discount stopped"))
+display(running.groupby(["today", "tomorrow"]).agg(days=("discounted", "size"), share=("discounted", lambda x: len(x) / 1), sales_vs_series_mean=("relative_sales", "mean"),
+                                                    stockout_next_day_pct=("stockout_next", lambda x: x.mean() * 100)).assign(share=lambda d: d.days / d.groupby(level=0).days.transform("sum") * 100).rename(columns={"share": "share, %"}).round(1))
 """)
 
 md(r"""
-**Reading the tables.**
+- **No.** Managers discount tomorrow on 47% of sold-out days against 42% of turning-over days (Table 2), and a running discount is continued 77–78% of the time whether or not the shelf cleared (Table 3). A week without a stockout is not treated as a clearance signal either: 41% of those days get a discount, the same as in the turning-over state. The rules are a change of practice, not a description of it.
+- **The data supports rules 1 and 2.** After a sell-out the next day is another stockout day 55% of the time with no discount and 66% with one, and sales relative to the series mean are the lowest of the three states, which is the censoring the model is trained on. A running discount continued after a sell-out ends in another stockout 67% of the time against 53% when it is stopped; when the shelf was not cleared the two are close (34% against 30%) and the continued discount shows the larger sales lift.
+- **The data cannot test rule 3.** Week-without-stockout days are 7% of training rows; a discount there lifts sales (1.2× the series mean against 0.9× without) but clears the shelf only a fifth to a quarter of the time. The rule rests on the shelf-life argument, not on evidence that the stock was old.
 
-- **Managers do not use stockouts as a brake** (Table 4). They discount tomorrow on 48% of sold-out days against 42% of turning-over days, and a running discount is continued 77–78% of the time whether or not the shelf cleared (Table 6). Nor do they treat a week without stockouts as a clearance signal: 43% of those days get a discount, the same as in the turning-over state. So the rules below are a change of practice, not a description of it.
-- **After a sell-out the shelf is short regardless of price** (Table 5). The next day is another stockout day 55% of the time with no discount, 65–69% with one. Sales relative to the series mean are the lowest of the three states in every band, which is the censoring: the model is trained on these understated days as well.
-- **Continuing a discount that cleared the shelf buys another stockout** (Table 6). When the discount is running and the shelf was emptied today, continuing tomorrow ends in a stockout 66% of the time against 53% when it is stopped; when the shelf was not emptied, the two are close (34% against 30%) and the continued discount shows the larger sales lift. This is the data's case for rules 1 and 2.
-- **A week without stockout is rare** (7% of training days) and a discount does lift sales there (1.41× the series mean under a deep discount against 0.88× with none), but it clears the shelf only a fifth to a quarter of the time whichever band is chosen. The rule is justified by the shelf life argument, not by any evidence in this data that the stock was old.
+### Outcome on the test week
 
-**Applying the rules to the test week.** The candidate set is the supported set from section 15; each rule removes candidates, then the max-value rule chooses among what is left.
+Every policy below starts from the supported candidates and the max-value rule; the rules and dials are layered on top. "Manager" is what actually happened.
 """)
 
 code(r"""
-guarded = scenario.guarded_recommend(supported, test, "max_value").set_index(C.ROW_KEY).reindex(actual.index)
-unguarded = recs["Max value"]
+def policy(hours=1, cost=0.0, min_gain=0.0):
+    return scenario.guarded_recommend(scenario.reprice(supported, cost), test, "max_value", sold_out_hours=hours, min_gain=min_gain).set_index(C.ROW_KEY).reindex(actual.index)
 
-def summarise_rec(rec):
-    a, b = band(actual).cat.codes, band(rec.discount).cat.codes
-    return {"recommends some discount": (rec.discount < 1).mean(), "deeper band than the manager chose": (b < a).mean(),
-            "same band as the manager": (b == a).mean(), "lighter band than the manager": (b > a).mean(),
-            "mean predicted sales lift over no discount": (rec.pred_sales / at_no_discount).mean() - 1}
+guarded = policy()
+policies = {"What-if + stock rules": guarded, "  sold out = 4 stockout hours": policy(hours=4), "  sold out = 8 stockout hours": policy(hours=8),
+            "  unit cost 0.5": policy(cost=0.5), "  unit cost 0.7": policy(cost=0.7),
+            "  unit cost 0.5, 10% gain hurdle": policy(cost=0.5, min_gain=0.10), "  unit cost 0.7, 10% gain hurdle": policy(cost=0.7, min_gain=0.10)}
+discounts = {"Manager (what actually happened)": actual, "What-if only, no rules": unguarded.discount} | {name: p.discount for name, p in policies.items()}
+at_no_discount = response[response.discount == 1.0].set_index(C.ROW_KEY).pred_sales.reindex(actual.index)
 
-print("Table 7. Which layer decided, % of the 2,184 test-week store-product-days")
-display((guarded.decided_by.value_counts(normalize=True) * 100).round(1).to_frame("days, %").T)
+bands_by_policy = pd.DataFrame({name: band(d).value_counts(normalize=True) * 100 for name, d in discounts.items()}).T.reindex(columns=["none", "moderate", "deep"]).fillna(0)
+agreement = pd.Series({name: (band(d) == band(actual)).mean() * 100 for name, d in discounts.items()})
+fig = plots.plot_policy_outcomes(bands_by_policy, agreement, len(actual), save=C.RESULTS / "policy_outcomes.png")
 
-print("\nTable 8. Recommended discount with and without the rules (max-value rule, supported candidates), % of days")
-display((pd.DataFrame({"Without rules (section 15)": unguarded.discount.value_counts(normalize=True),
-                       "With stock rules": guarded.discount.value_counts(normalize=True)}).reindex(scenario.CANDIDATES).fillna(0).T * 100).round(1))
+print("Table 4. Each policy in numbers, % of the 2,184 test-week days")
+rows = {"What-if only, no rules": unguarded.assign(decided_by="model")} | policies
+display(pd.DataFrame({name: {"decided by the model": (p.decided_by == "model").mean() * 100, "recommends a discount": (p.discount < 1).mean() * 100,
+                             "same band as the manager": agreement[name], "mean predicted sales lift over no discount": ((p.pred_sales / at_no_discount).mean() - 1) * 100}
+                      for name, p in rows.items()}).T.round(1))
 
-print("\nTable 9. What the recommendations amount to, % of days")
-display((pd.DataFrame({"Without rules": summarise_rec(unguarded), "With stock rules": summarise_rec(guarded)}) * 100).round(1))
+print("\nTable 5. With the stock rules: which layer decided, and agreement by stock state")
+by_state = pd.DataFrame({"state": guarded.state, "decided_by": guarded.decided_by, "manager": band(actual).values, "model": band(guarded.discount).values})
+display(by_state.groupby("state").apply(lambda x: pd.Series({"days": len(x), "share of days, %": len(x) / len(by_state) * 100, "decided by": x.decided_by.iloc[0].split(":")[0],
+        "manager discounted, %": (x.manager != "none").mean() * 100, "policy discounts, %": (x.model != "none").mean() * 100, "same band, %": (x.manager == x.model).mean() * 100}),
+        include_groups=False).reindex(scenario.STATES).round(0))
 
-print("\nTable 10. With stock rules, by state: how often the model and the manager land in the same band")
-by = pd.DataFrame({"state": guarded.state, "manager": band(actual).values, "model": band(guarded.discount).values})
-display(by.groupby("state").apply(lambda x: pd.Series({"days": len(x), "manager discounted, %": (x.manager != "none").mean() * 100,
-        "model discounts, %": (x.model != "none").mean() * 100, "same band, %": (x.manager == x.model).mean() * 100}), include_groups=False).reindex(scenario.STATES).round(0).astype(int))
-
-print("\nTable 11. Days with a discount running today: what tomorrow's discount does to it, % of those days")
-running_test = test.discount_t < C.DISCOUNT_DAY
-versus = lambda d: pd.Series(np.select([d >= 0.95, d > test.discount_t.values + 0.025, d < test.discount_t.values - 0.025], ["stop", "lighten", "deepen"], "continue"))[running_test.values]
-display((pd.DataFrame({"Manager": versus(test.discount_next.values).value_counts(normalize=True),
-                       "Without rules": versus(unguarded.discount.values).value_counts(normalize=True),
+print("\nTable 6. Days with a discount running today: what tomorrow's discount does to it, % of those days")
+running_test = (test.discount_t < C.DISCOUNT_DAY).values
+versus = lambda d: scenario.versus_today(pd.DataFrame({**{k: actual.index.get_level_values(k) for k in C.ROW_KEY}, "discount": np.asarray(d)}), test)[running_test]
+display((pd.DataFrame({"Manager": versus(actual.values).value_counts(normalize=True), "What-if only": versus(unguarded.discount.values).value_counts(normalize=True),
                        "With stock rules": versus(guarded.discount.values).value_counts(normalize=True)}).reindex(["continue", "deepen", "lighten", "stop"]).T * 100).round(1))
-print(f"Days with a discount running: {running_test.sum():,}, of which sold out today: {(guarded.state[running_test.values] == scenario.STATES[0]).mean():.0%}")
-""")
-
-md(r"""
-**Reading the tables.**
-
-- **The rules decide more than half the days** (Table 7): the sold-out rule fixes 44% of days at no discount and the week-without-stockout rule requires a discount on 9%; the model chooses on the remaining 47%.
-- **The policy now declines to discount on 45% of days**, against 2% without the rules (Tables 8 and 9). Nearly all of those are sold-out days; on the days the model is allowed to choose it still discounts almost always (Table 10: 98% of turning-over days). The predicted lift at the recommended discount drops from 44% to 24%, because the sold-out days contribute nothing.
-- **Agreement with the manager rises from 31% to 40% of days**, but Table 10 shows why: on sold-out days the manager chose no discount 54% of the time, so a rule that always says "none" agrees that often by construction. In the turning-over state the model agrees with the manager's band on only 28% of days, no better than in section 15.
-- **The biggest change of practice is on running discounts** (Table 11). Managers continue a running discount on 56% of days and stop it on 20%; the policy stops it on 66%, because 46% of the test-week days with a discount running are also sold-out days (printed under Table 11). The data's answer in Table 6 is that most of those continued discounts would have ended in another stockout.
-
-**Sensitivity: the three dials.** The sold-out threshold (how many stockout hours count as sold out), the unit cost (0 = sales value as before; 0.7 = a 30% gross margin at full price, so a 0.7 discount earns nothing per unit), and a minimum gain hurdle (recommend a discount only when its predicted value beats no-discount by this share).
-""")
-
-code(r"""
-def policy_summary(hours, cost, min_gain):
-    rec = scenario.guarded_recommend(scenario.reprice(supported, cost), test, "max_value", sold_out_hours=hours, min_gain=min_gain).set_index(C.ROW_KEY).reindex(actual.index)
-    s = summarise_rec(rec)
-    return {"sold-out hours": hours, "unit cost": cost, "min gain": min_gain, "decided by model, %": (rec.decided_by == "model").mean() * 100,
-            "recommends a discount, %": s["recommends some discount"] * 100, "same band as manager, %": s["same band as the manager"] * 100,
-            "mean predicted sales lift, %": s["mean predicted sales lift over no discount"] * 100}
-
-print("Table 12. Sold-out threshold (unit cost 0, no hurdle)")
-display(pd.DataFrame([policy_summary(h, 0.0, 0.0) for h in [1, 4, 8]]).set_index("sold-out hours").drop(columns=["unit cost", "min gain"]).round(1))
+print(f"Days with a discount running: {running_test.sum():,}, of which sold out today: {(guarded.state[running_test] == scenario.STATES[0]).mean():.0%}")
 so = train.stockout_hours_t[train.stockout_hours_t > 0]
 print(f"Training days with a stockout: {len(so):,} ({len(so) / len(train):.0%}); median stockout hours on those days: {so.median():.0f} of 16")
-print("\nTable 13. Unit cost and minimum gain (sold out = 1 stockout hour)")
-display(pd.DataFrame([policy_summary(1, c, g) for c in [0.0, 0.5, 0.7] for g in [0.0, 0.05, 0.10]]).set_index(["unit cost", "min gain"]).drop(columns="sold-out hours").round(1))
 """)
 
 md(r"""
-- **The sold-out threshold is the strongest dial.** Counting only days with 8 or more stockout hours as sold out hands 72% of days back to the model, and the policy then recommends a discount on 79% of all days (Table 12). Stockout days in this data are long (printed under Table 12: the median stockout day has 7 of the 16 tracked hours empty), so one hour is not an unreasonable threshold, but the choice should be the category manager's.
-- **Cost is what makes the model itself say no.** At a unit cost of 0 the model discounts on 98% of the days it is allowed to choose; at 0.7 the policy discounts on 28% of all days and agrees with the manager's band on 54% (Table 13). This is the margin item from the first draft: without it, only the rules ever say no.
-- **The hurdle matters once cost is in.** At cost 0 a 5% hurdle changes little (the predicted lifts are large); at cost 0.5 it cuts the discount share from 46% to 35%, and a 10% hurdle to 24%.
+**Findings**
 
-**Other guardrails worth adding.** None is implemented here; each is a few lines on the same `guarded_recommend` pattern.
+- **The rules decide more than half the days.** The sold-out rule fixes 44% of days at no discount, the week-without-stockout rule requires a discount on 9%, and the model chooses on the remaining 47% (Table 5).
+- **The policy declines to discount on 45% of days, against 2% for the what-if alone.** Nearly all of those are sold-out days. Where the model is allowed to choose it still discounts almost always (98% of turning-over days), and the mean predicted lift at the recommended discount falls from 44% to 24% because sold-out days contribute nothing (Table 4).
+- **Agreement with the manager rises from 31% to 40%, mostly by construction.** On sold-out days the manager chose no discount 54% of the time, so a rule that always says no agrees that often. In the turning-over state, where the model decides, agreement is 28%, no better than without the rules (Table 5).
+- **The biggest change of practice is on running discounts.** Managers continue a running discount on 56% of such days and stop it on 20%; the policy stops it on 66%, because 46% of the test-week days with a discount running are also sold-out days (Table 6). Table 3 says most of those continued discounts would have ended in another stockout.
+- **The sold-out threshold is the strongest dial; cost is what makes the model itself say no.** Counting only days with 8 or more stockout hours as sold out hands 72% of days to the model and the policy discounts on 79% of them; the median stockout day has 7 of the 16 tracked hours empty, so one hour is not an unreasonable threshold, but the choice is the manager's. With a unit cost of 0.7 the policy discounts on 28% of days and agrees with the manager's band on 54%; without a cost only the rules ever say no. The hurdle matters once cost is in: at cost 0.5 a 10% hurdle cuts the discount share from 46% to 24%.
 
-1. **Use the hour of the stockout, not the count.** The data has the hourly stock status. Selling out in the last hour of the day is the ideal outcome for a perishable (no waste, little lost demand) and should block a discount *and* leave the order quantity alone; selling out by noon says order more. The hour count conflates the two.
-2. **Treat the week-without-stockout rule as graduated.** Seven days without a stockout earns the lightest supported discount, ten or more the deepest. Better still, use a shelf life per category: the dataset's three category levels are unused so far, and fresh produce, bread and dairy do not share a week.
-3. **Cap the daily step.** Move at most one candidate (0.05) from today's discount per day. Managers themselves change a running discount on only a quarter of days (Table 11); a policy that jumps from 1.0 to 0.7 and back whips the reference price around and the what-if has no evidence about such jumps.
-4. **Replace the fixed hurdle with the forest's spread.** The forest's 300 trees give a prediction interval for free; recommend a discount only when the predicted gain clears that spread. This is the uncertainty item from the first draft.
-5. **Decide the order with the discount.** A stockout today is an ordering signal before it is a pricing signal. The honest recommendation on a sold-out day is "no discount, consider ordering more", and on a week-without-stockout day it is "discount, and order less".
-6. **Train on less censored targets.** Rows whose target day is a long stockout (8 or more hours) understate demand by construction. Dropping them from training, or using the dataset's own latent-demand recovery, would make the what-if less pessimistic on exactly the days the rules now bypass.
+**Limitations**
 
-**What this section does not show.** Whether the policy sells more or wastes less. The counterfactual is not observed, so the only honest test is an experiment, or the within-series check from section 15 as a proxy. The rules above are defensible on operational grounds (do not discount what is selling out; do discount what has sat for a week); the data confirms the first and cannot test the second.
+- **Correlation, not cause.** Discounts were applied on days when managers expected demand, so part of the lift the model learned is manager judgement. The response curve describes past co-occurrence; only an experiment, or at least a within-series check of predicted against observed lift, could say what a new discount would do.
+- **No realised outcome.** Whether the policy sells more or wastes less is not observable in this data. Agreement with the manager is a sanity check, not a score, and disagreement is not evidence that either side is wrong.
+- **Censored inputs and targets.** Stockout days are 45% of training days and understate demand. Rule 1 bypasses the worst of them at decision time, but the predictions on the remaining days inherit the bias.
+- **Thresholds are business choices.** One stockout hour, three supporting days, the unit cost and the hurdle were set by judgement, not learned, and Table 4 shows how much rides on them.
+- **Rule 3 assumes a one-week shelf life for every category.** The dataset's category levels are unused so far, and produce, bread and dairy do not share a week.
 
-## 17. Next steps
+**Guardrails worth adding next**, each a few lines on the same pattern: the hour of the stockout rather than the count (a sell-out in the last hour is the ideal outcome, a sell-out by noon is an ordering signal); a shelf life per category instead of a flat week; a cap of one candidate step per day, since managers change a running discount on only a quarter of days; the spread of the forest's 300 trees as the hurdle instead of a fixed percentage; a joint order-and-discount recommendation (sold out: no discount, order more; a week without a stockout: discount, order less); and training on less censored targets.
 
-1. Decide with the team which branch's notebook is the submission and fold the other's unique parts into it (sections 14 to 16 above are the candidates from this side).
-2. Phase 2: the within-series lift check (does the model's predicted lift match each series' own observed lift?), then the graduated shelf-life rule and the forest-spread hurdle from the list above.
-3. If time allows, a later untouched week from the dataset would restore a genuinely unseen test.
+## 15. Next steps
+
+1. The within-series lift check: does the model's predicted lift match the lift each series actually showed on its own discounted days, or is it inherited from manager timing?
+2. The per-category shelf-life rule and the forest-spread hurdle from the list above.
+3. A later untouched week from the dataset, to restore a genuinely unseen test.
 
 ## Appendix: reproducing this notebook
 
