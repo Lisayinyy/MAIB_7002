@@ -1,0 +1,57 @@
+{
+  "created_utc": "2026-10-09T17:46:28.671303+00:00",
+  "purpose": "Cross-city/store transfer stress check; no retuning, no winner change",
+  "status_of_data": "Not claimed globally untouched: public data and prior project history may already expose these series.",
+  "selection_basis": "Train-only teammate usable criteria, city_id != 0, smallest 100 stable SHA-256 keys",
+  "selection_salt": "freshretail-v2-transfer-20261010-v1",
+  "eligible_series": 7798,
+  "selected_series": 100,
+  "selected_keys_sha256": "305191215394e1073556ca3ea72c4c46a9f2efee5f3bb4ff74e73fd53a0f6a43",
+  "original_plan_sha256": "4b975c9bdd7e34c9a988b6ef7e02121a8a7ff4b286a8a245f19b588b6d362c61",
+  "original_selection_sha256": "4d8f97aca0a2bfa4e59573ceda91ac36b5995047af4715b2f41a23b0faddf690",
+  "v2_source_sha256_at_import": "5bb38e0684fddbf17fd6ac9d22b859ec9c39634f08e04272acc237149e8dc6da",
+  "script_sha256": "218a88cad10c28eac76745a9445b15ac6e6d56caf33bc3755d4aba597c547282",
+  "raw_expected_sha256": {
+    "train": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "eval": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e"
+  },
+  "fit_scope": "Original 312 series only, dt < 2024-06-26; zero new-series targets used to fit models",
+  "prediction_mode": "Rolling one-day-ahead: observed earlier days from each new series may update history features",
+  "target_dates": [
+    "2024-06-26",
+    "2024-07-02"
+  ],
+  "selected_model": "RF + validation best (25/75)",
+  "locked_specs": [
+    {
+      "name": "Teammate RF",
+      "kind": "rf",
+      "features": "base"
+    },
+    {
+      "name": "Teammate CatBoost",
+      "kind": "cat",
+      "features": "base",
+      "depth": 5,
+      "iterations": 500,
+      "lr": 0.03,
+      "loss": "RMSE",
+      "l2": 3
+    },
+    {
+      "name": "CatBoost history + IDs MAE",
+      "kind": "cat",
+      "features": "history_ids",
+      "depth": 5,
+      "iterations": 500,
+      "lr": 0.03,
+      "loss": "MAE",
+      "l2": 5
+    }
+  ],
+  "locked_blend_weights": {
+    "Teammate RF": 0.25,
+    "CatBoost history + IDs MAE": 0.75
+  },
+  "outcome_rule": "Report scores and coverage irrespective of direction; no tuning or model-selection update"
+}

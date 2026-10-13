@@ -1,0 +1,28 @@
+{
+  "completed_utc": "2026-10-13T05:38:55.343549+00:00",
+  "change": "Use model and configuration names throughout group report; baselines, individual models, feature/loss variants, then ensembles",
+  "frozen_experiment_files_unchanged": 62,
+  "naming_scope": "Copied in-memory data labels, notebook prose, plots, tables, calculations and diagnostics; saved result IDs and scientific values remain unchanged",
+  "execution": {
+    "completed_utc": "2026-10-13T05:38:05.217717+00:00",
+    "notebook_sha256": "3b9cec6439c321e039c4e102788b213df346849aef2fcbc7f01652d216cb7ce7",
+    "builder_sha256": "568133a5acd4001bbac2b42b8139969087b956509844e5e143104ad52d59aaf4",
+    "helper_sha256": "4398e3e9feb11b142b6570a648d024a5281663e40744237609e555227b0bf42c",
+    "cells": 98,
+    "code_cells": 34,
+    "executed_code_cells": 34,
+    "errors": 0,
+    "inline_images": 15,
+    "collapsible_code_blocks": 34,
+    "navigation_chapters": 17,
+    "live_demonstration_fits": 3,
+    "full_grid_retrained": false
+  },
+  "sha256": {
+    "scripts/build_lisa_notebook.py": "568133a5acd4001bbac2b42b8139969087b956509844e5e143104ad52d59aaf4",
+    "src/finalproject_pricingml/model_labels.py": "5baecabf3785b25d1dac1d27374c9d4a5e13c598daea60f161dcebe48115b62b",
+    "src/finalproject_pricingml/storytelling.py": "4398e3e9feb11b142b6570a648d024a5281663e40744237609e555227b0bf42c",
+    "02_lisa_pipeline.ipynb": "3b9cec6439c321e039c4e102788b213df346849aef2fcbc7f01652d216cb7ce7",
+    "results/v2/02_lisa_pipeline.html": "69a4458a193ef9eb5f40b795cb38cedd504d627dc6cd8f13525366a690f89cad"
+  }
+}

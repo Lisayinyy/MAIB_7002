@@ -1,0 +1,117 @@
+{
+  "checked_utc": "2026-10-10T18:53:12.794865+00:00",
+  "baseline_commit": "bc355d8bfee62e5eafc838f0e813396eb33ddee9",
+  "scope": "Expanded investigation notebook, validation-only diagnostics, Chinese explanation and redesigned A1 poster. No main model selection changes.",
+  "native_notebook": {
+    "completed_utc": "2026-10-10T18:50:45.056543+00:00",
+    "notebook_sha256": "a94807b1b7ed5c6129d0ffe185578e5be6a98346effb4510d3e3126d217a4211",
+    "builder_sha256": "3627b1d46f16da2b70f629d1b25ce82abdb1ce203184f8e1070ac2599c0ea5d9",
+    "helper_sha256": "7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca",
+    "cells": 89,
+    "code_cells": 31,
+    "executed_code_cells": 31,
+    "errors": 0,
+    "inline_images": 12,
+    "collapsible_code_blocks": 31,
+    "navigation_chapters": 18,
+    "live_demonstration_fits": 3,
+    "full_grid_retrained": false
+  },
+  "controlled_ablation": {
+    "status": "passed",
+    "variants": 7,
+    "folds": 5,
+    "fitted_estimators": 35,
+    "validation_rows": 10920,
+    "final_period_scored": false,
+    "selected_model_changed": false,
+    "plan_sha256": "1c8123c527e951b7dd185e3737a40c5e8f76b532fa3b7b1e8a6a9693852bd5a9"
+  },
+  "policy_sensitivity": {
+    "scenarios": 10,
+    "model_fits": 0,
+    "original_policy_replayed_exactly": true,
+    "default_policy_changed": false,
+    "receipt_sha256": "de17fcc18307b8bc8ba291b538320b0bc48ef506c726002649ef62249c00018f"
+  },
+  "canonical_files_unchanged_from_baseline": {
+    "src/finalproject_pricingml/v2.py": true,
+    "results/v2/comparison.csv": true,
+    "results/v2/features.parquet": true,
+    "results/v2/experiment_plan.json": true,
+    "results/v2/selection.json": true,
+    "results/v2/validation_predictions.csv": true,
+    "results/v2/test_predictions.csv": true,
+    "results/v2/discount_response.csv": true,
+    "results/v2/recommendations.csv": true,
+    "results/v2/story_evidence.json": true
+  },
+  "decision_unit_tests": {
+    "passed": 8,
+    "failed": 0
+  },
+  "visual_review": {
+    "all_12_embedded_figures_inspected": true,
+    "bar_chart_legend_corrected": true,
+    "a1_poster_render_inspected": true,
+    "a1_format_fonts_and_sources": {
+      "checked_at_hong_kong": "2026-10-11T02:43:07.314988+08:00",
+      "status": "passed",
+      "design": "Business-first illustrated editorial poster; compact three-method chart",
+      "pages": 1,
+      "width_mm": 594.0001666666666,
+      "height_mm": 840.9999972222221,
+      "embedded_text_fonts": {
+        "/AAAAAA+BitstreamVeraSans-Bold": true,
+        "/AAAAAA+BitstreamVeraSans-Roman": true
+      },
+      "pdf_sha256": "f0642a92cbaeaf533f261c4328ecaf72f0b0a784f3871875ef4bd0482224e1e5",
+      "source_hashes_match": true,
+      "cohort_funnel_and_current_results_checked": true,
+      "real_case_and_transfer_failure_checked": true,
+      "unsupported_glyphs_in_extracted_text": false,
+      "rendered_preview": "freshretail_group_q_A1_preview.png",
+      "visual_review": "Latest 2200-pixel render inspected: no clipping, overlap or missing glyphs. Main explanatory text is 22-28pt, with smaller labels and footnotes.",
+      "scope": "Poster format and saved-source consistency; no model training or policy validation performed.",
+      "submitted": false
+    },
+    "browser_ui": "Not verified this turn: CUA security policy rejected the localhost report URL. No alternate browser or indirect browser workaround attempted."
+  },
+  "local_environment": "Original .venv contained dataless files. Tests used a git-archive verification copy plus current edits under /private/tmp with uv sync --frozen; no changes to the original virtual environment.",
+  "docker": {
+    "status": "passed",
+    "receipt": "docs/REFINEMENT_DOCKER_VERIFICATION.json",
+    "receipt_sha256": "2a54856b975320d9f9720ba7b9b906009cfb5956ff2678af37e6d236dbfe3edd",
+    "offline": true,
+    "host_mounts": false,
+    "code_cells_executed": 31,
+    "live_example_fits": 3,
+    "canonical_grid_retrained": false,
+    "ablation_grid_retrained_in_container": false
+  },
+  "github": {
+    "pull_request": "https://github.com/Lisayinyy/MAIB_7002/pull/1",
+    "draft": true,
+    "merge_or_submission_performed": false
+  },
+  "personal_declarations": "Each member must complete and confirm their own factual contribution and AI-use paragraph before assignment submission.",
+  "artifact_sha256": {
+    "scripts/build_lisa_notebook.py": "3627b1d46f16da2b70f629d1b25ce82abdb1ce203184f8e1070ac2599c0ea5d9",
+    "scripts/execute_lisa_notebook.py": "be14913ebf5f7103cc501b3b826d19d67a5edadf42ba210c1293c578a810bc00",
+    "src/finalproject_pricingml/storytelling.py": "7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca",
+    "scripts/run_story_ablation.py": "34c148d4a32c445d4d6f3b152a73561ec6ac0354cf9cbfbd58352c45488734cf",
+    "scripts/build_story_diagnostics.py": "50432d7e29cbd2fd08fc9d2307c6efce07b4a8499c6ba06ddd88ae2b436ff0e8",
+    "scripts/build_v2_poster.py": "861f870eb642081e70812a5faff3d81a6de75cf74b5ac918782518de0af60f44",
+    "02_lisa_pipeline.ipynb": "a94807b1b7ed5c6129d0ffe185578e5be6a98346effb4510d3e3126d217a4211",
+    "results/v2/02_lisa_pipeline.html": "2d78db39cb021740ee1bbc77d4cda21575fe6c9627e20cf0191b3763100efa09",
+    "docs/PROJECT_STORY_ZH.md": "952e8e8b5e28fa060579b8a3e0e7b92104158d08c2cb15c16c7e873870ef532f",
+    "poster/freshretail_group_q_A1.pdf": "f0642a92cbaeaf533f261c4328ecaf72f0b0a784f3871875ef4bd0482224e1e5"
+  },
+  "html_structure": {
+    "valid_chapter_links": 18,
+    "collapsible_source_blocks": 31,
+    "embedded_figures": 12,
+    "sequential_executions": true,
+    "source_control_characters": 0
+  }
+}

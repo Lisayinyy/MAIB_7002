@@ -20,3 +20,8 @@ catboost_info/
 
 # Claude Code local settings
 .claude/
+tmp/
+*.log
+*.zip
+.env
+.DS_Store

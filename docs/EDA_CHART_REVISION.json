@@ -1,0 +1,30 @@
+{
+  "completed_utc": "2026-10-13T05:06:37.487877+00:00",
+  "change": "Refresh EDA with category donut, horizontal city ranking, category dumbbells and five-store heatmap",
+  "data_and_model_results_unchanged": true,
+  "saved_result_files_hash_checked": 46,
+  "heatmap_window": "2024-04-04 through 2024-05-21",
+  "heatmap_rows": 14976,
+  "execution": {
+    "completed_utc": "2026-10-13T05:06:14.628531+00:00",
+    "notebook_sha256": "f052c5d6bd85f83edefa341983198210186eb99821bc09e13f51f592abfd5bdb",
+    "builder_sha256": "a246df71de23fa84f4503efa6f1c1fd02bde2304a5d80f8642e6eb9fb63e316e",
+    "helper_sha256": "7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca",
+    "cells": 98,
+    "code_cells": 34,
+    "executed_code_cells": 34,
+    "errors": 0,
+    "inline_images": 15,
+    "collapsible_code_blocks": 34,
+    "navigation_chapters": 17,
+    "live_demonstration_fits": 3,
+    "full_grid_retrained": false
+  },
+  "sha256": {
+    "scripts/build_lisa_notebook.py": "a246df71de23fa84f4503efa6f1c1fd02bde2304a5d80f8642e6eb9fb63e316e",
+    "src/finalproject_pricingml/data_exploration.py": "172830ce3397263b47cf6f2e9a8602f02e7f08d1a060eb2af64dce5deba0e33f",
+    "results/data_eda/overview.json": "68811db451d012792a24462a971352f3f5fcca6c432d2c775d3b957c5e2a2d02",
+    "02_lisa_pipeline.ipynb": "f052c5d6bd85f83edefa341983198210186eb99821bc09e13f51f592abfd5bdb",
+    "results/v2/02_lisa_pipeline.html": "076a8046750717da6831b7bd0590e9982e97ee4a464ce54adedad6bb53507ccc"
+  }
+}

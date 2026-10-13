@@ -1,0 +1,308 @@
+{
+  "purpose": "Auditable descriptive evidence for a business-first notebook; no model fits and no new evaluation or tuning.",
+  "inputs_sha256": {
+    "raw_train": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "raw_eval": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e",
+    "features": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "discount_response": "f40755b3bb610d3a7252eaadf35e33fe0dfe600069a72f39657d8869f08f34de",
+    "recommendations": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+    "policy_summary": "5a61768ad42b1ab9af17a6455c24572352a44a08c0c8219b5766521302094763",
+    "teammate_selection_source": "30826ef542cd0f40daa2fcb27684d9bcafc8585f07f582d19ba20ac7ce7f76a4",
+    "teammate_config_source": "09d0b7570702345200772acd39ac96a099b881dda20468a4927db46ab8d32f94"
+  },
+  "source_script_sha256": "db66592b5b4223aa2cf5ebae599b467375fdfea25dd4b8e7bc2ec4ceee8da3bb",
+  "definitions": {
+    "unit": "One store-product-day; the same product in two stores is two sales series.",
+    "discount_rate": "Fraction of the regular price: 1.0 means full price, 0.9 means 10% off.",
+    "discounted_day_for_selection": "discount < 0.95, strictly more than 5% off; exactly 0.95 is not discounted for this filter.",
+    "eligibility": "On all raw train days, discounted share is in [0.15, 0.85], state switches >= 6, and zero-sales share < 0.20.",
+    "switches": "Count changes between consecutive days of the binary discounted-day flag, excluding the first row.",
+    "store_selection": "Rank stores by eligible series count, descending, and retain eligible series in the first five stores, matching teammate code.",
+    "selection_timing_limit": "The cohort is selected using the full historical training period, including validation dates; this is a retrospective benchmark cohort, not a strictly nested historical selection procedure.",
+    "filter_limits": "Variation improves scenario support but does not randomize discounts or remove confounding; zero sales may reflect demand, availability, or recording conditions.",
+    "value_proxy": "price rate times predicted standardized sales; not observed money, profit, expected revenue, or a causal policy effect.",
+    "target_construction": "target_sales is copied from the public dataset's sale_amount on the predicted date; this project's feature-building code does not standardize Y again. All saved target values match those raw sale_amount values exactly."
+  },
+  "full_public_train": {
+    "rows": 4500000,
+    "stores": 898,
+    "products": 865,
+    "store_product_series": 50000,
+    "first_day": "2024-03-28",
+    "last_day": "2024-06-25",
+    "days": 90,
+    "cities": 18
+  },
+  "full_public_eval": {
+    "rows": 350000,
+    "stores": 898,
+    "products": 865,
+    "store_product_series": 50000,
+    "first_day": "2024-06-26",
+    "last_day": "2024-07-02",
+    "days": 7,
+    "cities": 18
+  },
+  "selection_funnel": {
+    "all_series": 50000,
+    "after_discount_share_filter": 28219,
+    "after_discount_share_and_switch_filters": 17693,
+    "after_all_three_filters": 16684,
+    "stores_with_any_eligible_series": 895,
+    "cities_with_any_eligible_series": 18,
+    "selected_series_in_top_five": 312,
+    "selected_unique_products": 122,
+    "selected_city_ids": [
+      0
+    ],
+    "top_five_stores_ranked": [
+      {
+        "store_id": 343,
+        "city_id": 0,
+        "n_series": 152,
+        "n_eligible": 64
+      },
+      {
+        "store_id": 18,
+        "city_id": 0,
+        "n_series": 164,
+        "n_eligible": 64
+      },
+      {
+        "store_id": 235,
+        "city_id": 0,
+        "n_series": 162,
+        "n_eligible": 63
+      },
+      {
+        "store_id": 182,
+        "city_id": 0,
+        "n_series": 160,
+        "n_eligible": 61
+      },
+      {
+        "store_id": 154,
+        "city_id": 0,
+        "n_series": 131,
+        "n_eligible": 60
+      }
+    ],
+    "next_five_stores_ranked": [
+      {
+        "store_id": 145,
+        "city_id": 0,
+        "n_series": 148,
+        "n_eligible": 57
+      },
+      {
+        "store_id": 118,
+        "city_id": 0,
+        "n_series": 140,
+        "n_eligible": 57
+      },
+      {
+        "store_id": 555,
+        "city_id": 0,
+        "n_series": 147,
+        "n_eligible": 56
+      },
+      {
+        "store_id": 1,
+        "city_id": 0,
+        "n_series": 132,
+        "n_eligible": 56
+      },
+      {
+        "store_id": 263,
+        "city_id": 0,
+        "n_series": 161,
+        "n_eligible": 55
+      }
+    ]
+  },
+  "selected_raw_train": {
+    "rows": 28080,
+    "stores": 5,
+    "products": 122,
+    "store_product_series": 312,
+    "first_day": "2024-03-28",
+    "last_day": "2024-06-25",
+    "days": 90,
+    "cities": 1
+  },
+  "selected_raw_eval": {
+    "rows": 2184,
+    "stores": 5,
+    "products": 122,
+    "store_product_series": 312,
+    "first_day": "2024-06-26",
+    "last_day": "2024-07-02",
+    "days": 7,
+    "cities": 1
+  },
+  "cleaning": {
+    "raw_selected_rows": 30264,
+    "raw_selected_discount_above_one_rows": 0,
+    "raw_selected_zero_discount_rows": 0,
+    "raw_selected_missing_values_in_audited_columns": 0,
+    "saved_feature_rows": 28080,
+    "rows_removed_before_saved_features": 2184,
+    "removed_row_dates_and_counts": {
+      "2024-03-28": 312,
+      "2024-03-29": 312,
+      "2024-03-30": 312,
+      "2024-03-31": 312,
+      "2024-04-01": 312,
+      "2024-04-02": 312,
+      "2024-04-03": 312
+    },
+    "description": "Teammate code clips price rate above 1, blanks zero-rate sales/rates before lag construction, builds only lagged sales inputs, and drops rows lacking complete features; V2 preserves these exact row keys."
+  },
+  "saved_features_all": {
+    "rows": 28080,
+    "stores": 5,
+    "products": 122,
+    "store_product_series": 312,
+    "first_day": "2024-04-04",
+    "last_day": "2024-07-02",
+    "days": 90
+  },
+  "saved_features_train": {
+    "rows": 25896,
+    "stores": 5,
+    "products": 122,
+    "store_product_series": 312,
+    "first_day": "2024-04-04",
+    "last_day": "2024-06-25",
+    "days": 83
+  },
+  "saved_features_test": {
+    "rows": 2184,
+    "stores": 5,
+    "products": 122,
+    "store_product_series": 312,
+    "first_day": "2024-06-26",
+    "last_day": "2024-07-02",
+    "days": 7
+  },
+  "naive_scenario_policies": {
+    "candidate_rates": [
+      1.0,
+      0.95,
+      0.9,
+      0.85,
+      0.8,
+      0.75,
+      0.7,
+      0.6
+    ],
+    "max_sales_all_candidates": {
+      "objective": "predicted_standardized_sales",
+      "supported_candidates_only": false,
+      "tie_rule": "An exact objective tie prefers the highest price rate.",
+      "decisions": 2184,
+      "discounted_decisions": 2184,
+      "discount_share": 1.0,
+      "chosen_rate_counts": {
+        "0.70": 33,
+        "0.60": 2151
+      },
+      "unsupported_chosen_decisions": 2062
+    },
+    "max_value_all_candidates": {
+      "objective": "price_rate_times_predicted_sales",
+      "supported_candidates_only": false,
+      "tie_rule": "An exact objective tie prefers the highest price rate.",
+      "decisions": 2184,
+      "discounted_decisions": 2180,
+      "discount_share": 0.9981684981684982,
+      "chosen_rate_counts": {
+        "1.00": 4,
+        "0.95": 157,
+        "0.90": 24,
+        "0.85": 134,
+        "0.80": 6,
+        "0.70": 568,
+        "0.60": 1291
+      },
+      "unsupported_chosen_decisions": 1816
+    },
+    "max_sales_supported_candidates": {
+      "objective": "predicted_standardized_sales",
+      "supported_candidates_only": true,
+      "tie_rule": "An exact objective tie prefers the highest price rate.",
+      "decisions": 2184,
+      "discounted_decisions": 2184,
+      "discount_share": 1.0,
+      "chosen_rate_counts": {
+        "0.90": 364,
+        "0.85": 511,
+        "0.80": 616,
+        "0.75": 350,
+        "0.70": 238,
+        "0.60": 105
+      },
+      "unsupported_chosen_decisions": 0
+    },
+    "max_value_supported_candidates": {
+      "objective": "price_rate_times_predicted_sales",
+      "supported_candidates_only": true,
+      "tie_rule": "An exact objective tie prefers the highest price rate.",
+      "decisions": 2184,
+      "discounted_decisions": 2171,
+      "discount_share": 0.9940476190476191,
+      "chosen_rate_counts": {
+        "1.00": 13,
+        "0.95": 456,
+        "0.90": 222,
+        "0.85": 782,
+        "0.80": 281,
+        "0.75": 188,
+        "0.70": 181,
+        "0.60": 61
+      },
+      "unsupported_chosen_decisions": 0
+    },
+    "interpretation": "Descriptive argmax of already saved model scenarios, holding other inputs fixed; not observed counterfactual sales and not evidence that daily discounting is beneficial."
+  },
+  "actual_saved_policy": {
+    "rows": 2184,
+    "status_counts": {
+      "recommend_discount": 1179,
+      "review_stockout": 967,
+      "review_model_disagreement": 38
+    },
+    "recommended_discount_rate_counts": {
+      "0.95": 6,
+      "0.90": 179,
+      "0.85": 311,
+      "0.80": 348,
+      "0.75": 184,
+      "0.70": 103,
+      "0.60": 48
+    },
+    "discount_share_all_rows": 0.5398351648351648,
+    "rows_without_previous_day_stockout": 1217,
+    "discounted_rows_without_previous_day_stockout": 1179,
+    "discount_share_without_previous_day_stockout": 0.9687756778964667,
+    "parameters": {
+      "min_support_days": 3,
+      "support_width": 0.025,
+      "min_sales_gain": 0.05,
+      "min_value_share": 0.95,
+      "near_optimal_sales_tolerance": 0.01,
+      "stockout_hours_review_threshold": 1,
+      "agreement": "selected model, teammate RF and teammate CatBoost"
+    },
+    "limitation": "The guarded policy still recommends a discount for nearly all cases without previous-day stockout; high discount frequency remains an unresolved model/policy concern."
+  },
+  "checks": {
+    "cohort_keys_match_saved_features": true,
+    "unique_raw_selected_daily_keys": true,
+    "unique_saved_feature_daily_keys": true,
+    "unique_scenario_daily_rate_keys": true,
+    "one_recommendation_per_test_row": true,
+    "saved_targets_equal_raw_sale_amount": true,
+    "model_retraining": false
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "created_utc": "2026-10-10T18:46:27.441857+00:00",
+  "purpose": "Explain fixed technical choices using previously used validation periods; no new selection",
+  "previous_plan_sha256": null,
+  "script_sha256": "34c148d4a32c445d4d6f3b152a73561ec6ac0354cf9cbfbd58352c45488734cf",
+  "inputs_sha256": {
+    "canonical_features": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "canonical_plan": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+    "canonical_selection": "90e175436346a78370e146b47ec88e9f793aa29e4c16b8e71a1812aba3bfbf37",
+    "canonical_validation_predictions": "a8b2415f9508c5c6017c04e32d47096c0f1a6f6e05e551bc37f7a34a16feb8ac",
+    "v2_source": "820af368255c8a0e86380b86a7b962bc92cf84682c5d30ad02eee3cefcb19970",
+    "config_source": "09d0b7570702345200772acd39ac96a099b881dda20468a4927db46ab8d32f94"
+  },
+  "fixed_parameters": {
+    "depth": 5,
+    "iterations": 500,
+    "learning_rate": 0.03,
+    "l2_leaf_reg": 5,
+    "random_seed": 0,
+    "verbose": false,
+    "allow_writing_files": false,
+    "thread_count": 4
+  },
+  "variants": [
+    {
+      "name": "Base 10 / RMSE",
+      "columns": [
+        "sales_t",
+        "sales_lag7",
+        "sales_mean7",
+        "sales_mean_to_date",
+        "stockout_hours_t",
+        "discount_t",
+        "discount_next",
+        "activity_t",
+        "holiday_next",
+        "weekday_next"
+      ],
+      "loss": "RMSE"
+    },
+    {
+      "name": "History 18 / RMSE",
+      "columns": [
+        "sales_t",
+        "sales_lag7",
+        "sales_mean7",
+        "sales_mean_to_date",
+        "stockout_hours_t",
+        "discount_t",
+        "discount_next",
+        "activity_t",
+        "holiday_next",
+        "weekday_next",
+        "sales_lag2",
+        "sales_lag3",
+        "sales_mean3",
+        "sales_mean14",
+        "sales_std7",
+        "sales_trend",
+        "discount_mean7",
+        "stockout_days7"
+      ],
+      "loss": "RMSE"
+    },
+    {
+      "name": "Full 20 / RMSE",
+      "columns": [
+        "sales_t",
+        "sales_lag7",
+        "sales_mean7",
+        "sales_mean_to_date",
+        "stockout_hours_t",
+        "discount_t",
+        "discount_next",
+        "activity_t",
+        "holiday_next",
+        "weekday_next",
+        "sales_lag2",
+        "sales_lag3",
+        "sales_mean3",
+        "sales_mean14",
+        "sales_std7",
+        "sales_trend",
+        "discount_mean7",
+        "stockout_days7",
+        "store_category",
+        "product_category"
+      ],
+      "loss": "RMSE"
+    },
+    {
+      "name": "Full 20 / MAE",
+      "columns": [
+        "sales_t",
+        "sales_lag7",
+        "sales_mean7",
+        "sales_mean_to_date",
+        "stockout_hours_t",
+        "discount_t",
+        "discount_next",
+        "activity_t",
+        "holiday_next",
+        "weekday_next",
+        "sales_lag2",
+        "sales_lag3",
+        "sales_mean3",
+        "sales_mean14",
+        "sales_std7",
+        "sales_trend",
+        "discount_mean7",
+        "stockout_days7",
+        "store_category",
+        "product_category"
+      ],
+      "loss": "MAE"
+    },
+    {
+      "name": "No proposed discount / MAE",
+      "columns": [
+        "sales_t",
+        "sales_lag7",
+        "sales_mean7",
+        "sales_mean_to_date",
+        "stockout_hours_t",
+        "discount_t",
+        "activity_t",
+        "holiday_next",
+        "weekday_next",
+        "sales_lag2",
+        "sales_lag3",
+        "sales_mean3",
+        "sales_mean14",
+        "sales_std7",
+        "sales_trend",
+        "discount_mean7",
+        "stockout_days7",
+        "store_category",
+        "product_category"
+      ],
+      "loss": "MAE"
+    },
+    {
+      "name": "No previous activity / MAE",
+      "columns": [
+        "sales_t",
+        "sales_lag7",
+        "sales_mean7",
+        "sales_mean_to_date",
+        "stockout_hours_t",
+        "discount_t",
+        "discount_next",
+        "holiday_next",
+        "weekday_next",
+        "sales_lag2",
+        "sales_lag3",
+        "sales_mean3",
+        "sales_mean14",
+        "sales_std7",
+        "sales_trend",
+        "discount_mean7",
+        "stockout_days7",
+        "store_category",
+        "product_category"
+      ],
+      "loss": "MAE"
+    },
+    {
+      "name": "No proposed discount or previous activity / MAE",
+      "columns": [
+        "sales_t",
+        "sales_lag7",
+        "sales_mean7",
+        "sales_mean_to_date",
+        "stockout_hours_t",
+        "discount_t",
+        "holiday_next",
+        "weekday_next",
+        "sales_lag2",
+        "sales_lag3",
+        "sales_mean3",
+        "sales_mean14",
+        "sales_std7",
+        "sales_trend",
+        "discount_mean7",
+        "stockout_days7",
+        "store_category",
+        "product_category"
+      ],
+      "loss": "MAE"
+    }
+  ],
+  "contrasts": [
+    {
+      "name": "Add eight history features",
+      "reference": "Base 10 / RMSE",
+      "changed": "History 18 / RMSE",
+      "hypothesis": "Recent level, variation and trend may improve forecasts beyond the four original sales summaries."
+    },
+    {
+      "name": "Add store and product IDs",
+      "reference": "History 18 / RMSE",
+      "changed": "Full 20 / RMSE",
+      "hypothesis": "Recurring store/product differences may improve forecasts within this existing-store cohort."
+    },
+    {
+      "name": "Change RMSE loss to MAE",
+      "reference": "Full 20 / RMSE",
+      "changed": "Full 20 / MAE",
+      "hypothesis": "Training toward a conditional median may reduce validation MAE, potentially at the expense of RMSE."
+    },
+    {
+      "name": "Remove proposed target-day discount",
+      "reference": "Full 20 / MAE",
+      "changed": "No proposed discount / MAE",
+      "hypothesis": "The proposed price contains predictive information beyond history, IDs and previous-day activity."
+    },
+    {
+      "name": "Remove previous-day activity",
+      "reference": "Full 20 / MAE",
+      "changed": "No previous activity / MAE",
+      "hypothesis": "Previous-day activity may add information beyond recent sales and discounts; redundancy is possible."
+    },
+    {
+      "name": "Remove both action/context fields",
+      "reference": "Full 20 / MAE",
+      "changed": "No proposed discount or previous activity / MAE",
+      "hypothesis": "Removing both fields tests their combined conditional contribution; correlated history may remain informative."
+    }
+  ],
+  "folds": {
+    "1": [
+      "2024-05-22",
+      "2024-05-28"
+    ],
+    "2": [
+      "2024-05-29",
+      "2024-06-04"
+    ],
+    "3": [
+      "2024-06-05",
+      "2024-06-11"
+    ],
+    "4": [
+      "2024-06-12",
+      "2024-06-18"
+    ],
+    "5": [
+      "2024-06-19",
+      "2024-06-25"
+    ]
+  },
+  "expected_fits": 35,
+  "excluded_final_period_start": "2024-06-26",
+  "fit_rule": "Expanding training rows strictly before each validation week; no eval_set, early stopping or parameter search",
+  "prediction_rule": "Rolling one-day-ahead observed histories, one fit per fold, shared nonnegative prediction clipping",
+  "metric_rule": "Equal-week mean MAE primary; equal-week mean RMSE secondary; paired fold deltas changed minus reference",
+  "cohort_status": "Same retrospective 312-series cohort selected using all original training dates; no city-wide generalization claim.",
+  "exposure_status": "Already-viewed shared benchmark. All new work is exploratory; no untouched final evaluation remains.",
+  "outcome_rule": "Report every declared contrast, including negative results; do not update canonical selection or score final-week targets",
+  "causal_boundary": "Conditional predictive contribution, not randomized discount/activity effects, elasticity, profit or waste outcomes",
+  "ablation_boundary": "Removing discount_next leaves historical discounts and sales; removing activity_t tests yesterday's activity only",
+  "canonical_selected_model": "RF + validation best (25/75)",
+  "canonical_weights": {
+    "Teammate RF": 0.25,
+    "CatBoost history + IDs MAE": 0.75
+  },
+  "environment": {
+    "python": "3.12.13",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "catboost": "1.2.10",
+    "scikit-learn": "1.9.1",
+    "pyarrow": "25.0.1"
+  }
+}

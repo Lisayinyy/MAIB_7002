@@ -1,0 +1,19 @@
+{
+  "completed_utc": "2026-10-13T05:38:05.217717+00:00",
+  "notebook_sha256": "ba3ffa4ebf2a7041d490269f52069f0feca0f26dd477b38ddd4c2834790080e9",
+  "builder_sha256": "4ee485dcf98faca2f3c37c32ddfef1c66f1a9a5f95409b9f74f6257c12e9e612",
+  "helper_sha256": "4398e3e9feb11b142b6570a648d024a5281663e40744237609e555227b0bf42c",
+  "cells": 83,
+  "code_cells": 29,
+  "executed_code_cells": 29,
+  "errors": 0,
+  "inline_images": 15,
+  "collapsible_code_blocks": 29,
+  "navigation_chapters": 14,
+  "live_demonstration_fits": 0,
+  "full_grid_retrained": false,
+  "presentation_modified_utc": "2026-10-13T09:23:06.861324+00:00",
+  "prior_execution_notebook_sha256": "3b9cec6439c321e039c4e102788b213df346849aef2fcbc7f01652d216cb7ce7",
+  "execution_note": "Retained outputs from the completed_utc execution. All technical appendices were removed after that execution; this presentation-only edit did not rerun or refit models.",
+  "retained_outputs_unchanged": true
+}

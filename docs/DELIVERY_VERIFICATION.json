@@ -1,0 +1,108 @@
+{
+  "verified_utc": "2026-10-09T18:01:36.192049+00:00",
+  "status": "local_delivery_checks_passed",
+  "tested_implementation_commit": "d0e2e5a7110042aaf004d7aea3ab9afb918289a9",
+  "platforms": {
+    "host": "macOS arm64",
+    "container": "Linux arm64 via Docker Desktop",
+    "other_platforms": "Not yet verified; GitHub Actions is configured for Ubuntu amd64."
+  },
+  "offline_container": {
+    "network": "none",
+    "raw_files_present": false,
+    "saved_methods_checked": 17,
+    "unit_tests_passed": 8,
+    "notebook_code_cells_executed": 10,
+    "notebook_errors": 0,
+    "inline_images": 2,
+    "live_example_fits": 2,
+    "poster_rebuilt": true
+  },
+  "full_container_run": {
+    "status": "passed",
+    "models_checked": 17,
+    "oof_rows": 10920,
+    "test_rows": 2184,
+    "recommendation_rows": 2184,
+    "raw_sha256": {
+      "train": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+      "eval": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e"
+    },
+    "checked_utc": "2026-10-09T17:56:46.553559+00:00",
+    "retrained_here": true,
+    "duration_seconds": 56.95931702600137,
+    "fitted_models": 66
+  },
+  "full_container_raw_source": "Fresh download from the pinned public revision; no host raw-data bind mount",
+  "clean_copy": {
+    "method": "git clone --no-hardlinks from the committed review branch",
+    "commit": "d0e2e5a7110042aaf004d7aea3ab9afb918289a9",
+    "host_venv_copied": false,
+    "raw_files_copied": false,
+    "docker_compose_build": "passed (reused package/image build cache)",
+    "both_services_healthy": true,
+    "named_raw_data_volume_nonroot_write": "passed",
+    "saved_results_check": "passed"
+  },
+  "cross_platform_comparison": {
+    "same_validation_selected_model": true,
+    "model": "RF + validation best (25/75)",
+    "macos_metrics": {
+      "validation_mae": 0.2940187482544489,
+      "test_mae": 0.2833894724023905,
+      "test_rmse": 0.4560514364090787
+    },
+    "linux_arm64_metrics": {
+      "validation_mae": 0.2940153896556705,
+      "test_mae": 0.283404151481561,
+      "test_rmse": 0.4561176737430102
+    },
+    "maximum_absolute_difference_across_17_methods": {
+      "validation_mae": 3.358598778424593e-06,
+      "test_mae": 4.381646345780199e-05,
+      "test_rmse": 0.00026405826042019687
+    },
+    "interpretation": "Close numerical reproduction, not bitwise equality. The observed small platform differences do not change the selected model; their exact numerical cause was not isolated. Published notebook/poster tables use the saved macOS run."
+  },
+  "browser_checks": {
+    "report_home": "passed",
+    "executed_html": "passed: visible results, two images, worked example and transfer limitation",
+    "jupyter": "service healthy; final UI login pending"
+  },
+  "poster": {
+    "checked_at_hong_kong": "2026-10-10T01:50:00.761411+08:00",
+    "status": "passed",
+    "pages": 1,
+    "width_mm": 594.0001666666666,
+    "height_mm": 840.9999972222221,
+    "embedded_text_fonts": {
+      "/AAAAAA+BitstreamVeraSans-Bold": true,
+      "/AAAAAA+BitstreamVeraSans-Roman": true
+    },
+    "pdf_sha256": "4c3e114ff08edb98fdbafa518fdf8e3e848c6920a926d977d6daadc25ae60bc0",
+    "source_hashes_match": true,
+    "selected_model_and_metrics_text_checked": true,
+    "transfer_failure_and_metrics_text_checked": true,
+    "unsupported_glyphs_in_extracted_text": false,
+    "rendered_preview": "freshretail_group_q_A1_preview.png",
+    "visual_review": "Final 2000-pixel render inspected: no clipping, overlap or missing glyphs.",
+    "scope": "Poster format and source consistency; not an independent replication of model training.",
+    "submitted": false
+  },
+  "publication": {
+    "branch": "codex/freshretail-review-v2",
+    "target": "pricing-ml-ap",
+    "state": "pushed; final documentation commit follows",
+    "verified_remote_implementation_sha": "d0e2e5a7110042aaf004d7aea3ab9afb918289a9",
+    "pull_request": "https://github.com/Lisayinyy/MAIB_7002/pull/1",
+    "draft": true,
+    "ci": "Configured; final live status is available on the pull request checks tab."
+  },
+  "submission": "Not submitted. Each group member must complete their own factual contribution/AI declaration and review the artifacts.",
+  "limitations": [
+    "The final benchmark week has been seen during prior development.",
+    "The selected blend failed to improve over the teammate on the additional transfer cohort.",
+    "Forecast scores and scenario constraints do not establish causal pricing, profit or waste improvements.",
+    "A first image build needs network access; static HTML math rendering may use an optional remote MathJax CDN."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "completed_utc": "2026-10-09T17:49:34.148769+00:00",
+  "duration_seconds": 11.66890704099933,
+  "plan_sha256": "e061c4f5a5f4513181a5f1e9d30cf2239611f0df320e30c3016d53fb254f513b",
+  "prediction_sha256": "9cbaffd07ff2025a7453a584c9a43a3d7575084afaf9a854872077450daa1ca2",
+  "fitted_estimators": 3,
+  "training_rows": 25896,
+  "selected_series": 100,
+  "evaluation_series": 100,
+  "evaluation_rows": 700,
+  "maximum_expected_rows": 700,
+  "excluded_feature_rows": 0,
+  "new_cities": 16,
+  "new_stores": 93,
+  "unseen_product_ids": 47,
+  "winner_changed": false,
+  "tuning_performed": false,
+  "interpretation": "Transfer stress check with train-only deterministic cohort selection. Sales forecasting only; no policy or causal uplift evaluation."
+}

@@ -1,0 +1,13 @@
+{
+  "checked_utc": "2026-10-13T05:30:10.440487+00:00",
+  "change": "Explicitly state the higher stockout share in the deep-discount band in Section2.4",
+  "source": "Existing executed EDA output:1392deep-bandrows,stockout_share0.56034;8773near/fullrows,stockout_share0.42300",
+  "markdown_only": true,
+  "code_and_saved_outputs_unchanged": true,
+  "models_rerun": false,
+  "sha256": {
+    "scripts/build_lisa_notebook.py": "92eef1ac6016fd79bb35abf93cd68c57db4e6565d019e9223684e4264822b7ab",
+    "02_lisa_pipeline.ipynb": "d80173d24c1da923b424cf47decb25811f9cbbf5b3268fb7121e2f45c7eab9f3",
+    "results/v2/02_lisa_pipeline.html": "eaf2a6d733b0964a3744cce262f92123997ee73a08716430450677e0a72e8c86"
+  }
+}

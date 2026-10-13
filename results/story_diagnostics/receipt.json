@@ -1,0 +1,20 @@
+{
+  "completed_utc": "2026-10-10T18:47:01.376212+00:00",
+  "status": "passed",
+  "inputs_sha256": {
+    "results/v2/features.parquet": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "results/v2/discount_response.csv": "f40755b3bb610d3a7252eaadf35e33fe0dfe600069a72f39657d8869f08f34de",
+    "results/v2/recommendations.csv": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+    "results/v2/experiment_plan.json": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+    "src/finalproject_pricingml/v2.py": "820af368255c8a0e86380b86a7b962bc92cf84682c5d30ad02eee3cefcb19970"
+  },
+  "script_sha256": "50432d7e29cbd2fd08fc9d2307c6efce07b4a8499c6ba06ddd88ae2b436ff0e8",
+  "model_fits": 0,
+  "original_policy_replayed_exactly": true,
+  "canonical_results_unchanged": true,
+  "outputs_sha256": {
+    "plan.json": "7f2eb7de41a26230a346c0eb1f9387cc49399e1ad6dd81a5e6692011926a674f",
+    "policy_sensitivity.csv": "c7130f3207ce1acefe829ee3f9259a7014d41b7108e0a59b35f7c5beb692cd02",
+    "policy_decisions.csv": "2c4672751cf056057e73c11be494d8b00a444a84ba339b4c06ef4d09ad91e5e1"
+  }
+}

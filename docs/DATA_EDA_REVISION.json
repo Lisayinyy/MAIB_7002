@@ -1,0 +1,32 @@
+{
+  "completed_utc": "2026-10-13T04:55:58.147417+00:00",
+  "change": "Merge Data and selection into Data + EDA (2.1-2.5), add source and cohort comparisons, move cleaning before features, renumber later chapters",
+  "evidence": "Pinned original public training file; pre-validation behavioral dates; unchanged 312-series cohort",
+  "execution": {
+    "completed_utc": "2026-10-13T04:55:37.294239+00:00",
+    "notebook_sha256": "7ef009bb66764ad659710f19b5625bc8df375efa0894199dfb2d2ec54c1ce3af",
+    "builder_sha256": "e6b6073fdac6f2b8f365fbe29af1cf7130f4a29f002d573e7dbd2562bc085ecd",
+    "helper_sha256": "7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca",
+    "cells": 95,
+    "code_cells": 33,
+    "executed_code_cells": 33,
+    "errors": 0,
+    "inline_images": 14,
+    "collapsible_code_blocks": 33,
+    "navigation_chapters": 17,
+    "live_demonstration_fits": 3,
+    "full_grid_retrained": false
+  },
+  "scientific_results_unchanged": true,
+  "saved_scientific_artifacts_hash_checked": 63,
+  "sha256": {
+    "scripts/build_lisa_notebook.py": "e6b6073fdac6f2b8f365fbe29af1cf7130f4a29f002d573e7dbd2562bc085ecd",
+    "scripts/build_dataset_eda.py": "f70a58809cd6796985ed154c21bf5d516d094659854cf9ef22347d3b6603f5ef",
+    "src/finalproject_pricingml/data_exploration.py": "347cf84a4eff64a5392edfe246dd7fd35aed237297646c932c42efa49055f922",
+    "results/data_eda/overview.json": "68811db451d012792a24462a971352f3f5fcca6c432d2c775d3b957c5e2a2d02",
+    "02_lisa_pipeline.ipynb": "7ef009bb66764ad659710f19b5625bc8df375efa0894199dfb2d2ec54c1ce3af",
+    "results/v2/02_lisa_pipeline.html": "5a9c820e647545430d966c818f64d010c8ea9fe0386452d48d8d106c25bd0ebf"
+  },
+  "saved_scientific_artifacts_byte_identical": 62,
+  "audit_only_change": "verification.json: checked_utc refreshed; all other values identical"
+}

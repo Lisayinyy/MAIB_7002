@@ -1,0 +1,45 @@
+{
+  "status": "passed",
+  "method": "Independent Python stdlib csv + math.fsum; no project score/aggregate helpers called",
+  "checked_rows": 10920,
+  "checked_variants": 7,
+  "checked_fold_metrics": 35,
+  "plan_sha256": "1c8123c527e951b7dd185e3737a40c5e8f76b532fa3b7b1e8a6a9693852bd5a9",
+  "results": [
+    {
+      "variant": "Base 10 / RMSE",
+      "validation_mae": 0.30454808657944243,
+      "validation_rmse": 0.47221007095720857
+    },
+    {
+      "variant": "History 18 / RMSE",
+      "validation_mae": 0.2978095663185062,
+      "validation_rmse": 0.46140806368749815
+    },
+    {
+      "variant": "Full 20 / RMSE",
+      "validation_mae": 0.29715150342828395,
+      "validation_rmse": 0.46014936103841775
+    },
+    {
+      "variant": "Full 20 / MAE",
+      "validation_mae": 0.2944946456501093,
+      "validation_rmse": 0.4591155272056916
+    },
+    {
+      "variant": "No proposed discount / MAE",
+      "validation_mae": 0.31080778595134656,
+      "validation_rmse": 0.49954471435115905
+    },
+    {
+      "variant": "No previous activity / MAE",
+      "validation_mae": 0.2953748241552524,
+      "validation_rmse": 0.4633326872939862
+    },
+    {
+      "variant": "No proposed discount or previous activity / MAE",
+      "validation_mae": 0.3104446575194765,
+      "validation_rmse": 0.4993133504348191
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "revision_scope": "English narrative and contents label only",
+  "cells": 89,
+  "markdown_cells": 58,
+  "code_cells": 31,
+  "code_sources_unchanged": true,
+  "words_before": 8235,
+  "words_after": 5783,
+  "word_reduction_pct": 29.8,
+  "reference_blob_sha": "e5bf2184fd977c73ae61d4c0975e1ca86ef0616a",
+  "scientific_artifacts_unchanged": {
+    "results/v2/comparison.csv": "212f17b467481ba81b5b5a42ac3a19759375f0734cf0bfa8ce9e985fede419d8",
+    "results/v2/selection.json": "90e175436346a78370e146b47ec88e9f793aa29e4c16b8e71a1812aba3bfbf37",
+    "results/v2/features.parquet": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "results/v2/test_predictions.csv": "9ac3699b39fe582de8cc9606d4d44ad6835c3aaf7660e6fd222dee60c6d4c516",
+    "results/v2/policy_summary.json": "5a61768ad42b1ab9af17a6455c24572352a44a08c0c8219b5766521302094763",
+    "results/v2/recommendations.csv": "43cbbceed94c2c6aa9cd8ed9bba3a96ed37b67f38d1736dd58f9302d932717fd",
+    "src/finalproject_pricingml/v2.py": "820af368255c8a0e86380b86a7b962bc92cf84682c5d30ad02eee3cefcb19970"
+  },
+  "execution": {
+    "completed_utc": "2026-10-12T08:27:30.848055+00:00",
+    "notebook_sha256": "eb5de86cf107ef02f7871b7cc61d1049e4aa4a03677229b9de589bedbe0484c0",
+    "builder_sha256": "79653c62117d79c4bc083977bfbebf12bc616338921a6c5a109781131012583f",
+    "helper_sha256": "7de5cc0648fceffc2e3dd78e25b2bc1cd040392ef7446996b89a799e5eaf49ca",
+    "cells": 89,
+    "code_cells": 31,
+    "executed_code_cells": 31,
+    "errors": 0,
+    "inline_images": 12,
+    "collapsible_code_blocks": 31,
+    "navigation_chapters": 18,
+    "live_demonstration_fits": 3,
+    "full_grid_retrained": false
+  },
+  "review": "All narrative cells checked against the original notebook and saved outputs."
+}

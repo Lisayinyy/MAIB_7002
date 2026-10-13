@@ -1,0 +1,8 @@
+{
+  "selected_minus_teammate_mae": -0.005842771261994179,
+  "series_bootstrap_95pct_interval": [
+    -0.010104686129866775,
+    -0.0011266001930648228
+  ],
+  "limitation": "Descriptive 7-day, 5-store interval; shared-store correlation and selection optimism not corrected."
+}

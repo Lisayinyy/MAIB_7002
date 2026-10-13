@@ -1,0 +1,22 @@
+{
+  "status": "complete",
+  "completed_utc": "2026-10-10T18:47:24.803280+00:00",
+  "first_fit_started_utc": "2026-10-10T18:46:37.849349+00:00",
+  "duration_seconds": 46.95492362499863,
+  "fitted_estimators": 35,
+  "validation_rows": 10920,
+  "plan_sha256": "1c8123c527e951b7dd185e3737a40c5e8f76b532fa3b7b1e8a6a9693852bd5a9",
+  "outputs_sha256": {
+    "validation_predictions.csv": "e9e4deabf6bedc5ed87353014e1073d2131149736728243695e01ba6b3af9355",
+    "fold_metrics.csv": "14911e05577ae56aa730538b910b595db01859f26786b4c8d7236ed1f9ab5144",
+    "summary.csv": "0b305e950ed36fb76358126907085b4a7b3e0c6d61f48754b64c1cb64687ca50",
+    "fold_contrasts.csv": "94e33f6005dc5d0bff8fe92fd3f5a5292a36fc84e38cb59b3000b067192ff417",
+    "contrasts.csv": "1951a8a5ddeede223fb1a72365ebdcf4ffa75982e19654c4d6b92570b594a6fb",
+    "timing.csv": "01f4950a406383b0e8c9883347aac724862bc21c9510104c2b64e62b86970d65",
+    "baseline_fold_metrics.csv": "175d2969c4861f6f5b5d405f131d6cf4a8155253b2cfc573970dc58cbfec30cf",
+    "canonical_replay_check.json": "2bb94ae8e930b470f85ba9c1fd4a9a1d43143fe2631119c68446abaa51196655"
+  },
+  "final_period_scored": false,
+  "selected_model_changed": false,
+  "input_hashes_unchanged": true
+}

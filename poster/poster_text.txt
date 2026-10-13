@@ -1,0 +1,80 @@
+HKU  /  MAIB7002  /  GROUP Q
+Should we discount
+tomorrow?
+Daily decision support for perishable food
+Aashish Omprakash Pareek  |  Yuanyuan Yin  |  Lingyu Chen
+?
+A category manager must choose tomorrow's discount. We use public sales histories to compare supported
+price options while limiting loss of predicted sales value.
+01
+Why these five stores?
+Use products with enough discount variation to study, then choose the stores with the most eligible products.
+50,000
+public store-SKU
+histories
+16,684
+eligible after filtering
+5
+stores with most
+eligible series
+312
+series in our benchmark
+Eligibility: 15-85% discounted days, 6+ discount-state changes, and fewer than 20% zero-sales days.
+Selected stores: 343 / 18 / 235 / 182 / 154. One city; chosen retrospectively using the full training period.
+02
+Forecast first. Then make a cautious decision.
+Read the history
+Recent sales, past stockouts,
+calendar and a planned price
+rate.
+Predict tomorrow
+Random Forest averages
+trees (25%). CatBoost adds
+trees (75%), using MAE loss,
+richer history and store/SKU
+inputs.
+%
+Compare discounts
+Only rates with historical
+support. Compare sales and
+price rate × sales.
+?
+Recommend or review
+Require model agreement. If
+evidence or supply is
+uncertain, ask the manager to
+review.
+The rule: seek at least 5% more predicted sales while keeping at least 95% of full-price sales value. These are decision thresholds, not
+guarantees.
+03
+More accurate on the five-store benchmark
+7-day sales average
+0.3142
+Original 50/50 blend
+0.2892
+Proposed 25/75 blend
+0.2834
+Final-period MAE: mean absolute error in the dataset sales scale; lower is better. Same 2,184
+daily cases, 26 June-2 July 2024.
+9.8%
+lower prediction error
+than the simple baseline
+Selected using the lowest mean MAE
+across five chronological validation
+weeks.
+One technical experiment: keep the extended features fixed and change CatBoost's training loss. MAE loss reduced validation MAE
+from 0.2972 to 0.2945 versus RMSE loss.
+04
+What would the manager actually see?
+10%
+OFF
+Store 18, SKU 11, 2024-06-26
+Yesterday's observed sales: 1.400. Other context is held fixed.
+Full price: 1.074 predicted sales   |   10% off: 1.291 predicted sales
+Sales-value proxy: 0.90 × 1.291 = 1.162. The candidate passes support, value and model-agreement
+checks.
+An illustrative model scenario, not an observed response to changing the price.
+Where evidence stops: on 700 cases from 93 new stores, MAE was 0.2890 vs. 0.2884 for the original blend: no improvement; the models were not retuned.
+The main benchmark was already viewed; 96.9% of cases without recent stockouts still recommend discounts. Historical discounts are not causal evidence, and
+stockouts do not reveal inventory age or waste.
+Public data: Dingdong-Inc/FreshRetailNet-50K, CC BY 4.0. Code + Docker: github.com/Lisayinyy/MAIB_7002. Full experiments, limitations and contribution/AI-use statements accompany the notebook.
