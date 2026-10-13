@@ -1,0 +1,20 @@
+{
+  "scope": "Two Markdown cells only; code, outputs and execution counts preserved.",
+  "lab_before_sha256": "aaad9c28885f6c01ce34c3f2d314a07a3e82bb6e46f7057428282feb09d5144e",
+  "host_before_sha256": "eb5de86cf107ef02f7871b7cc61d1049e4aa4a03677229b9de589bedbe0484c0",
+  "host_after_sha256": "80dbd1774f98fb3d417b23ec99082c0a47845a05286536c3b2828fb8290b73cc",
+  "builder_before_sha256": "79653c62117d79c4bc083977bfbebf12bc616338921a6c5a109781131012583f",
+  "builder_after_sha256": "7df19c9bb447607654965ed7edeb58c674e49790a41d3cdebdf75ae9a1341f96",
+  "edited_cells_zero_based": [
+    2,
+    85
+  ],
+  "model_retraining": false,
+  "lab_after_sha256": "ed7141072e3e4091b1e1a6fecef784d808659855404b1f9dd6670b08a1e37c6e",
+  "html_sha256": "5d2284b17201864945d3c3a37a36d3b841e6db66ca2c6ef69a54d9b8ab1c4a91",
+  "validated_notebook_format": true,
+  "code_cells_and_outputs_unchanged": true,
+  "execution_receipt_preserved": true,
+  "last_execution_utc": "2026-10-12T08:27:30.848055+00:00",
+  "revision_note": "Editorial change only; exported saved outputs without rerunning models."
+}

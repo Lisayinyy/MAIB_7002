@@ -1,6 +1,6 @@
 # Daily discount decisions for perishable food
 
-HKU MAIB7002 · Group Q · **Lisa's review and pipeline extension**
+HKU MAIB7002 · Group Q · **Daily discount decision-support project**
 
 The workflow is **predict tomorrow's observed sales → check whether discount evidence is sufficient → compare supported rates → recommend or request review**. The intended user is a fresh-food category manager. Forecast errors are measured; predicted discount gains are scenarios, not proven sales, revenue or waste improvements.
 
@@ -8,9 +8,9 @@ This branch extends Aashish's `pricing-ml-ap` commit `5b52099ab73e57c5afbb1915d0
 
 ## Start here
 
-1. **Learn the teammate version:** [逐行代码讲解](docs/TEAMMATE_CODE_WALKTHROUGH_ZH.md).
-2. **Understand Lisa's logic:** [中文故事与答辩讲解](docs/PROJECT_STORY_ZH.md), then [源码逐步说明](docs/LISA_PIPELINE_WALKTHROUGH_ZH.md).
-3. **Read the project story:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [executed HTML report](results/v2/02_lisa_pipeline.html). Follow the manager's question, public-data suitability, five-store selection, feature arithmetic, chronological evaluation, each model's investigation, controlled ablations, and a specific discount recommendation. The HTML has chapter navigation and expandable Python. Worked model calculations and full results remain in the technical appendix.
+1. **Read the current group report:** [02_lisa_pipeline.ipynb](02_lisa_pipeline.ipynb), or its [executed HTML report](results/v2/02_lisa_pipeline.html). Follow the manager's question, Data + EDA, five-store selection, data cleaning and feature arithmetic, then **baselines → individual models → feature and loss comparisons → ensembles**, chronological results, and a specific discount recommendation. The HTML has chapter navigation and expandable Python. Worked model calculations and full results remain in the technical appendix.
+2. **Understand the project logic:** [中文故事与答辩讲解](docs/PROJECT_STORY_ZH.md), then [源码逐步说明](docs/LISA_PIPELINE_WALKTHROUGH_ZH.md). These earlier guides document the extension's development.
+3. **Learn the original implementation:** [逐行代码讲解](docs/TEAMMATE_CODE_WALKTHROUGH_ZH.md), covering Aashish's original work.
 4. **Review the A1 poster:** [single-page portrait PDF](poster/freshretail_group_q_A1.pdf), [preview](poster/freshretail_group_q_A1_preview.png), [editable generator](scripts/build_v2_poster.py).
 5. **Check submission requirements:** [brief checklist](docs/assignment_requirements.md) and [personal contribution/AI declarations](docs/CONTRIBUTIONS_TEMPLATE.md). Each member must complete and confirm their own paragraph.
 
@@ -61,6 +61,8 @@ docker compose exec lab python scripts/run_story_ablation.py --force
 # Rebuild the selection funnel and scenario diagnostics against the new output hashes.
 docker compose exec lab python scripts/build_story_evidence.py
 docker compose exec lab python scripts/build_story_diagnostics.py
+# Refresh the full-source and selected-cohort EDA cache from the pinned training data.
+docker compose exec lab python scripts/build_dataset_eda.py
 # Update notebook output and poster after results change.
 docker compose exec lab python scripts/build_lisa_notebook.py
 docker compose exec lab python scripts/execute_lisa_notebook.py
@@ -80,26 +82,33 @@ docker compose down
 
 The report service serves the files saved in its image. Re-executing the notebook in `lab` does not update `report` automatically. To publish your regenerated artifacts locally, copy `lab:/app/results/.` into `./results/` and `lab:/app/poster/.` into `./poster/`, then run `docker compose up --build -d` again. Export notebook edits first as shown above. The default report already contains the delivered results.
 
-To change host ports, copy `.env.example` to `.env` and edit them before startup. The [current refinement Docker check](docs/REFINEMENT_DOCKER_VERIFICATION.json) ran all 31 notebook code cells and three live examples without network or raw data, verified both new result sets, and rebuilt the poster. For local Python development, `uv sync --frozen` uses the version-locked environment; run commands with `uv run`. Python and uv base images are pinned by digest in the Dockerfile. See [Docker verification](docs/DELIVERY_VERIFICATION.json) for exactly what was tested.
+To change host ports, copy `.env.example` to `.env` and edit them before startup. The [earlier refinement Docker check](docs/REFINEMENT_DOCKER_VERIFICATION.json), recorded on 10 October 2026 UTC, ran that version's 31 notebook code cells and three live examples without network or raw data, verified both new result sets, and rebuilt the poster. It predates the current EDA and model-label revisions. For local Python development, `uv sync --frozen` uses the version-locked environment; run commands with `uv run`. Python and uv base images are pinned by digest in the Dockerfile. See the [earlier Docker delivery verification](docs/DELIVERY_VERIFICATION.json) for its exact tested scope.
+
+The [current notebook execution](results/v2/notebook_execution.json), completed on **13 October 2026 UTC**, records 98 cells, all 34 code cells executed, zero errors, 15 inline images and three live example fits. [Model-label verification](docs/MODEL_LABEL_REVISION.json) matches the current notebook, HTML and source hashes; [EDA chart revision](docs/EDA_CHART_REVISION.json) records the preceding chart changes. These revisions retain the saved experiment results and use model/configuration names in the group report.
 
 ## Measured result and scope
 
-All rows below use the same 312 series, five chronological validation weeks, and 2,184 final-period cases. MAE and RMSE are in **normalized observed sales**, not physical units or currency. Rows are in baseline-first order.
+All rows below use the same 312 series, five chronological validation weeks, and 2,184 final-period cases. MAE and RMSE are in **normalized observed sales**, not physical units or currency. The selected rows follow the report's progression: baselines, individual models, feature/loss variants, then ensembles. Blend weights are RF/CatBoost.
 
 | Method | Validation MAE | Final-period MAE | Final-period RMSE |
 |---|---:|---:|---:|
 | 7-day mean baseline | 0.32840 | 0.31418 | 0.52089 |
-| Same weekday baseline | 0.41502 | 0.39975 | 0.61707 |
-| Teammate 50/50 RF + CatBoost | 0.30125 | 0.28923 | 0.45926 |
-| Lisa: 25% RF + 75% extended CatBoost (MAE) | **0.29402** | **0.28339** | **0.45605** |
+| Same-weekday baseline | 0.41502 | 0.39975 | 0.61707 |
+| kNN | 0.31198 | 0.30398 | 0.49002 |
+| Random Forest | 0.30244 | 0.29235 | 0.46459 |
+| CatBoost (base, RMSE) | 0.30330 | 0.28965 | 0.46026 |
+| CatBoost (history + IDs, RMSE) | 0.29715 | 0.28423 | 0.45500 |
+| CatBoost (history + IDs, MAE) | 0.29449 | 0.28458 | 0.46006 |
+| RF + CatBoost (base, 50/50) | 0.30125 | 0.28923 | 0.45926 |
+| RF + CatBoost (history + IDs, MAE; 25/75), selected | **0.29402** | **0.28339** | 0.45605 |
 
-The selected blend improves MAE on all five original validation weeks. Relative to the teammate blend, its mean validation MAE is 2.40% lower and final-period MAE 2.02% lower. It adds past-only history features and categorical store/product IDs; its CatBoost member trains with MAE loss. The controlled RMSE-versus-MAE loss comparison keeps the extended features and other CatBoost settings fixed. [Full comparison: 17 methods including baselines](results/v2/comparison.csv).
+The selected blend improves MAE over the base 50/50 RF + CatBoost blend on all five original validation weeks. Relative to that base blend, its mean validation MAE is 2.40% lower and final-period MAE 2.02% lower. It adds past-only history features and categorical store/product IDs; its CatBoost member trains with MAE loss. The controlled RMSE-versus-MAE loss comparison keeps the extended features and other CatBoost settings fixed. [Full comparison: 17 methods including baselines](results/v2/comparison.csv). The saved CSV retains the original experiment IDs; the report maps them to model/configuration labels without changing the values.
 
 A full Docker Linux ARM64 rerun reproduced the same winner (validation MAE 0.294015; final-period MAE 0.283404). Small platform differences occur: the largest absolute MAE difference across all 17 methods was 0.000044. The table above uses the saved macOS run; [Docker comparison](docs/docker_comparison.csv) records the rerun separately.
 
 **The final week was already seen in previous development.** This is an exploratory extension using a shared benchmark. Saving selection before this run's final scoring prevents new within-run choices based on that score, but does not undo prior exposure or repeated validation reuse.
 
-**The improvement did not transfer to the extra cohort.** After selection, a fixed training-data-only SHA ordering chose 100 series across 93 new stores in 16 other cities. On their 700 final-period rows, the locked new blend scored MAE **0.28902** / RMSE **0.48863**, versus the teammate blend's **0.28842 / 0.47096**. No retuning or winner change followed. The stress check is not claimed globally untouched across the entire project's history. [Transfer evidence](results/v2_transfer/summary.csv).
+**The improvement did not transfer to the extra cohort.** After selection, a fixed training-data-only SHA ordering chose 100 series across 93 new stores in 16 other cities. On their 700 final-period rows, the locked selected blend scored MAE **0.28902** / RMSE **0.48863**, versus the base 50/50 RF + CatBoost blend's **0.28842 / 0.47096**. No retuning or winner change followed. The stress check is not claimed globally untouched across the entire project's history. [Transfer evidence](results/v2_transfer/summary.csv).
 
 ## Decision rules and limitations
 
@@ -111,7 +120,7 @@ The thresholds are illustrative, not learned business optima. MAE training targe
 
 ## Evidence and files
 
-- `discount_sales_prediction.ipynb`, `src/finalproject_pricingml/{data,evaluate,models,scenario,...}.py`: teammate original.
+- `discount_sales_prediction.ipynb`, `src/finalproject_pricingml/{data,evaluate,models,scenario,...}.py`: Aashish's original implementation.
 - `02_lisa_pipeline.ipynb`, `src/finalproject_pricingml/v2.py`: extension and worked demonstration.
 - `results/v2/experiment_plan.json`, `selection.json`, `run_receipt.json`: source/data hashes, declared choices, selection chronology and actual fits.
 - `results/v2/validation_predictions.csv`, `test_predictions.csv`: keyed row-level evidence.
@@ -121,7 +130,7 @@ The thresholds are illustrative, not learned business optima. MAE training targe
 - `scripts/build_story_evidence.py`, `results/v2/story_evidence.json`: independently rebuilt selection-funnel counts and diagnostics from saved discount scenarios; no new model fitting. The narrative revision preserves the existing model scores and selection.
 - `scripts/run_story_ablation.py`, `results/story_ablation/`: seven fixed CatBoost designs, 35 validation-only fits and paired contrasts separating historical inputs, store/product IDs, training loss and discount/activity inputs. These diagnose the frozen design; they do not select a new winner or establish causal uplift.
 - `scripts/build_story_diagnostics.py`, `results/story_diagnostics/`: ten rule settings applied to the same saved forecasts, including a replay of the original policy. No model fits or observed policy outcomes; the delivered thresholds are unchanged.
-- [Expanded-story verification](docs/REFINEMENT_VERIFICATION.json): current notebook, controls, rendering and delivery checks. [Earlier narrative verification](docs/STORY_REVISION_VERIFICATION.json) remains the historical record of the shorter 16-code-cell version.
+- [Current notebook and model-label verification](docs/MODEL_LABEL_REVISION.json): 13 October 2026 execution and hashes, with 62 frozen experiment files unchanged. [EDA chart revision](docs/EDA_CHART_REVISION.json) records the earlier chart update. [Expanded-story verification](docs/REFINEMENT_VERIFICATION.json) records the previous 31-code-cell notebook, controls, rendering and delivery checks; [earlier narrative verification](docs/STORY_REVISION_VERIFICATION.json) records the shorter 16-code-cell version.
 - `DATA_LICENSE.md`: FreshRetailNet attribution. No raw data or login tokens are committed.
 
 Generative AI assisted substantially with this extension's code, review, experiments and presentation materials. Automated checks have been run; they do not replace each member's personal understanding, contribution declaration and final review. The group brief requires a one-page A1 portrait poster, runnable Docker project and personal declarations by the end of **14 October 2026**.

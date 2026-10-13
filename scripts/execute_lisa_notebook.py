@@ -34,7 +34,7 @@ headings = soup.select(".jp-MarkdownCell h2")
 navigation = soup.new_tag("nav", attrs={"class": "story-navigation", "aria-label": "Report chapters"})
 nav_details = soup.new_tag("details", attrs={"open": ""})
 nav_summary = soup.new_tag("summary")
-nav_summary.string = "Follow the investigation · 15 chapters and a technical appendix"
+nav_summary.string = "Contents"
 nav_details.append(nav_summary)
 nav_list = soup.new_tag("ol")
 for i, heading in enumerate(headings, 1):

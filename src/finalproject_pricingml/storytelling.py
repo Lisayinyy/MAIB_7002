@@ -1,8 +1,8 @@
 """Small, inspectable figures and worked calculations for the project narrative.
 
 These helpers explain the frozen experiment. They never select a new model,
-change its parameters, or write into the canonical result directory. Historical
-tuning figures are attributed to the teammate's saved experiments.
+change its parameters, or write into the canonical result directory. Tuning
+figures reproduce the project's saved experiments.
 """
 from __future__ import annotations
 
@@ -110,7 +110,7 @@ def feature_walkthrough(feat, example):
     return shown.reset_index(drop=True), checks
 
 
-def teammate_knn(root):
+def knn_tuning(root):
     root = Path(root) / "results"
     with_weather = pd.read_csv(root/"knn_stage1_with_weather_summary.csv")
     no_weather = pd.read_csv(root/"knn_stage1_summary.csv")
@@ -134,7 +134,7 @@ def teammate_knn(root):
     return fig, table
 
 
-def teammate_rf(root):
+def rf_tuning(root):
     root = Path(root)/"results"
     grid = pd.read_csv(root/"rf_tuning_summary.csv", dtype={"max_depth":str})
     order = [x for x in ["10","15","20","No limit"] if x in grid.max_depth.unique()]
@@ -154,7 +154,7 @@ def teammate_rf(root):
     return fig, grid.sort_values("mae").head(4)[["max_depth","min_leaf","mae","folds_beating_baseline"]]
 
 
-def teammate_catboost(root):
+def catboost_tuning(root):
     root = Path(root)/"results"
     curves = pd.read_csv(root/"catboost_learning_curves.csv", header=[0,1], index_col=0)
     grid = pd.read_csv(root/"catboost_round1b_summary.csv")
@@ -168,7 +168,7 @@ def teammate_catboost(root):
     axes[1].set(title=f"Training improves; later dates can worsen ({slow})",xlabel="Boosting iteration",ylabel="MAE")
     for ax in axes:
         ax.legend(frameon=False,fontsize=9); _clean(ax)
-    fig.suptitle("Teammate's cached learning-curve experiment (diagnostic, not a new fit)",fontsize=11)
+    fig.suptitle("CatBoost learning curves (saved diagnostic experiment)",fontsize=11)
     fig.tight_layout()
     return fig, grid.sort_values("mae").head(5)[["depth","learning_rate","iterations","mae"]]
 
@@ -190,11 +190,11 @@ def blend_diagnostics(root):
     axes[0].plot(old.rf_weight,old.mae,"o-",color=GRAY)
     pick=old[old.rf_weight.eq(.5)].iloc[0]
     axes[0].scatter([.5],[pick.mae],color=GREEN,s=70,zorder=5)
-    axes[0].set_title(f"Teammate blend: similar errors (r={old_corr:.2f})",fontsize=11)
+    axes[0].set_title(f"RF + CatBoost (base inputs)\nPrediction-error correlation: r={old_corr:.2f}",fontsize=11)
     axes[1].plot(table["RF weight"],table["Validation MAE"],"o-",color=GREEN)
     axes[1].scatter([.25],[table.loc[table["RF weight"].eq(.25),"Validation MAE"].iloc[0]],
                     s=140,facecolors="none",edgecolors=AMBER,linewidths=2,zorder=5)
-    axes[1].set_title(f"Extended blend: declared grid picks 25% RF (r={new_corr:.2f})",fontsize=11)
+    axes[1].set_title(f"RF + CatBoost (history + IDs, MAE)\nValidation grid selects 25% RF; error r={new_corr:.2f}",fontsize=11)
     for ax in axes:
         ax.set(xlabel="RF weight (remaining weight goes to CatBoost)",ylabel="Five-week validation MAE")
         ax.set_xticks([0,.25,.5,.75,1]);_clean(ax)
@@ -277,3 +277,9 @@ def live_knn_example(feat,example):
     calculation=pd.DataFrame({"Calculation":["Neighbours used","Sum of their observed targets","Sum / 25","Pipeline prediction"],
                               "Value":[25,neighbors[C.TARGET].sum(),forecast,direct]})
     return neighbors.head(5).reset_index(drop=True),calculation
+
+
+# Retain compatibility with notebooks saved before the presentation-label update.
+teammate_knn = knn_tuning
+teammate_rf = rf_tuning
+teammate_catboost = catboost_tuning

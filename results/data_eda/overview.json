@@ -1,0 +1,573 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-13T04:50:23.140425+00:00",
+  "inputs_sha256": {
+    "raw_train": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "features": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611"
+  },
+  "full_train": {
+    "rows": 4500000,
+    "series": 50000,
+    "stores": 898,
+    "products": 865,
+    "cities": 18,
+    "date_start": "2024-03-28",
+    "date_end": "2024-06-25",
+    "days": 90,
+    "schema": [
+      {
+        "name": "city_id",
+        "type": "int64"
+      },
+      {
+        "name": "store_id",
+        "type": "int64"
+      },
+      {
+        "name": "management_group_id",
+        "type": "int64"
+      },
+      {
+        "name": "first_category_id",
+        "type": "int64"
+      },
+      {
+        "name": "second_category_id",
+        "type": "int64"
+      },
+      {
+        "name": "third_category_id",
+        "type": "int64"
+      },
+      {
+        "name": "product_id",
+        "type": "int64"
+      },
+      {
+        "name": "dt",
+        "type": "string"
+      },
+      {
+        "name": "sale_amount",
+        "type": "double"
+      },
+      {
+        "name": "hours_sale",
+        "type": "list<element: double>"
+      },
+      {
+        "name": "stock_hour6_22_cnt",
+        "type": "int32"
+      },
+      {
+        "name": "hours_stock_status",
+        "type": "list<element: int64>"
+      },
+      {
+        "name": "discount",
+        "type": "double"
+      },
+      {
+        "name": "holiday_flag",
+        "type": "int32"
+      },
+      {
+        "name": "activity_flag",
+        "type": "int32"
+      },
+      {
+        "name": "precpt",
+        "type": "double"
+      },
+      {
+        "name": "avg_temperature",
+        "type": "double"
+      },
+      {
+        "name": "avg_humidity",
+        "type": "double"
+      },
+      {
+        "name": "avg_wind_level",
+        "type": "double"
+      }
+    ]
+  },
+  "selected": {
+    "rows": 28080,
+    "series": 312,
+    "stores": 5,
+    "products": 122,
+    "cities": 1,
+    "date_start": "2024-03-28",
+    "date_end": "2024-06-25",
+    "days": 90,
+    "store_ids": [
+      18,
+      154,
+      182,
+      235,
+      343
+    ],
+    "city_ids": [
+      0
+    ]
+  },
+  "cities": [
+    {
+      "city_id": 0,
+      "stores": 290,
+      "series": 25811
+    },
+    {
+      "city_id": 1,
+      "stores": 14,
+      "series": 451
+    },
+    {
+      "city_id": 2,
+      "stores": 11,
+      "series": 407
+    },
+    {
+      "city_id": 3,
+      "stores": 101,
+      "series": 2648
+    },
+    {
+      "city_id": 4,
+      "stores": 34,
+      "series": 1141
+    },
+    {
+      "city_id": 5,
+      "stores": 15,
+      "series": 677
+    },
+    {
+      "city_id": 6,
+      "stores": 43,
+      "series": 2384
+    },
+    {
+      "city_id": 7,
+      "stores": 20,
+      "series": 444
+    },
+    {
+      "city_id": 8,
+      "stores": 3,
+      "series": 65
+    },
+    {
+      "city_id": 9,
+      "stores": 6,
+      "series": 197
+    },
+    {
+      "city_id": 10,
+      "stores": 6,
+      "series": 365
+    },
+    {
+      "city_id": 11,
+      "stores": 38,
+      "series": 1870
+    },
+    {
+      "city_id": 12,
+      "stores": 107,
+      "series": 5117
+    },
+    {
+      "city_id": 13,
+      "stores": 90,
+      "series": 2336
+    },
+    {
+      "city_id": 14,
+      "stores": 9,
+      "series": 493
+    },
+    {
+      "city_id": 15,
+      "stores": 17,
+      "series": 803
+    },
+    {
+      "city_id": 16,
+      "stores": 89,
+      "series": 4528
+    },
+    {
+      "city_id": 17,
+      "stores": 5,
+      "series": 263
+    }
+  ],
+  "categories": [
+    {
+      "first_category_id": 0,
+      "full_series": 365,
+      "selected_series": 19,
+      "full_share": 0.0073,
+      "selected_share": 0.060897435897435896
+    },
+    {
+      "first_category_id": 1,
+      "full_series": 6,
+      "selected_series": 0,
+      "full_share": 0.00012,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 2,
+      "full_series": 4,
+      "selected_series": 0,
+      "full_share": 8e-05,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 3,
+      "full_series": 82,
+      "selected_series": 0,
+      "full_share": 0.00164,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 4,
+      "full_series": 10888,
+      "selected_series": 27,
+      "full_share": 0.21776,
+      "selected_share": 0.08653846153846154
+    },
+    {
+      "first_category_id": 5,
+      "full_series": 1650,
+      "selected_series": 9,
+      "full_share": 0.033,
+      "selected_share": 0.028846153846153848
+    },
+    {
+      "first_category_id": 6,
+      "full_series": 60,
+      "selected_series": 0,
+      "full_share": 0.0012,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 7,
+      "full_series": 1018,
+      "selected_series": 9,
+      "full_share": 0.02036,
+      "selected_share": 0.028846153846153848
+    },
+    {
+      "first_category_id": 8,
+      "full_series": 2885,
+      "selected_series": 31,
+      "full_share": 0.0577,
+      "selected_share": 0.09935897435897435
+    },
+    {
+      "first_category_id": 9,
+      "full_series": 2,
+      "selected_series": 0,
+      "full_share": 4e-05,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 10,
+      "full_series": 2838,
+      "selected_series": 8,
+      "full_share": 0.05676,
+      "selected_share": 0.02564102564102564
+    },
+    {
+      "first_category_id": 11,
+      "full_series": 511,
+      "selected_series": 7,
+      "full_share": 0.01022,
+      "selected_share": 0.022435897435897436
+    },
+    {
+      "first_category_id": 12,
+      "full_series": 36,
+      "selected_series": 0,
+      "full_share": 0.00072,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 13,
+      "full_series": 23,
+      "selected_series": 3,
+      "full_share": 0.00046,
+      "selected_share": 0.009615384615384616
+    },
+    {
+      "first_category_id": 14,
+      "full_series": 203,
+      "selected_series": 2,
+      "full_share": 0.00406,
+      "selected_share": 0.00641025641025641
+    },
+    {
+      "first_category_id": 15,
+      "full_series": 692,
+      "selected_series": 21,
+      "full_share": 0.01384,
+      "selected_share": 0.0673076923076923
+    },
+    {
+      "first_category_id": 16,
+      "full_series": 7177,
+      "selected_series": 63,
+      "full_share": 0.14354,
+      "selected_share": 0.20192307692307693
+    },
+    {
+      "first_category_id": 17,
+      "full_series": 72,
+      "selected_series": 0,
+      "full_share": 0.00144,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 18,
+      "full_series": 2349,
+      "selected_series": 31,
+      "full_share": 0.04698,
+      "selected_share": 0.09935897435897435
+    },
+    {
+      "first_category_id": 19,
+      "full_series": 3,
+      "selected_series": 0,
+      "full_share": 6e-05,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 20,
+      "full_series": 5533,
+      "selected_series": 13,
+      "full_share": 0.11066,
+      "selected_share": 0.041666666666666664
+    },
+    {
+      "first_category_id": 21,
+      "full_series": 2843,
+      "selected_series": 4,
+      "full_share": 0.05686,
+      "selected_share": 0.01282051282051282
+    },
+    {
+      "first_category_id": 22,
+      "full_series": 327,
+      "selected_series": 0,
+      "full_share": 0.00654,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 23,
+      "full_series": 301,
+      "selected_series": 6,
+      "full_share": 0.00602,
+      "selected_share": 0.019230769230769232
+    },
+    {
+      "first_category_id": 24,
+      "full_series": 1383,
+      "selected_series": 10,
+      "full_share": 0.02766,
+      "selected_share": 0.03205128205128205
+    },
+    {
+      "first_category_id": 25,
+      "full_series": 412,
+      "selected_series": 0,
+      "full_share": 0.00824,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 26,
+      "full_series": 31,
+      "selected_series": 0,
+      "full_share": 0.00062,
+      "selected_share": 0.0
+    },
+    {
+      "first_category_id": 27,
+      "full_series": 230,
+      "selected_series": 5,
+      "full_share": 0.0046,
+      "selected_share": 0.016025641025641024
+    },
+    {
+      "first_category_id": 28,
+      "full_series": 1998,
+      "selected_series": 4,
+      "full_share": 0.03996,
+      "selected_share": 0.01282051282051282
+    },
+    {
+      "first_category_id": 29,
+      "full_series": 3496,
+      "selected_series": 17,
+      "full_share": 0.06992,
+      "selected_share": 0.05448717948717949
+    },
+    {
+      "first_category_id": 30,
+      "full_series": 670,
+      "selected_series": 4,
+      "full_share": 0.0134,
+      "selected_share": 0.01282051282051282
+    },
+    {
+      "first_category_id": 31,
+      "full_series": 1912,
+      "selected_series": 19,
+      "full_share": 0.03824,
+      "selected_share": 0.060897435897435896
+    }
+  ],
+  "selected_stores": [
+    {
+      "city_id": 0,
+      "store_id": 18,
+      "series": 64
+    },
+    {
+      "city_id": 0,
+      "store_id": 154,
+      "series": 60
+    },
+    {
+      "city_id": 0,
+      "store_id": 182,
+      "series": 61
+    },
+    {
+      "city_id": 0,
+      "store_id": 235,
+      "series": 63
+    },
+    {
+      "city_id": 0,
+      "store_id": 343,
+      "series": 64
+    }
+  ],
+  "early_period": {
+    "start": "2024-03-28",
+    "end_inclusive": "2024-05-21",
+    "end_exclusive": "2024-05-22",
+    "days": 55,
+    "comparison": [
+      {
+        "scope": "Full dataset",
+        "rows": 2750000,
+        "zero_sales_count": 138598,
+        "zero_sales_share": 0.05039927272727273,
+        "stockout_day_count": 1275636,
+        "stockout_day_share": 0.46386763636363637,
+        "valid_discount_rows": 2740250,
+        "discounted_count": 1174952,
+        "discounted_share": 0.42877547669008303,
+        "invalid_discount_count": 9750
+      },
+      {
+        "scope": "Selected cohort",
+        "rows": 17160,
+        "zero_sales_count": 369,
+        "zero_sales_share": 0.021503496503496502,
+        "stockout_day_count": 7967,
+        "stockout_day_share": 0.46427738927738926,
+        "valid_discount_rows": 17160,
+        "discounted_count": 6888,
+        "discounted_share": 0.4013986013986014,
+        "invalid_discount_count": 0
+      }
+    ],
+    "definitions": {
+      "zero_sales_share": "Rows with sale_amount == 0 / all rows in the scope and period.",
+      "stockout_day_share": "Rows with stock_hour6_22_cnt > 0 / all rows in the scope and period.",
+      "discounted_share": "Rows with 0 < discount < 0.95 / rows with finite 0 < discount <= 1.",
+      "invalid_discount_count": "Rows with discount <= 0, discount > 1, missing or nonfinite discount; excluded only from the discount-share denominator."
+    }
+  },
+  "raw_quality": {
+    "scope": "Original 90-day training file; descriptive only, no cleaning applied",
+    "rows": 4500000,
+    "missing_by_read_column": {
+      "city_id": 0,
+      "store_id": 0,
+      "product_id": 0,
+      "first_category_id": 0,
+      "dt": 0,
+      "sale_amount": 0,
+      "discount": 0,
+      "stock_hour6_22_cnt": 0
+    },
+    "duplicate_store_product_date_rows": 0,
+    "discount_zero_count": 16039,
+    "discount_above_one_count": 34,
+    "discount_negative_count": 0,
+    "discount_nonfinite_count": 0
+  },
+  "field_groups": {
+    "Identifiers and category hierarchy": [
+      "city_id",
+      "store_id",
+      "management_group_id",
+      "first_category_id",
+      "second_category_id",
+      "third_category_id",
+      "product_id"
+    ],
+    "Date, sales and stockouts": [
+      "dt",
+      "sale_amount",
+      "hours_sale",
+      "stock_hour6_22_cnt",
+      "hours_stock_status"
+    ],
+    "Price and calendar context": [
+      "discount",
+      "holiday_flag",
+      "activity_flag"
+    ],
+    "Weather": [
+      "precpt",
+      "avg_temperature",
+      "avg_humidity",
+      "avg_wind_level"
+    ]
+  },
+  "caveats": [
+    "Composition describes the original 90-day training file retrospectively. No final evaluation file is read.",
+    "The 312 existing store-product keys were selected using all 90 original training dates. Early-period charts do not undo that retrospective cohort choice.",
+    "Behavioral comparisons use only 28 March through 21 May 2024, before the first validation week.",
+    "Category and city identifiers are anonymous. No product-category or city names are inferred.",
+    "Category shares count unique store-product histories, not units sold or revenue.",
+    "Zero-sales and stockout rows are retained. Recorded stockout days do not reveal inventory quantity, freshness or waste.",
+    "These summaries show sample composition and association; they do not estimate causal effects of discounting."
+  ],
+  "provenance": {
+    "dataset": "Dingdong-Inc/FreshRetailNet-50K",
+    "revision": "08c1fab7f9257bc73679d415d65d644165d351d4",
+    "raw_train_sha256": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "feature_sha256": "4029f5b2984875eb4ab1e21751cb8499e87eaf617eff046b64cfae1e2927d611",
+    "experiment_plan_sha256": "96aea5d4b2d085568f95baa1c0b8cc8172cd76102cd707ce61f6a95507888c75",
+    "source_script_sha256": "f70a58809cd6796985ed154c21bf5d516d094659854cf9ef22347d3b6603f5ef",
+    "download_command": "python scripts/download_public_data.py --splits train",
+    "reproduce_command": "python scripts/build_dataset_eda.py",
+    "runtime": {
+      "python": "3.12.13",
+      "pandas": "3.0.6",
+      "numpy": "2.5.3",
+      "pyarrow": "25.0.1"
+    },
+    "assertions": "Pinned raw and feature hashes; 312 saved keys; consistent series metadata; unique daily rows; 90 dates per history; city and category counts reconcile."
+  }
+}
