@@ -9,17 +9,33 @@ design: the original title, fruit artwork and author order are preserved.
 The original header is stored in `assets/poster/`, so rebuilding does not depend
 on the WeChat cache or on a flattened screenshot.
 
-Revisions against the supplied v2 poster:
+The story follows the final `pricing-ml-ap` notebook at `a7e26dd`:
 
-- Align all results and settings to the final `pricing-ml-ap` commit `a7e26dd`:
-  MAE 0.2892, RMSE 0.4593 and 7.9% lower MAE than the seven-day average;
-  300-tree Random Forest and 500-iteration CatBoost.
-- Add the public-data selection path and the conditions for the five-store cohort.
-- Include kNN in the model comparison and explain the equal-weight choice:
-  60/40 is marginally lower on validation, so 50/50 is a simplicity choice.
-- Recompute errors by observed price band from all 2,184 final-period predictions.
-- Add the supported 5% discount example and the price-selection method.
-- Retain the limitations and add a working link/QR code to the final project.
+1. **Start with the manager's trade-off.** Unsold perishables and unnecessary
+   markdowns motivate tomorrow's discount decision.
+2. **Choose histories with price changes.** Public FreshRetailNet records contain
+   the sales, discount and stockout information needed. The stated filters reduce
+   50,000 histories to 16,684 eligible ones; the top five stores supply 312.
+3. **Test assumptions before adding complexity.** Removing weather reduces
+   equal-weight kNN validation MAE from 0.3267 to 0.3120 at k=25.
+4. **Compare the forecasts.** Random Forest and CatBoost form a simple 50/50
+   ensemble. Its final-week MAE is 0.2892 versus the baseline's 0.3142 (7.9% lower);
+   CatBoost alone is almost tied. Equal weights are a simplicity choice on a
+   flat validation curve, not the exact minimum.
+5. **Discover the decision problem.** Maximizing predicted sales times price rate,
+   even within supported candidates, recommends discounts on 98.3% of cases.
+6. **Test explicit stock rules.** The recommendation share becomes 55.0%. This
+   change reflects the assumed rules, not demonstrated business improvement.
+   A 5%-off worked example makes the final recommendation concrete.
+
+The two recommendation-rate rings use the same 2,184 store-product-days and
+zero assumed unit cost. `stockout_hours_t` describes the current/latest observed
+sales day; the recommendation is for tomorrow. Stockout records do not establish
+inventory age or freshness.
+
+The figures are drawn from saved experiment results. This poster revision did
+not retrain the models or change the final project's pricing code. The editorial
+sequence was checked against notebook cells 0-5, 14-20, 38-46 and 54-62.
 
 Source hashes and derived values are in `fresh_ensemble_revision_evidence.json`.
 The old body is removed from the source PDF stream, so obsolete scores are not
@@ -33,8 +49,7 @@ Rebuild from the repository root (verified with ReportLab 4.4.9, pypdf 6.10.0):
 uv run --with reportlab==4.4.9 --with pypdf==6.10.0 python scripts/revise_fresh_ensemble_poster.py
 ```
 
-The body uses Arial if available, otherwise ReportLab Vera. Both renderings were
-checked. The original header keeps its embedded fonts and original artwork.
+The body uses Arial if available, otherwise ReportLab Vera. The generated layout is checked before publication. The original header keeps its embedded fonts and original artwork.
 
 ## Earlier alternative: editorial layout
 
