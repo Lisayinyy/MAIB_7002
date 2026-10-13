@@ -1,5 +1,43 @@
 # A1 exhibition poster
 
+## Current choice: revised Fresh Ensemble design
+
+Print **MAIB7002_GroupQ_A1_Fresh_Ensemble_revised.pdf** at actual size:
+**594 × 841 mm**, portrait, one page. Its matching PNG is a preview.
+This revision uses the group's supplied **Fresh Food. Smarter Discounts.**
+design: the original title, fruit artwork and author order are preserved.
+The original header is stored in `assets/poster/`, so rebuilding does not depend
+on the WeChat cache or on a flattened screenshot.
+
+Revisions against the supplied v2 poster:
+
+- Align all results and settings to the final `pricing-ml-ap` commit `a7e26dd`:
+  MAE 0.2892, RMSE 0.4593 and 7.9% lower MAE than the seven-day average;
+  300-tree Random Forest and 500-iteration CatBoost.
+- Add the public-data selection path and the conditions for the five-store cohort.
+- Include kNN in the model comparison and explain the equal-weight choice:
+  60/40 is marginally lower on validation, so 50/50 is a simplicity choice.
+- Recompute errors by observed price band from all 2,184 final-period predictions.
+- Add the supported 5% discount example and the price-selection method.
+- Retain the limitations and add a working link/QR code to the final project.
+
+Source hashes and derived values are in `fresh_ensemble_revision_evidence.json`.
+The old body is removed from the source PDF stream, so obsolete scores are not
+left hidden behind new graphics. Header pixels match the supplied design.
+The revised PDF was checked for A1 size, embedded fonts, final-model results,
+text overflow and printing margins.
+
+Rebuild from the repository root (verified with ReportLab 4.4.9, pypdf 6.10.0):
+
+```sh
+uv run --with reportlab==4.4.9 --with pypdf==6.10.0 python scripts/revise_fresh_ensemble_poster.py
+```
+
+The body uses Arial if available, otherwise ReportLab Vera. Both renderings were
+checked. The original header keeps its embedded fonts and original artwork.
+
+## Earlier alternative: editorial layout
+
 Print **freshretail_a1_poster.pdf** at actual size: **594 × 841 mm**, portrait,
 one page. Text, charts and the QR code are vector objects. The PNG is a preview;
 use the PDF for printing. Fonts used in the delivered PDF are embedded.

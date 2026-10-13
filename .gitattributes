@@ -1,0 +1,3 @@
+# Poster and chart artifacts are binary files, even if PDF headers resemble text.
+*.pdf binary
+*.png binary

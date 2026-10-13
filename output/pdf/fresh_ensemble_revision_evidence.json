@@ -1,0 +1,41 @@
+{
+  "final_notebook_commit": "a7e26dd979af88b4c14f98a7f029f6a64bffaedf",
+  "source_template": {
+    "source_filename": "MAIB7002_GroupQ_A1_Fresh_Ensemble_v2.pdf",
+    "source_sha256": "75e832249f5166d0e2a6a0fa9701736574c24736da7a4861ff05222c1300b578",
+    "preserved": "Original title, fruit artwork, color palette, question and author order",
+    "content_operations_kept": 73,
+    "content_operations_original": 939
+  },
+  "pdf_sha256": "df56fb39bd5bfa604894eba336abb4a16ababb5802670e4c47e2fa1e5f1a7229",
+  "gain_percent": 7.942053081842082,
+  "test_mae": 0.28923224366438466,
+  "test_rmse": 0.4592618239665576,
+  "observed_discount_errors": [
+    {
+      "band": "Full/light (>0.95)",
+      "n": 1186,
+      "mae": 0.23298234117135325
+    },
+    {
+      "band": "Moderate (0.80, 0.95]",
+      "n": 757,
+      "mae": 0.29821355292823076
+    },
+    {
+      "band": "Deep (<=0.80)",
+      "n": 241,
+      "mae": 0.5378361160461432
+    }
+  ],
+  "deep_light_mae_ratio": 2.308484468574281,
+  "selection": "Equal weights retained for simplicity; 60/40 has slightly lower mean validation MAE",
+  "source_hashes": {
+    "results/test_summary.csv": "1de8d62040251f0672bdd0ec23bf9d702d09adf650ff418a114a4223369c0b97",
+    "results/ensemble_weight_sweep.csv": "12e1d2828134c8df68ef21b6eba1d29df884aa5054b0a9651ab1abd2c20a07ba",
+    "results/test_predictions.csv": "e220acd62586cf06120eab3db66ebf2be9c89b766bcf6f009466745ab0204728",
+    "results/visuals/one_product_discount_decision.csv": "0c11efe47a2739c815a5cf872ee9f6d646a0d5b0be36f99f0681ed5de0f0177c"
+  },
+  "preservation": "Original title, fruit artwork, author order and palette; original body physically removed",
+  "business_claim": "Predictive benchmark and model scenarios; no causal revenue/profit/waste gain shown"
+}
