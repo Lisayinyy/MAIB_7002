@@ -9,47 +9,65 @@ design: the original title, fruit artwork and author order are preserved.
 The original header is stored in `assets/poster/`, so rebuilding does not depend
 on the WeChat cache or on a flattened screenshot.
 
+The main body integrates **key figures 02, 03 and 04** into three large,
+sequential panels. Charts are redrawn as vector objects for this A1 layout;
+complete landscape figure pages are not shrunk into screenshots. The optional
+weather/tuning figure is omitted, and sample selection plus the worked case are
+compact opening and closing elements.
+
 The story follows the final `pricing-ml-ap` notebook at `a7e26dd`:
 
-1. **Start with the manager's trade-off.** Unsold perishables and unnecessary
-   markdowns motivate tomorrow's discount decision.
-2. **Choose histories with price changes.** Public FreshRetailNet records contain
-   the sales, discount and stockout information needed. The stated filters reduce
-   50,000 histories to 16,684 eligible ones; the top five stores supply 312.
-3. **Test assumptions before adding complexity.** Removing weather reduces
-   equal-weight kNN validation MAE from 0.3267 to 0.3120 at k=25.
-4. **Compare the forecasts.** Random Forest and CatBoost form a simple 50/50
-   ensemble. Its final-week MAE is 0.2892 versus the baseline's 0.3142 (7.9% lower);
-   CatBoost alone is almost tied. Equal weights are a simplicity choice on a
-   flat validation curve, not the exact minimum.
-5. **Discover the decision problem.** Maximizing predicted sales times price rate,
-   even within supported candidates, recommends discounts on 98.3% of cases.
-6. **Test explicit stock rules.** The recommendation share becomes 55.0%. This
-   change reflects the assumed rules, not demonstrated business improvement.
-   A 5%-off worked example makes the final recommendation concrete.
+1. **Business question and data.** Help a category manager choose tomorrow's
+   discount. FreshRetailNet provides daily sales, discount and stockout records.
+   The filters leave 16,684 of 50,000 histories; the five stores with the most
+   qualifying histories provide 312.
+2. **A better forecast, with difficult cases.** Baseline-to-ensemble MAE bars show
+   a 7.9% improvement against the seven-day average. CatBoost alone is nearly
+   tied with the equal-weight Random Forest + CatBoost ensemble. A second chart
+   shows larger absolute errors on deep-discount days, which also have higher
+   average sales. All scores describe the reused final-week benchmark.
+3. **Bigger predicted gains, thinner evidence.** Paired plots show the predicted
+   response at eight candidate discounts and the proportion of histories with
+   historical support. At 40% off, predicted sales are 2.32 times the full-price
+   forecast, but only 15 of 312 histories (4.8%) support this rate.
+4. **Rules change the recommendation.** A three-step rule diagram and two 100%
+   stacked bars show how stock assumptions change the frequency and depth of
+   discount recommendations: 98.3% with model + support, 55.0% with stock rules.
+5. **Concrete output.** For store 18 / product 11 on 26 June, 5% off gives the
+   highest predicted value among eligible candidates. This is a model scenario,
+   not an observed gain from an intervention.
 
-The two recommendation-rate rings use the same 2,184 store-product-days and
-zero assumed unit cost. `stockout_hours_t` describes the current/latest observed
-sales day; the recommendation is for tomorrow. Stockout records do not establish
-inventory age or freshness.
+Response ratios compare mean predictions over the same **2,184 cases**.
+Support uses a different denominator: **312 store-product histories**, requiring
+at least three training days within 0.025 of a candidate price rate.
+Recommendation shares also use the same 2,184 cases. The value proxy is predicted
+normalized sales times price rate, with zero assumed unit cost; it is not currency.
 
-The figures are drawn from saved experiment results. This poster revision did
-not retrain the models or change the final project's pricing code. The editorial
-sequence was checked against notebook cells 0-5, 14-20, 38-46 and 54-62.
+Stockout today of at least one hour takes priority and forces full price tomorrow.
+Otherwise, no stockout in the last seven days requires a supported discount when
+one is available; remaining cases use the model's highest eligible predicted
+value. These rules assume a stock policy. Stockout records do not establish age
+or freshness. No causal sales, revenue or waste improvement has been demonstrated.
 
+This revision reads saved experimental evidence; it does not retrain models,
+change the final notebook, or modify its pricing rules. The cohort was selected
+retrospectively and the final evaluation week was reused during development.
 Source hashes and derived values are in `fresh_ensemble_revision_evidence.json`.
 The old body is removed from the source PDF stream, so obsolete scores are not
-left hidden behind new graphics. Header pixels match the supplied design.
-The revised PDF was checked for A1 size, embedded fonts, final-model results,
-text overflow and printing margins.
+left hidden behind new graphics. The original header, title, fruit art and
+member order remain unchanged.
 
 Rebuild from the repository root (verified with ReportLab 4.4.9, pypdf 6.10.0):
 
 ```sh
-uv run --with reportlab==4.4.9 --with pypdf==6.10.0 python scripts/revise_fresh_ensemble_poster.py
+uv run --no-project --with reportlab==4.4.9 --with pypdf==6.10.0 python scripts/revise_fresh_ensemble_poster.py
+pdftoppm -scale-to 2600 -singlefile -png output/pdf/MAIB7002_GroupQ_A1_Fresh_Ensemble_revised.pdf output/pdf/MAIB7002_GroupQ_A1_Fresh_Ensemble_revised_preview
 ```
 
-The body uses Arial if available, otherwise ReportLab Vera. The generated layout is checked before publication. The original header keeps its embedded fonts and original artwork.
+The body uses Arial if available, otherwise ReportLab Vera. Check the rendered
+PDF after rebuilding on a different system. The original header retains its
+embedded fonts. The delivered version is checked for A1 size, visible embedded
+fonts, text collisions, printing margins, source numbers and QR decoding.
 
 ## Earlier alternative: editorial layout
 

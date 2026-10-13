@@ -182,146 +182,177 @@ def build(source=None):
     base=header(source)
     fonts()
     scores={r[""]: {k:float(v) for k,v in r.items() if k} for r in rows("results/test_summary.csv")}
-    weight=rows("results/ensemble_weight_sweep.csv")
     predictions=rows("results/test_predictions.csv")
     case=rows("results/visuals/one_product_discount_decision.csv")
     chosen=next(r for r in case if r["chosen"]=="True")
-    reference=next(r for r in case if float(r["discount"])==1)
     blend=scores["RF + CatBoost (50/50)"]
     baseline=scores["Baseline (7-day mean)"]
     gain=100*(1-blend["mae"]/baseline["mae"])
-    bands=[("Full/light (>0.95)",lambda x:x>.95),
-           ("Moderate (0.80, 0.95]",lambda x:.8<x<=.95),
-           ("Deep (<=0.80)",lambda x:x<=.8)]
+    band_specs=[("<5% off",lambda x:x>.95),
+                ("5% to <20%",lambda x:.8<x<=.95),
+                ("20%+ off",lambda x:x<=.8)]
     errors=[]
-    for name,keep in bands:
+    for name,keep in band_specs:
         group=[r for r in predictions if keep(float(r["discount_next"]))]
-        mae=sum(abs(float(r["target_sales"])-float(r["pred_ensemble"])) for r in group)/len(group)
-        errors.append(dict(band=name,n=len(group),mae=mae))
+        errors.append(dict(band=name,n=len(group),
+                           mae=sum(abs(float(r["target_sales"])-float(r["pred_ensemble"])) for r in group)/len(group)))
     assert sum(r["n"] for r in errors)==2184
     assert abs(sum(r["n"]*r["mae"] for r in errors)/2184-blend["mae"])<1e-10
     assert float(chosen["discount"])==.95
-    ratio=errors[2]["mae"]/errors[0]["mae"]
-    layer=TMP/"fresh_ensemble_revision_body.pdf"
-    p=Layout(layer)
-    # The poster follows the notebook's experimental sequence, including the
-    # surprising gap between forecasting accuracy and discount decisions.
-    wx=next(r for r in rows("results/knn_stage1_with_weather_summary.csv")
-            if r["weighting"]=="equal" and int(r["k"])==25)
-    no_wx=next(r for r in rows("results/knn_stage1_summary.csv")
-               if r["weighting"]=="equal" and int(r["k"])==25)
+    response=rows("results/visuals/discount_response_and_support.csv")
     policy=rows("results/visuals/recommendation_distribution.csv")
     shares={r["strategy"]:float(r["discount_share_percent"]) for r in policy}
-    lx,rx,colw=M,310*MM,262*MM
+    deepest=next(r for r in response if float(r["percent_off"])==40)
+    layer=TMP/"fresh_ensemble_revision_body.pdf"
+    p=Layout(layer)
 
-    p.rect(M,201*MM,RIGHT-M,46*MM,LIME,radius=8)
-    p.text("Can a better forecast guide tomorrow's discount?",M+26,208*MM,size=35,bold=True)
-    p.para("A Dingdong category manager must balance unsold perishables against value lost to markdowns. We first predict sales, then test what happens when the forecast chooses the price.",
-           M+26,224*MM,RIGHT-M-52,size=25,leading=30,max_h=64)
+    # Reflow figure content into poster-sized vector plots; do not shrink the
+    # complete 16:9 figure pages. Three evidence panels carry the main story.
+    p.rect(M,201*MM,RIGHT-M,31*MM,LIME,radius=8)
+    p.text("Help a category manager choose tomorrow's discount.",M+22,207*MM,size=32,bold=True)
+    p.text("Unsold perishables create waste; unnecessary markdowns give away value. Can forecasts help?",
+           M+22,222*MM,size=22)
+    p.text("WHY THESE DATA?",M,241*MM,size=18,bold=True,color=ACCENT)
+    p.para("FreshRetailNet records daily sales, discounts and stockouts. We select regularly selling products with repeated price changes.",
+           M,251*MM,222*MM,size=21,leading=25,max_h=80)
+    for xm,value,label in [(289,"50,000","public histories"),(414,"16,684","eligible histories"),(540,"312","in five stores")]:
+        p.text(value,xm*MM,239*MM,size=34,bold=True,color=ACCENT,align="center")
+        p.text(label,xm*MM,253*MM,size=18,color=MUTED,align="center")
+    p.arrow(331*MM,247*MM,363*MM,247*MM)
+    p.arrow(462*MM,247*MM,499*MM,247*MM)
+    p.para("Filters: 15-85% discounted days (rate &lt;0.95), 6+ discount switches, &lt;20% zero-sales days. Then take the five stores with the most eligible histories.",
+           264*MM,264*MM,308*MM,size=17,leading=21,max_h=45)
+    p.line(M,282*MM,RIGHT,282*MM)
 
-    p.section("1","Choose histories with price changes",lx,260*MM,size=29)
-    p.para("We chose FreshRetailNet for its daily store-product sales, discounts and stockout records. We needed products with regular sales and repeated discount changes.",
-           lx,279*MM,colw,size=24,leading=29,max_h=94)
-    for x,value,label in [(lx,"50,000","public histories"),(123*MM,"16,684","pass the filters"),(228*MM,"312","in five stores")]:
-        p.text(value,x,320*MM,size=37,bold=True,color=ACCENT)
-        p.text(label,x,337*MM,size=19,color=MUTED)
-    p.arrow(91*MM,329*MM,112*MM,329*MM)
-    p.arrow(198*MM,329*MM,217*MM,329*MM)
-    p.para("Keep histories with 15-85% discounted days (rate &lt; 0.95), 6+ discount-state changes and &lt;20% zero-sales days. Select the five stores with the most qualifying histories.",
-           lx,353*MM,colw,size=22,leading=27,max_h=111)
-    p.text("122 products, one city; 25,896 training/validation rows.",lx,396*MM,size=20,bold=True,color=ACCENT)
-
-    p.section("2","Test our assumptions first",rx,260*MM,size=29)
-    p.para("We began with kNN: predict from similar past days. Adding weather looked useful, but validation showed that fewer inputs worked better.",
-           rx,279*MM,colw,size=24,leading=29,max_h=94)
-    p.text("Mean absolute error (MAE)",rx,320*MM,size=22,bold=True)
-    for i,(label,rr,color) in enumerate([("With weather",wx,"#A5B7A0"),("Weather removed",no_wx,ACCENT)]):
-        y=(337+i*17)*MM
-        p.text(label,rx,y,size=22)
-        p.rect(401*MM,y+3,111*MM*float(rr["mae"])/.34,18,color)
-        p.text(f"{float(rr['mae']):.4f}",RIGHT,y,size=24,bold=i==1,align="right")
-    p.text("kNN: k=25, equal weights; five validation weeks.",rx,373*MM,size=19,color=MUTED)
-    p.para("Decision: keep 10 inputs covering sales history, stockouts, discounts and calendar information.",
-           rx,387*MM,colw,size=22,leading=26,max_h=55)
-
-    p.line(M,412*MM,RIGHT,412*MM)
-    p.section("3","Build from a simple baseline to a combined forecast",M,423*MM,size=31)
-    p.text("Predict next-day normalized sales; select settings using five time-ordered validation weeks.",M,442*MM,size=23,color=MUTED)
-
-    gap=13*MM; cw=(colw-gap)/2
-    p.rect(lx,462*MM,cw,40*MM,PALE_GREEN,radius=6)
-    p.rect(lx+cw+gap,462*MM,cw,40*MM,PALE_ORANGE,radius=6)
-    rf_x=lx+cw/2; cb_x=lx+cw+gap+cw/2
-    p.text("Random Forest",rf_x,468*MM,size=25,bold=True,color=ACCENT,align="center")
-    p.text("300 parallel trees",rf_x,481*MM,size=22,align="center")
-    p.text("Average their predictions",rf_x,491*MM,size=19,align="center")
-    p.text("CatBoost",cb_x,468*MM,size=25,bold=True,color="#D15C19",align="center")
-    p.text("500 sequential trees",cb_x,481*MM,size=22,align="center")
-    p.text("Each corrects prior errors",cb_x,491*MM,size=19,align="center")
-    avgx=lx+colw/2
-    p.arrow(rf_x,504*MM,avgx-32*MM,517*MM)
-    p.arrow(cb_x,504*MM,avgx+32*MM,517*MM,color=ORANGE)
-    p.rect(lx+36*MM,518*MM,colw-72*MM,16*MM,GREEN,radius=5)
-    p.text("0.5 RF + 0.5 CatBoost",avgx,521*MM,size=28,bold=True,color=WHITE,align="center")
-    p.para("Averaging helped slightly. We chose 50/50 for simplicity on a flat validation curve; CatBoost alone is almost tied on the final week.",
-           lx,542*MM,colw,size=22,leading=27,max_h=85)
-
-    model_rows=[("7-day average","Baseline (7-day mean)","#A5B7A0"),
-                ("kNN","kNN (k=25)","#B4CBB7"),
-                ("Random Forest","Random forest",ACCENT),
-                ("CatBoost","CatBoost","#61AAA6"),
+    # FIGURE 02: forecast improvement and remaining absolute error by depth.
+    p.section("1","A better forecast - with difficult cases still to solve",M,291*MM,size=32)
+    p.text("Predict next-day normalized sales; choose settings with five time-ordered validation weeks.",M,307*MM,size=22,color=MUTED)
+    p.text("Mean absolute error (MAE)",M,325*MM,size=23,bold=True)
+    p.text("Ensemble MAE by observed discount",322*MM,325*MM,size=23,bold=True)
+    p.text("Lower is better",283*MM,326*MM,size=17,color=MUTED,align="right")
+    model_rows=[("7-day average","Baseline (7-day mean)","#B4C5AE"),
+                ("kNN","kNN (k=25)","#B4C5AE"),
+                ("Random Forest","Random forest","#6D9C80"),
+                ("CatBoost","CatBoost",ACCENT),
                 ("50/50 ensemble","RF + CatBoost (50/50)",ORANGE)]
-    p.text("Final-week MAE (lower is better)",rx,459*MM,size=22,bold=True)
-    bx,bw=416*MM,112*MM
+    bx,bw=120*MM,118*MM
     for i,(name,key,color) in enumerate(model_rows):
-        y=(476+i*13)*MM
-        v=scores[key]["mae"]
-        p.text(name,rx,y,size=22,bold=i==4)
-        p.rect(bx,y+4,bw*v/.32,17,color)
-        p.text(f"{v:.4f}",RIGHT,y,size=23,bold=i==4,align="right")
-    p.text(f"{gain:.1f}% lower MAE",rx,548*MM,size=34,bold=True,color=ACCENT)
-    p.text(f"vs. the 7-day average  |  RMSE {blend['rmse']:.4f}",rx,564*MM,size=20,color=MUTED)
-    p.text("Validation: 22 May - 25 Jun 2024. Final evaluation: 26 Jun - 2 Jul, 2,184 cases (a reused benchmark).",
-           M,583*MM,size=20,color=MUTED)
-    p.line(M,598*MM,RIGHT,598*MM)
+        y=(340+i*11)*MM; v=scores[key]["mae"]
+        p.text(name,M,y,size=21,bold=i==4)
+        p.rect(bx,y+4,bw*v/.34,15,color)
+        p.text(f"{v:.4f}",283*MM,y,size=22,bold=i==4,align="right")
+    for tick in [0,.1,.2,.3]:
+        tx=bx+bw*tick/.34
+        p.text(f"{tick:.1f}",tx,396*MM,size=15,color=MUTED,align="center")
+    p.line(bx,393*MM,bx+bw,393*MM)
+    # These bars use the original figure's absolute-error diagnostic, omitting
+    # a second baseline series so the small panel stays readable at A1 size.
+    gx,gw,gy,gh=336*MM,228*MM,388*MM,47*MM
+    for v in [0,.3,.6]:
+        yy=gy-gh*v/.6
+        p.line(gx,yy,gx+gw,yy,color=RULE,width=.8)
+        p.text(f"{v:.1f}",gx-8,yy-7,size=15,color=MUTED,align="right")
+    for i,r in enumerate(errors):
+        xx=gx+(i+.5)*gw/3; barh=gh*r["mae"]/.6
+        p.rect(xx-16*MM,gy-barh,32*MM,barh,ORANGE if i==2 else ACCENT)
+        p.text(f"{r['mae']:.3f}",xx,gy-barh-24,size=21,bold=True,align="center")
+        p.text(r["band"],xx,393*MM,size=18,bold=i==2,align="center")
+        p.text(f"n = {r['n']:,}",xx,403*MM,size=15,color=MUTED,align="center")
+    p.rect(M,416*MM,RIGHT-M,23*MM,PALE_GREEN,radius=6)
+    p.text(f"{gain:.1f}% lower MAE",M+18,422*MM,size=31,bold=True,color=ACCENT)
+    p.para("vs. the 7-day average. Equal-weight RF + CatBoost; CatBoost alone is nearly tied.\nDeep-discount days have larger absolute errors and higher average sales.",
+           157*MM,421*MM,404*MM,size=19,leading=24,max_h=49)
 
-    p.section("4","Then the model wants to discount",M,610*MM,size=29)
-    p.section("5","Put stock rules before price",rx,610*MM,size=29)
-    p.para("We varied tomorrow's price rate over eight candidates and maximized predicted sales x rate. Even with historical support, it chose discounts almost every day.",
-           M,629*MM,colw,size=23,leading=28,max_h=91)
-    p.para("We therefore tested rules: stockout today means full price; no stockout in a week requires a discount. Otherwise, the model compares eligible rates.",
-           rx,629*MM,colw,size=23,leading=28,max_h=91)
-    p.donut(52*MM,697*MM,27*MM,shares["Supported model only"])
-    p.para("Model + historical support<br/><br/>Require 3+ training days within 0.025 of a candidate rate. This alone did not make recommendations selective.",
-           89*MM,671*MM,193*MM,size=21,leading=26,max_h=145)
-    p.donut(340*MM,697*MM,27*MM,shares["With stock rules"],color=ACCENT)
-    p.para("Model + support + stock rules<br/><br/>The rules change the recommendation rate. They assume a stock policy; stockout records do not reveal inventory age.",
-           377*MM,671*MM,195*MM,size=21,leading=26,max_h=145)
-    p.text("Same 2,184 cases. Zero unit cost assumed. These are recommendation rates, not measured business improvements.",
-           M,733*MM,size=19,color=MUTED)
+    # FIGURE 03: predicted response and historical coverage are different things.
+    p.section("2","Bigger predicted gains, thinner historical evidence",M,451*MM,size=32)
+    p.text("Same 2,184 cases, eight discounts. Value proxy = predicted sales x price rate; zero cost assumed.",M,467*MM,size=22,color=MUTED)
+    p.text("Predicted response vs. full price",M,484*MM,size=23,bold=True)
+    p.text("Histories supporting each candidate",322*MM,484*MM,size=23,bold=True)
+    for xx,label,color in [(M,"Sales",ACCENT),(91*MM,"Value proxy",ORANGE)]:
+        p.line(xx,500*MM,xx+15*MM,500*MM,color=color,width=3)
+        p.text(label,xx+19*MM,496.5*MM,size=18,color=color)
+    p.text("% of 312 store-product histories",322*MM,497*MM,size=18,color=MUTED)
+    x0,y0,pw,ph=46*MM,568*MM,232*MM,57*MM
+    for v in [1,1.5,2,2.5]:
+        yy=y0-ph*(v-.8)/1.7
+        p.line(x0,yy,x0+pw,yy,width=.8)
+        p.text(f"{v:.1f}x",x0-9,yy-8,size=15,color=MUTED,align="right")
+    for key,color in [("sales_vs_no_discount",ACCENT),("value_vs_no_discount",ORANGE)]:
+        pts=[(x0+pw*float(r["percent_off"])/40,y0-ph*(float(r[key])-.8)/1.7) for r in response]
+        for (xa,ya),(xb,yb) in zip(pts,pts[1:]): p.line(xa,ya,xb,yb,color=color,width=3)
+        for xx,yy in pts:
+            p.c.setFillColor(HexColor(color));p.c.circle(xx,H-yy,4,fill=1,stroke=0)
+        xx,yy=pts[-1]
+        p.text(f"{float(deepest[key]):.2f}x",xx-9,yy-25,size=20,color=color,bold=True,align="right")
+    sx,sy,sw,sh=344*MM,568*MM,217*MM,57*MM
+    for v in [0,50,100]:
+        yy=sy-sh*v/100
+        p.line(sx,yy,sx+sw,yy,width=.8)
+        p.text(str(v),sx-20,yy-8,size=15,color=MUTED,align="right")
+    for r in response:
+        xx=sx+sw*float(r["percent_off"])/40; bh=sh*float(r["support_percent"])/100
+        p.rect(xx-4*MM,sy-bh,8*MM,bh,ORANGE if float(r["percent_off"])==40 else ACCENT)
+        if float(r["percent_off"])==40:
+            p.text("4.8%",xx,sy-bh-24,size=19,bold=True,color="#B24B1F",align="center")
+    for start,width in [(x0,pw),(sx,sw)]:
+        for v in [0,10,20,30,40]:
+            p.text(f"{v}%",start+width*v/40,573*MM,size=16,color=MUTED,align="center")
+        p.text("Discount (% off)",start+width/2,584*MM,size=17,color=MUTED,align="center")
+    p.rect(M,597*MM,RIGHT-M,24*MM,PALE_ORANGE,radius=6)
+    p.text("40% off",M+18,603*MM,size=30,bold=True,color="#B24B1F")
+    p.para("2.32x predicted sales, but only 15 / 312 histories (4.8%) support this rate.\nSupport requires 3+ training days within 0.025 of the candidate price rate.",
+           104*MM,602*MM,454*MM,size=20,leading=25,max_h=52)
 
-    p.rect(M,744*MM,RIGHT-M,44*MM,GREEN,radius=7)
-    p.section("6","One product: 5% off",M+22,751*MM,size=28,color=WHITE)
-    p.text("Store 18 / Product 11 / 26 Jun 2024",M+22,767*MM,size=20,color=WHITE)
-    p.text("Highest predicted value among eligible rates.",M+22,778*MM,size=17,color="#D4E3CE")
-    p.line(295*MM,750*MM,295*MM,782*MM,color="#6B967B")
-    options=[(344,1.0,"Full price"),(432,.95,"5% off"),(523,.8,"20% off")]
-    for xm,rate,label in options:
-        r=next(r for r in case if float(r["discount"])==rate)
-        color=LIME if rate==.95 else WHITE
-        p.text(label,xm*MM,751*MM,size=22,bold=rate==.95,color=color,align="center")
-        p.text(f"{float(r['pred_value']):.3f}",xm*MM,763*MM,size=32,bold=True,color=color,align="center")
-    p.text("Predicted value = sales x rate (5% off means a rate of 0.95).",433*MM,779*MM,size=16,color="#D4E3CE",align="center")
+    # FIGURE 04: explain the policy and show the entire recommendation mix.
+    p.section("3","Add explicit stock rules before choosing the price",M,634*MM,size=32)
+    p.text("Model + support still recommends discounts almost every day; rules change when and how deeply.",M,650*MM,size=22,color=MUTED)
+    rule_rows=[("1  Stockout today >=1 hour","Full price tomorrow",PALE_GREEN),
+               ("2  Otherwise, no stockout in 7 days","Use a supported discount, if available",PALE_ORANGE),
+               ("3  Otherwise","Choose the highest predicted value",PALE_GREEN)]
+    for i,(condition,decision,color) in enumerate(rule_rows):
+        yy=(668+i*23)*MM
+        p.rect(M,yy,255*MM,20*MM,color,radius=5)
+        p.text(condition,M+13,yy+7,size=19,bold=True)
+        p.text(decision,M+13,yy+32,size=20)
+    p.text("Discount recommendations",313*MM,668*MM,size=21,bold=True)
+    p.text(f"{shares['Supported model only']:.1f}%",313*MM,680*MM,size=34,bold=True,color=ORANGE)
+    p.arrow(365*MM,687*MM,390*MM,687*MM,color=MUTED)
+    p.text(f"{shares['With stock rules']:.1f}%",405*MM,680*MM,size=34,bold=True,color=ACCENT)
+    p.text("with stock rules",455*MM,685*MM,size=18,color=MUTED)
+    sx,sw=373*MM,198*MM
+    pc={"Full price":"#D5DFC4","Moderate discount":ACCENT,"Deep discount":ORANGE}
+    for j,(strategy,label) in enumerate([("Supported model only","Model + support"),("With stock rules","+ stock rules")]):
+        yy=(706+j*18)*MM
+        p.text(label,313*MM,yy+2,size=18,bold=j==1)
+        left=sx
+        for r in [r for r in policy if r["strategy"]==strategy]:
+            portion=float(r["percent"]); width=sw*portion/100
+            p.rect(left,yy,width,11*MM,pc[r["band"]])
+            if portion>=10:
+                p.text(f"{portion:.1f}%",left+width/2,yy+7,size=18,bold=True,color=INK if r["band"]=="Full price" else WHITE,align="center")
+            left+=width
+    for xm,label,color in [(313,"Full price",pc["Full price"]),(389,"0% < off < 20%",ACCENT),(482,"20%+ off",ORANGE)]:
+        p.rect(xm*MM,742*MM,5*MM,5*MM,color)
+        p.text(label,(xm+8)*MM,741*MM,size=17,color=MUTED)
+    p.text("Same 2,184 cases. Rules are assumptions; stockouts do not reveal inventory age. Revenue or waste gains remain untested.",M,754*MM,size=18,color=MUTED)
 
-    p.text("Next: test the pricing decision in a real store.",M,794*MM,size=27,bold=True)
-    p.para("Sales are normalized and stock-limited; discounts are observational. No measured revenue or waste gain.<br/>Five stores, retrospective selection and a reused evaluation week limit generalization.",
-           M,808*MM,482*MM,size=18,leading=21,max_h=44)
-    p.text("FreshRetailNet-50K / Dingdong / CC BY 4.0. Final notebook: pricing-ml-ap @ a7e26dd. Add inventory/cost data before a pilot.",
-           M,826*MM,size=12,color=MUTED)
-    p.qr(535*MM,791*MM,36*MM)
-    p.text("CODE + NOTEBOOK",553*MM,829*MM,size=9.5,bold=True,color=GREEN,align="center")
-    p.c.linkURL(SOURCE_DATA,(M,H-834*MM,240*MM,H-823*MM),relative=0,thickness=0)
-    p.c.linkURL(NOTEBOOK,(M,H-248*MM,RIGHT,H-201*MM),relative=0,thickness=0)
+    # Compact closing example from the original figure 05.
+    p.rect(M,769*MM,RIGHT-M,29*MM,GREEN,radius=7)
+    p.text("ONE PRODUCT, ONE DECISION: 5% OFF",M+18,775*MM,size=26,bold=True,color=LIME)
+    p.text("Store 18 / Product 11 / 26 June",M+18,789*MM,size=18,color=WHITE)
+    p.text("Predicted value",358*MM,775*MM,size=17,color="#D4E3CE",align="center")
+    p.text("Full price  1.121",358*MM,786*MM,size=22,color=WHITE,align="center")
+    p.text("Best eligible rate",502*MM,775*MM,size=17,color="#D4E3CE",align="center")
+    p.text("5% off  1.198",502*MM,786*MM,size=23,bold=True,color=LIME,align="center")
+
+    p.text("Next: validate decisions in a controlled store pilot.",M,804*MM,size=24,bold=True)
+    p.para("Observational, normalized sales; value is a proxy, not currency. Five stores in one city; retrospective selection.\n26 Jun - 2 Jul 2024: 2,184 cases, a reused benchmark. Add inventory and cost data before a pilot.",
+           M,815*MM,493*MM,size=16,leading=20,max_h=41)
+    p.text("Source: Dingdong FreshRetailNet-50K (CC BY 4.0). Final notebook: pricing-ml-ap @ a7e26dd. Model scenarios do not prove causal uplift.",
+           M,832*MM,size=10.5,color=MUTED)
+    p.qr(538*MM,803*MM,33*MM)
+    p.c.linkURL(SOURCE_DATA,(M,H-840*MM,230*MM,H-831*MM),relative=0,thickness=0)
+    p.c.linkURL(NOTEBOOK,(M,H-232*MM,RIGHT,H-201*MM),relative=0,thickness=0)
     p.c.save()
 
     result=OUT/"MAIB7002_GroupQ_A1_Fresh_Ensemble_revised.pdf"
@@ -337,15 +368,19 @@ def build(source=None):
     for old in ("8.56%","0.2873","200 parallel trees","400 sequential trees","Lowest mean validation MAE: 50/50"):
         assert old not in text, f"Obsolete source text remains in PDF: {old}"
     (TMP/"fresh_ensemble_revision_layout.json").write_text(json.dumps(p.boxes,indent=2))
-    files=["results/test_summary.csv","results/ensemble_weight_sweep.csv","results/test_predictions.csv",
-           "results/visuals/one_product_discount_decision.csv", "results/knn_stage1_with_weather_summary.csv",
-           "results/knn_stage1_summary.csv", "results/visuals/recommendation_distribution.csv"]
+    files=["results/test_summary.csv","results/test_predictions.csv",
+           "results/visuals/one_product_discount_decision.csv",
+           "results/visuals/discount_response_and_support.csv",
+           "results/visuals/recommendation_distribution.csv"]
     receipt={"final_notebook_commit":PIN,"final_notebook_sha256":NOTEBOOK_SHA256,"final_notebook_url":NOTEBOOK,
-             "story_cells":{"goal_and_selection":[0,2,3,4],"feature_experiment":[14,16,18,20],"forecast_and_blend":[38,40,42,44,46],"discount_decision":[54,58,60,62]},"source_template":json.loads((ASSETS/"fresh_ensemble_template_source.json").read_text()),
+             "story_cells":{"goal_and_selection":[0,2,3,4],"forecast_and_errors":[38,40,42,44,46,47,48],"discount_decision":[54,58,60,61,62]},
+             "source_template":json.loads((ASSETS/"fresh_ensemble_template_source.json").read_text()),
              "pdf_sha256":hashlib.sha256(result.read_bytes()).hexdigest(),"gain_percent":gain,"test_mae":blend["mae"],
-             "test_rmse":blend["rmse"],"observed_discount_errors":errors,"deep_light_mae_ratio":ratio,
-             "story":"Business trade-off -> data selection -> feature experiment -> forecast comparison -> over-discounting discovery -> assumed stock rules -> worked recommendation",
-             "knn_weather_validation":{"with_weather":float(wx["mae"]),"without_weather":float(no_wx["mae"]),"k":25,"weighting":"equal"},
+             "test_rmse":blend["rmse"],"observed_discount_errors":errors,
+             "story":"Business question and cohort -> forecasting progress and remaining errors -> predicted response versus support -> stock rules and recommendation mix -> one supported 5%-off decision",
+             "integrated_key_figures":[2,3,4],"compact_bookends":[1,5],"omitted_optional_figure":6,
+             "response_ratios_denominator":"Mean prediction across the same 2184 cases at each candidate",
+             "historical_support_denominator":312,"forty_percent_off":deepest,
              "policy_discount_share_percent":shares,
              "selection":"Equal weights retained for simplicity; 60/40 has slightly lower mean validation MAE",
              "source_hashes":{f:hashlib.sha256((ROOT/f).read_bytes()).hexdigest() for f in files},
