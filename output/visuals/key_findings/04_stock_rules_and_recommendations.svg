@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1152pt" height="648pt" viewBox="0 0 1152 648" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-14T00:16:27.980364</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 648
+L 1152 648
+L 1152 0
+L 0 0
+z
+" style="fill: #fffdf3"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 78.7392 211.29984
+L 427.3344 211.29984
+Q 439.63776 211.29984 439.63776 208.656
+L 439.63776 153.576
+Q 439.63776 150.93216 427.3344 150.93216
+L 78.7392 150.93216
+Q 66.43584 150.93216 66.43584 153.576
+L 66.43584 208.656
+Q 66.43584 211.29984 78.7392 211.29984
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #e7f0dc"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 439.589074 181.116
+Q 473.47437 181.116 505.123597 181.116
+" clip-path="url(#p733cdd0fd3)" style="fill: none; stroke: #a7b4a6; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 499.123597 178.116
+L 505.123597 181.116
+L 499.123597 184.116
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #a7b4a6; stroke: #a7b4a6; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 514.4832 211.29984
+L 893.8368 211.29984
+Q 906.14016 211.29984 906.14016 208.656
+L 906.14016 153.576
+Q 906.14016 150.93216 893.8368 150.93216
+L 514.4832 150.93216
+Q 502.17984 150.93216 502.17984 153.576
+L 502.17984 208.656
+Q 502.17984 211.29984 514.4832 211.29984
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #a7b4a6"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 78.7392 281.80224
+L 427.3344 281.80224
+Q 439.63776 281.80224 439.63776 279.1584
+L 439.63776 224.0784
+Q 439.63776 221.43456 427.3344 221.43456
+L 78.7392 221.43456
+Q 66.43584 221.43456 66.43584 224.0784
+L 66.43584 279.1584
+Q 66.43584 281.80224 78.7392 281.80224
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #e7f0dc"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 439.589074 251.6184
+Q 473.47437 251.6184 505.123597 251.6184
+" clip-path="url(#p733cdd0fd3)" style="fill: none; stroke: #f27339; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 499.123597 248.6184
+L 505.123597 251.6184
+L 499.123597 254.6184
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #f27339; stroke: #f27339; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 514.4832 281.80224
+L 893.8368 281.80224
+Q 906.14016 281.80224 906.14016 279.1584
+L 906.14016 224.0784
+Q 906.14016 221.43456 893.8368 221.43456
+L 514.4832 221.43456
+Q 502.17984 221.43456 502.17984 224.0784
+L 502.17984 279.1584
+Q 502.17984 281.80224 514.4832 281.80224
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #f27339"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 78.7392 352.30464
+L 427.3344 352.30464
+Q 439.63776 352.30464 439.63776 349.6608
+L 439.63776 294.5808
+Q 439.63776 291.93696 427.3344 291.93696
+L 78.7392 291.93696
+Q 66.43584 291.93696 66.43584 294.5808
+L 66.43584 349.6608
+Q 66.43584 352.30464 78.7392 352.30464
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #e7f0dc"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 439.589074 322.1208
+Q 473.47437 322.1208 505.123597 322.1208
+" clip-path="url(#p733cdd0fd3)" style="fill: none; stroke: #0c5839; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 499.123597 319.1208
+L 505.123597 322.1208
+L 499.123597 325.1208
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #0c5839; stroke: #0c5839; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 514.4832 352.30464
+L 893.8368 352.30464
+Q 906.14016 352.30464 906.14016 349.6608
+L 906.14016 294.5808
+Q 906.14016 291.93696 893.8368 291.93696
+L 514.4832 291.93696
+Q 502.17984 291.93696 502.17984 294.5808
+L 502.17984 349.6608
+Q 502.17984 352.30464 514.4832 352.30464
+z
+" clip-path="url(#p733cdd0fd3)" style="fill: #0c5839"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="253.0368" y="185.531" transform="rotate(-0 253.0368 185.531)">Stockout today &gt;=1 hour</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="704.16" y="185.531" transform="rotate(-0 704.16 185.531)">Full price</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 27px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="945.1008" y="185.926472" transform="rotate(-0 945.1008 185.926472)">44.3%</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #647567" x="945.1008" y="206.4528" transform="rotate(-0 945.1008 206.4528)">967 cases</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="253.0368" y="256.0334" transform="rotate(-0 253.0368 256.0334)">Else: no stockout for 7 days</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="704.16" y="256.0334" transform="rotate(-0 704.16 256.0334)">Discount required; choose depth</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 27px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #f27339" x="945.1008" y="256.428872" transform="rotate(-0 945.1008 256.428872)">8.9%</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #647567" x="945.1008" y="276.9552" transform="rotate(-0 945.1008 276.9552)">195 cases</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="253.0368" y="328.0858" transform="rotate(-0 253.0368 328.0858)">Otherwise</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="704.16" y="326.4733" transform="rotate(-0 704.16 326.4733)">Model chooses the eligible rate</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 27px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="945.1008" y="326.931272" transform="rotate(-0 945.1008 326.931272)">46.8%</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #647567" x="945.1008" y="347.4576" transform="rotate(-0 945.1008 347.4576)">1,022 cases</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_11">
+    <path d="M 288 448.076571
+L 301.62989 448.076571
+L 301.62989 419.934857
+L 288 419.934857
+z
+" clip-path="url(#pe4f834602c)" style="fill: #a7b4a6"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 301.62989 448.076571
+L 818.48967 448.076571
+L 818.48967 419.934857
+L 301.62989 419.934857
+z
+" clip-path="url(#pe4f834602c)" style="fill: #559f9a"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 818.48967 448.076571
+L 1071.36 448.076571
+L 1071.36 419.934857
+L 818.48967 419.934857
+z
+" clip-path="url(#pe4f834602c)" style="fill: #f27339"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 288 506.705143
+L 640.583736 506.705143
+L 640.583736 478.563429
+L 288 478.563429
+z
+" clip-path="url(#pe4f834602c)" style="fill: #a7b4a6"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 640.583736 506.705143
+L 927.17011 506.705143
+L 927.17011 478.563429
+L 640.583736 478.563429
+z
+" clip-path="url(#pe4f834602c)" style="fill: #559f9a"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 927.17011 506.705143
+L 1071.36 506.705143
+L 1071.36 478.563429
+L 927.17011 478.563429
+z
+" clip-path="url(#pe4f834602c)" style="fill: #f27339"/>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #163d29" x="272.3328" y="437.902785" transform="rotate(-0 272.3328 437.902785)">Supported model only</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="294.814945" y="412.899429" transform="rotate(-0 294.814945 412.899429)">1.7%</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="560.05978" y="437.902199" transform="rotate(-0 560.05978 437.902199)">66.0%</text>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="944.924835" y="437.902199" transform="rotate(-0 944.924835 437.902199)">32.3%</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #163d29" x="272.3328" y="496.531356" transform="rotate(-0 272.3328 496.531356)">With stock rules</text>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="464.291868" y="496.53077" transform="rotate(-0 464.291868 496.53077)">45.0%</text>
+   </g>
+   <g id="text_19">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="783.876923" y="496.53077" transform="rotate(-0 783.876923 496.53077)">36.6%</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #163d29" x="999.265055" y="496.53077" transform="rotate(-0 999.265055 496.53077)">18.4%</text>
+   </g>
+  </g>
+  <g id="text_21">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="63.36" y="32.4" transform="rotate(-0 63.36 32.4)">04  /  POSTER MAIN FIGURE</text>
+  </g>
+  <g id="text_22">
+   <text style="font-weight: 700; font-size: 29px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="63.36" y="74.52" transform="rotate(-0 63.36 74.52)">Stock rules change both whether and how much to discount</text>
+  </g>
+  <g id="text_23">
+   <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #647567" x="63.36" y="106.92" transform="rotate(-0 63.36 106.92)">Restrict to supported rates, apply the assumed rules, then compare eligible predicted values.</text>
+  </g>
+  <g id="text_24">
+   <text style="font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #a7b4a6" x="299.52" y="545.616" transform="rotate(-0 299.52 545.616)">■ Full price</text>
+  </g>
+  <g id="text_25">
+   <text style="font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #559f9a" x="570.24" y="545.616" transform="rotate(-0 570.24 545.616)">■ &gt;0% to &lt;20% off</text>
+  </g>
+  <g id="text_26">
+   <text style="font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #f27339" x="840.96" y="545.616" transform="rotate(-0 840.96 545.616)">■ 20%+ off</text>
+  </g>
+  <g id="text_27">
+   <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="63.36" y="601.344" transform="rotate(-0 63.36 601.344)">Any discount: 98.3% of cases becomes 55.0%. This is changed behavior, not proven business gain.</text>
+  </g>
+  <g id="text_28">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #647567" x="63.36" y="627.264" transform="rotate(-0 63.36 627.264)">Same 2,184 cases, zero assumed unit cost. Stockout history does not establish inventory age or freshness. Notebook Table 5 supplies counts.</text>
+  </g>
+  <g id="text_29">
+   <a xlink:href="https://github.com/Lisayinyy/MAIB_7002/blob/a7e26dd979af88b4c14f98a7f029f6a64bffaedf/discount_sales_prediction.ipynb" target="_blank">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #647567" x="1088.64" y="627.264" transform="rotate(-0 1088.64 627.264)">Final notebook / a7e26dd</text>
+   </a>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p733cdd0fd3">
+   <rect x="63.36" y="142.56" width="1025.28" height="220.32"/>
+  </clipPath>
+  <clipPath id="pe4f834602c">
+   <rect x="288" y="401.76" width="783.36" height="123.12"/>
+  </clipPath>
+ </defs>
+</svg>

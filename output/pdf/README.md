@@ -103,3 +103,16 @@ if Poppler is installed:
 ```sh
 pdftoppm -scale-to 2100 -singlefile -png output/pdf/freshretail_a1_poster.pdf output/pdf/freshretail_a1_poster_preview
 ```
+
+## Reusable key-finding figures
+
+`FreshRetail_key_findings_visuals.pdf` is a six-page figure pack, not another A1
+poster. Five main figures cover cohort selection, forecast results and discount
+errors, predicted response versus historical support, stock rules and discount
+composition, and one supported product-day recommendation. The sixth is an
+optional weather-removal / CatBoost learning-curve experiment.
+
+Editable SVGs, 4800 x 2700 PNGs, an overview, English captions, Chinese speaking
+notes and source hashes are in `output/visuals/key_findings/`. The complete asset
+archive is `output/visuals/FreshRetail_key_visuals.zip`. Prioritize figures 02-04
+for poster space; use 01 and 05 as compact opening and closing illustrations.

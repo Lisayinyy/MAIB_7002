@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1152pt" height="648pt" viewBox="0 0 1152 648" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-14T00:16:26.977506</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 648
+L 1152 648
+L 1152 0
+L 0 0
+z
+" style="fill: #fffdf3"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 63.36 345.53952
+L 355.5648 345.53952
+Q 367.86816 345.53952 367.86816 342.2736
+L 367.86816 181.6992
+Q 367.86816 178.43328 355.5648 178.43328
+L 63.36 178.43328
+Q 51.05664 178.43328 51.05664 181.6992
+L 51.05664 342.2736
+Q 51.05664 345.53952 63.36 345.53952
+z
+" clip-path="url(#p36d7be33aa)" style="fill: #e7f0dc"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 364.744072 260.6256
+Q 387.862749 260.6256 408.745357 260.6256
+" clip-path="url(#p36d7be33aa)" style="fill: none; stroke: #0c5839; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 402.745357 257.6256
+L 408.745357 260.6256
+L 402.745357 263.6256
+z
+" clip-path="url(#p36d7be33aa)" style="fill: #0c5839; stroke: #0c5839; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 427.3344 345.53952
+L 719.5392 345.53952
+Q 731.84256 345.53952 731.84256 342.2736
+L 731.84256 181.6992
+Q 731.84256 178.43328 719.5392 178.43328
+L 427.3344 178.43328
+Q 415.03104 178.43328 415.03104 181.6992
+L 415.03104 342.2736
+Q 415.03104 345.53952 427.3344 345.53952
+z
+" clip-path="url(#p36d7be33aa)" style="fill: #e7f0dc"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 728.718472 260.6256
+Q 751.837149 260.6256 772.719757 260.6256
+" clip-path="url(#p36d7be33aa)" style="fill: none; stroke: #0c5839; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 766.719757 257.6256
+L 772.719757 260.6256
+L 766.719757 263.6256
+z
+" clip-path="url(#p36d7be33aa)" style="fill: #0c5839; stroke: #0c5839; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 791.3088 345.53952
+L 1083.5136 345.53952
+Q 1095.81696 345.53952 1095.81696 342.2736
+L 1095.81696 181.6992
+Q 1095.81696 178.43328 1083.5136 178.43328
+L 791.3088 178.43328
+Q 779.00544 178.43328 779.00544 181.6992
+L 779.00544 342.2736
+Q 779.00544 345.53952 791.3088 345.53952
+z
+" clip-path="url(#p36d7be33aa)" style="fill: #d4ed62"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="94.1184" y="222.5232" transform="rotate(-0 94.1184 222.5232)">PUBLIC DATA</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 42px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="94.1184" y="279.6768" transform="rotate(-0 94.1184 279.6768)">50,000</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="94.1184" y="317.7792" transform="rotate(-0 94.1184 317.7792)">store-product histories</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="458.0928" y="222.5232" transform="rotate(-0 458.0928 222.5232)">PASS THE FILTERS</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 42px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="458.0928" y="279.6768" transform="rotate(-0 458.0928 279.6768)">16,684</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="458.0928" y="317.7792" transform="rotate(-0 458.0928 317.7792)">eligible histories</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="822.0672" y="222.5232" transform="rotate(-0 822.0672 222.5232)">WORKING COHORT</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 42px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="822.0672" y="279.6768" transform="rotate(-0 822.0672 279.6768)">312</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="822.0672" y="317.7792" transform="rotate(-0 822.0672 317.7792)">histories in five stores</text>
+   </g>
+  </g>
+  <g id="text_10">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="63.36" y="32.4" transform="rotate(-0 63.36 32.4)">01  /  POSTER MAIN FIGURE</text>
+  </g>
+  <g id="text_11">
+   <text style="font-weight: 700; font-size: 29px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="63.36" y="74.52" transform="rotate(-0 63.36 74.52)">Choose histories with enough discount variation</text>
+  </g>
+  <g id="text_12">
+   <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #647567" x="63.36" y="106.92" transform="rotate(-0 63.36 106.92)">FreshRetailNet links daily sales, discounts and stockouts for each store-product pair.</text>
+  </g>
+  <g id="text_13">
+   <text style="font-weight: 700; font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="74.88" y="421.2" transform="rotate(-0 74.88 421.2)">Require repeated price changes</text>
+  </g>
+  <g id="text_14">
+   <text style="font-size: 17px; font-family: 'DejaVu Sans'; fill: #163d29" transform="translate(74.88 484.850937)">15-85% discounted days; at least six discount-state switches;</text>
+   <text style="font-size: 17px; font-family: 'DejaVu Sans'; fill: #163d29" transform="translate(74.88 512.050937)">zero sales on fewer than 20% of days.</text>
+  </g>
+  <g id="text_15">
+   <text style="font-weight: 700; font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #163d29" x="725.76" y="421.2" transform="rotate(-0 725.76 421.2)">Select the top five stores</text>
+  </g>
+  <g id="text_16">
+   <text style="font-size: 17px; font-family: 'DejaVu Sans'; fill: #163d29" transform="translate(725.76 484.850937)">Rank stores by eligible histories.</text>
+   <text style="font-size: 17px; font-family: 'DejaVu Sans'; fill: #163d29" transform="translate(725.76 512.050937)">All five happen to be in one city.</text>
+  </g>
+  <g id="text_17">
+   <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="74.88" y="541.08" transform="rotate(-0 74.88 541.08)">312 histories  |  122 products  |  25,896 training/validation rows  |  2,184 final-week cases</text>
+  </g>
+  <g id="text_18">
+   <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0c5839" x="63.36" y="601.344" transform="rotate(-0 63.36 601.344)">This cohort supports comparison; it does not represent every store or product.</text>
+  </g>
+  <g id="text_19">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #647567" x="63.36" y="627.264" transform="rotate(-0 63.36 627.264)">Discounted day: price rate &lt;0.95. Retrospective selection across the 90-day training file. Diagram stages are not area-scaled.</text>
+  </g>
+  <g id="text_20">
+   <a xlink:href="https://github.com/Lisayinyy/MAIB_7002/blob/a7e26dd979af88b4c14f98a7f029f6a64bffaedf/discount_sales_prediction.ipynb" target="_blank">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #647567" x="1088.64" y="627.264" transform="rotate(-0 1088.64 627.264)">Final notebook / a7e26dd</text>
+   </a>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p36d7be33aa">
+   <rect x="63.36" y="149.04" width="1025.28" height="272.16"/>
+  </clipPath>
+ </defs>
+</svg>
