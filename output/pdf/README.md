@@ -1,85 +1,108 @@
 # A1 exhibition poster
 
-## Current choice: three-part green poster
+## Current green poster with empirical notebook figures
 
 Print **MAIB7002_GroupQ_A1_Fresh_Ensemble_revised.pdf** at actual size:
 **594 x 841 mm**, portrait, one page. Its matching PNG is the preview.
 
-The revised structure follows the group's requested presentation order:
+The three-part structure is retained and now shows both project phases:
 
-1. **Problem / Data Cleaning.** Problem and business trade-off on the left;
-   dataset choice, cohort funnel and cleaning steps on the right.
-2. **Models.** The largest section, with five approaches in order: seven-day
-   mean baseline, kNN, Random Forest, CatBoost and their 50/50 ensemble. Each
-   card explains the mechanism, uses a schematic diagram, and states the
-   experiment's actual settings. The input-to-target flow and chronological
-   evaluation plan connect the cards to the project.
-3. **Results & Implications.** A five-method MAE/RMSE comparison, the 7.9% MAE
-   reduction, recommendation rates before/after stock rules, and a 5%-off
-   worked case. The final takeaway calls for a controlled store pilot.
+1. **Problem / Data Cleaning.** Short business context and a larger central
+   question on the left; source choice, cohort funnel and cleaning on the right.
+2. **Models and Phase One.** Five forecasting approaches: the seven-day mean
+   baseline, kNN, Random Forest, CatBoost and their equal-weight ensemble.
+   Four empirical plots explain the actual model selection. The final-week
+   MAE comparison follows immediately below them.
+3. **Results and Implications with Phase Two.** Stock rules determine whether
+   to discount; candidate forecasts determine how much. A policy comparison
+   and one product's sales/value curves show the resulting business decision.
 
-There is **no QR code**. The green identity, title and author order are retained;
-the header is smaller and uses new generated decorative produce artwork. The
-artwork is not project data or a photograph of a participating store. Its PNG
-and full generation prompt are in `assets/poster/fresh_produce_hero_v3.*` and
-`assets/poster/fresh_produce_hero_v3_prompt.md`. The original header PDF is kept
-as an archival asset but is no longer imported by the current builder.
+The abstract neighbour/tree schematics are removed. Charts use actual saved
+experiment data, reflowed with larger lettering for the poster. The builder
+keeps vector geometry and embedded fonts. Original notebook plot PNGs are
+retained in `assets/poster/experiments/notebook_cell_*_original.png` for visual
+traceability. Poster plot PDFs, PNGs and editable SVGs are in the same directory.
+The numeric provenance is in its `evidence.json`.
 
-### Evidence and scope
+### Empirical figure sources
 
-All scores and settings follow the final `pricing-ml-ap` notebook at `a7e26dd`.
-The five approaches include one simple baseline and one ensemble, not five
-independent fitted models. Random Forest uses 300 trees / depth 10 / minimum
-leaf size 3; CatBoost uses 500 trees / depth 5 / learning rate 0.03; kNN uses
-25 equally weighted neighbours after feature standardization. CatBoost alone
-is almost tied with the ensemble; equal weights were retained for simplicity,
-not because 50/50 was the exact validation minimum.
+| Poster plot | Source in the final notebook | What it explains |
+|---|---|---|
+| kNN validation curve | Cell 19, `knn_stage1_summary.csv` | Equal-weight k=25 in a flat tuning region |
+| RF depth/leaf heatmap | Cell 25, `rf_tuning_summary.csv` | The chosen depth 10 / minimum leaf 3; small grid differences |
+| CatBoost learning curve | Cell 35, `catboost_learning_curves.csv` | Training versus validation error at lr=0.03 |
+| RF/CatBoost weight curve | Cell 39, `ensemble_weight_sweep.csv` | 50/50 retained for simplicity near the lowest tested 60/40 result |
+| Stock-rule recommendation mix | Cell 61, `recommendation_distribution.csv` | Supported model versus the default stock rules |
+| One-product discount depth | Saved case from the same final ensemble | Why the supported 5%-off option has the highest predicted value |
 
-The sample is selected from 50,000 store-product histories using 15-85% days
-with price rate below 0.95, at least six discount-state changes, and fewer than
-20% zero-sales days. The top five stores by eligible-history count yield 312
-histories. The cohort was selected retrospectively from the original training
-file. Selection and data-cleaning rules are distinct.
+The CatBoost view shows the source's lr=0.03 panel from trees 100-3,000. Its
+zero-based logged iteration is displayed as the number of trees added. It is
+one validation fold, whereas the locked 500-tree design was selected across
+five folds. The RF colour scale covers only a 0.003 MAE range; its full numeric
+grid is printed. The ensemble curve is also zoomed, as the actual differences
+are small. No data is smoothed and no model is retrained for the poster.
 
-Cleaning checks unique daily keys, missing fields and gaps; caps rates above 1;
-masks sales and discounts on zero-price days; builds historical features from
-prior observations; then removes rows lacking complete features. The poster
-states the rules without inventing per-rule removal counts. There are 25,896
-training/validation rows plus 2,184 final-week observations after the seven-day
-history requirement.
+### Business decision and evidence boundaries
 
-Settings use five expanding validation weeks. Final-week metrics describe
-26 June-2 July 2024, which was reused during development. These are normalized
-recorded sales, not units, dollars or unconstrained demand. Recommendation
-shares use the same 2,184 cases. The value proxy is predicted sales times price
-rate, with zero assumed unit cost; it is not measured revenue or profit.
+Phase One predicts next-day normalized recorded sales using ten inputs.
+Phase Two holds the historical context fixed and varies tomorrow's price rate
+across 1.00, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70 and 0.60. Price rate 0.95 means
+5% off. Supported rates require at least three training days within 0.025 for
+that store-product. The decision compares predicted sales times price rate,
+with zero assumed unit cost in the displayed default case. The code also
+supports cost and minimum-gain business settings.
 
-For the stock policy, a stockout of at least one hour today forces full price
-tomorrow. Otherwise no stockout in seven days requires a supported discount if
-available; remaining cases choose the highest eligible predicted value. A
-supported rate has at least three training days within 0.025 of that rate.
-The rules are assumptions: stockouts do not reveal age or freshness. The 5%-off
-case is store 18 / product 11 / 26 June 2024. No causal sales, revenue or waste
-gain has been demonstrated.
+Stockout today of at least one hour forces full price tomorrow. Otherwise no
+stockout in seven days requires a supported discount if available; remaining
+cases choose the highest eligible predicted value. These policy assumptions
+do not measure freshness or stock age. The same 2,184 cases underlie the two
+recommendation distributions: 98.3% with model and support, 55.0% with stock
+rules. These are recommendation rates, not observed business gains.
 
-This poster revision changes presentation only; it does not retrain models or
-modify the final notebook. Numeric source hashes and provenance are in
-`fresh_ensemble_revision_evidence.json`. Model illustrations are explanatory
-schematics, not visualizations of particular fitted trees or data samples.
+The example is store 18 / product 11 / 26 June 2024: a 5% discount predicts
+sales 1.261 and value 1.198. The 20%-off candidate predicts more sales but less
+value (1.136). Rates of 25%, 30% and 40% off are unsupported for this product.
+This saved worked case extends the final notebook's Phase Two logic; it is
+not an original plotted case in that notebook. Both its source and values
+are identified in the chart evidence file.
 
-### Rebuild
+All scores follow `pricing-ml-ap` at `a7e26dd`. The five approaches include
+one baseline and one ensemble, rather than five independent fitted models.
+CatBoost alone is nearly tied with the ensemble; 50/50 is a simple choice on
+a flat validation curve, while 60/40 has the smallest measured validation MAE among the tested weights.
 
-Verified with ReportLab 4.4.9 and pypdf 6.10.0. From the repository root:
+The cohort was selected retrospectively from the original training file. The
+final evaluation period is 26 June-2 July 2024 and was reused during development.
+Sales are normalized and stock-limited; the value proxy is not currency, revenue
+or profit. No causal sales, revenue or waste gain is demonstrated. The manager
+implication is to use the recommendation as decision support, set business
+limits using inventory/cost information, and test it in a controlled store pilot.
+
+### Design and rebuild
+
+The title, member order, green palette and decorative produce asset are retained.
+There is no QR code. The requested Figma skills guide spacing, hierarchy,
+consistent styling and rendered verification; no Figma source node was supplied
+or copied. The Design Report template was consulted as guidance only, following
+the user's clarification to focus on the poster.
+
+Plot rebuild (matplotlib 3.11.2, pandas 3.0.6):
+
+```sh
+uv run --no-project --with matplotlib==3.11.2 --with pandas==3.0.6 --with pillow --with pypdf==6.20.1 python scripts/build_poster_experiment_figures.py
+```
+
+Poster rebuild (ReportLab 4.4.9, pypdf 6.10.0):
 
 ```sh
 uv run --no-project --with reportlab==4.4.9 --with pypdf==6.10.0 python scripts/revise_fresh_ensemble_poster.py
-pdftoppm -scale-to 2600 -singlefile -png output/pdf/MAIB7002_GroupQ_A1_Fresh_Ensemble_revised.pdf output/pdf/MAIB7002_GroupQ_A1_Fresh_Ensemble_revised_preview
+pdftoppm -scale-to 2800 -singlefile -png output/pdf/MAIB7002_GroupQ_A1_Fresh_Ensemble_revised.pdf output/pdf/MAIB7002_GroupQ_A1_Fresh_Ensemble_revised_preview
 ```
 
-The body uses Arial if available, otherwise ReportLab Vera. Check the rendered
-PDF when rebuilding on a different system. The delivered version is checked
-for one A1 page, embedded visible fonts, no text collisions, correct evidence
-values and no QR code. Its charts and text remain vector objects.
+The body uses Arial if available, otherwise ReportLab Vera. The plot assets use
+embedded DejaVu Sans. Check the rendered PDF when rebuilding on another system.
+The delivered version is checked for A1 dimensions, all visible embedded fonts,
+layout and chart collisions, evidence values, and no QR code.
 
 ## Earlier alternative: editorial layout
 

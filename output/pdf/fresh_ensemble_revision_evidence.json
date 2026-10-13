@@ -2,11 +2,11 @@
   "final_notebook_commit": "a7e26dd979af88b4c14f98a7f029f6a64bffaedf",
   "final_notebook_sha256": "a42326bed278c3b70c3469dd508ab563e6586dbdd84033117663c86a25033859",
   "final_notebook_url": "https://github.com/Lisayinyy/MAIB_7002/blob/a7e26dd979af88b4c14f98a7f029f6a64bffaedf/discount_sales_prediction.ipynb",
-  "pdf_sha256": "c8d9c8769490166743720357c2ad284b60480f5ad5a0b4ed6455e86fcf4465da",
+  "pdf_sha256": "3e3b845bbeebf3a0f873395e34917c3602f9cc097c87cff1156df05786d6916e",
   "sections": [
     "Problem / Data Cleaning",
-    "Models",
-    "Results & Implications"
+    "Models: Phase One sales prediction",
+    "Results & Implications: Phase Two price choice"
   ],
   "model_methods": [
     "7-day mean baseline",
@@ -16,11 +16,101 @@
     "50/50 RF + CatBoost"
   ],
   "model_section_mm": [
-    326,
-    638
+    277,
+    600
   ],
-  "header": "New AI-generated decorative produce art; compact green title area",
+  "header": "Compact green identity; existing decorative produce asset retained",
   "no_qr_code": true,
+  "plot_provenance": {
+    "notebook_commit": "a7e26dd979af88b4c14f98a7f029f6a64bffaedf",
+    "notebook_sha256": "a42326bed278c3b70c3469dd508ab563e6586dbdd84033117663c86a25033859",
+    "source_hashes": {
+      "results/knn_stage1_summary.csv": "079018b6fd03a6e1b4112ebbbd5790d4339bb91fdd1be2790810c472d7005677",
+      "results/rf_tuning_summary.csv": "64316b2855734b2ed3c77333a0f86162236e8accb05afe56fe5a465766e04cc9",
+      "results/catboost_learning_curves.csv": "4d970f3589cd286d3f5015ccacac770b76f1e98ceea825a63819f7631c78ba56",
+      "results/ensemble_weight_sweep.csv": "12e1d2828134c8df68ef21b6eba1d29df884aa5054b0a9651ab1abd2c20a07ba",
+      "results/visuals/recommendation_distribution.csv": "4b4ad8ff82f62857cc8417581bab3f89b7f5de3db17442592097202638b2842c",
+      "results/visuals/one_product_discount_decision.csv": "0c11efe47a2739c815a5cf872ee9f6d646a0d5b0be36f99f0681ed5de0f0177c"
+    },
+    "charts": {
+      "01_knn_validation": {
+        "notebook_cell": 19,
+        "subset": "equal-weight kNN and7-daybaseline"
+      },
+      "02_rf_validation_grid": {
+        "notebook_cell": 25,
+        "note": "Numeric heatmap reproduced exactly"
+      },
+      "03_catboost_learning": {
+        "notebook_cell": 35,
+        "subset": "lr=.03, trees100-3000; zero-based logged iteration +1 displayed as tree count"
+      },
+      "04_ensemble_weights": {
+        "notebook_cell": 39,
+        "chosen_rf_weight": 0.5,
+        "minimum_rf_weight": 0.6
+      },
+      "05_policy_recommendations": {
+        "notebook_cell": 61,
+        "subset": "Two default policies, same2184cases"
+      },
+      "06_case_discount_depth": {
+        "source": "Saved case from same final ensemble, alongside PhaseTwo",
+        "store": 18,
+        "product": 11,
+        "date": "2024-06-26",
+        "chosen_percent_off": 5,
+        "pred_sales": 1.2614195236670387,
+        "pred_value": 1.1983485474836868
+      }
+    },
+    "presentation": "Actual saved experiments reflowed with larger fonts for A1; no mechanism cartoons; no retraining or invented data"
+  },
+  "model_diagrams_removed": true,
+  "chart_slots": [
+    {
+      "name": "01_knn_validation",
+      "x": 22,
+      "y": 338,
+      "w": 265,
+      "h": 81.26666666666667
+    },
+    {
+      "name": "02_rf_validation_grid",
+      "x": 307,
+      "y": 338,
+      "w": 265,
+      "h": 81.26666666666667
+    },
+    {
+      "name": "03_catboost_learning",
+      "x": 22,
+      "y": 459,
+      "w": 265,
+      "h": 81.26666666666667
+    },
+    {
+      "name": "04_ensemble_weights",
+      "x": 307,
+      "y": 459,
+      "w": 265,
+      "h": 81.26666666666667
+    },
+    {
+      "name": "05_policy_recommendations",
+      "x": 22,
+      "y": 658,
+      "w": 265,
+      "h": 81.26666666666667
+    },
+    {
+      "name": "06_case_discount_depth",
+      "x": 307,
+      "y": 658,
+      "w": 265,
+      "h": 81.26666666666667
+    }
+  ],
   "gain_percent": 7.942053081842082,
   "test_mae": 0.28923224366438466,
   "test_rmse": 0.4592618239665576,
