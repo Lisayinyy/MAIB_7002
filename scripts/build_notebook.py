@@ -38,10 +38,15 @@ from pathlib import Path
 
 # A generic JupyterLab image may lack the two packages below. Install only what is missing, pinned to this project's
 # lock file; in the project's own environment or Docker image nothing happens here.
-for module, requirement in [("catboost", "catboost==1.2.10"), ("pyarrow", "pyarrow==25.0.1")]:
-    if importlib.util.find_spec(module) is None:
-        print(f"{module} is not installed in this environment: installing {requirement} once (needs network)")
-        subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", requirement], check=True)
+missing = [req for mod, req in [("catboost", "catboost==1.2.10"), ("pyarrow", "pyarrow==25.0.1")] if importlib.util.find_spec(mod) is None]
+if missing:
+    print(f"Not installed in this environment: {', '.join(missing)}. Installing once (needs network).")
+    if importlib.util.find_spec("pip") is None:  # environments made by uv ship without pip
+        subprocess.run([sys.executable, "-m", "ensurepip", "--upgrade"], check=True, capture_output=True)
+    install = subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", *missing], capture_output=True, text=True)
+    if install.returncode != 0:
+        raise RuntimeError(f"Could not install {' '.join(missing)}. Run `pip install {' '.join(missing)}` in this environment, "
+                           f"or use the project's Dockerfile.\n{install.stderr[-800:]}")
 
 import numpy as np
 import pandas as pd
