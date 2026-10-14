@@ -31,8 +31,17 @@ It is written to be read top to bottom. Each section states what was done, shows
 """)
 
 code(r"""
+import importlib.util
+import subprocess
 import sys
 from pathlib import Path
+
+# A generic JupyterLab image may lack the two packages below. Install only what is missing, pinned to this project's
+# lock file; in the project's own environment or Docker image nothing happens here.
+for module, requirement in [("catboost", "catboost==1.2.10"), ("pyarrow", "pyarrow==25.0.1")]:
+    if importlib.util.find_spec(module) is None:
+        print(f"{module} is not installed in this environment: installing {requirement} once (needs network)")
+        subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", requirement], check=True)
 
 import numpy as np
 import pandas as pd
