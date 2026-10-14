@@ -18,6 +18,8 @@ OUT = ROOT / "poster"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 BLUE, ORANGE, GREEN, AMBER, GRAY = C.COLOURS["knn"], C.COLOURS["rf"], C.COLOURS["catboost"], C.COLOURS["ensemble"], C.COLOURS["baseline"]
 INK, MUTED, GRID, LIGHT_BLUE = "#0b0b0b", "#52514e", "#e1e0d9", "#8db8ea"
+# Poster scheme (green, amber accent)
+NAVY, DEEP, LEAF, PALE, TINT, PAGE, MOSS = "#1e4d3b", "#1a7a4a", "#9ec9ad", "#e7f1e6", "#eef5ee", "#fbfdf8", "#d9ddd5"
 
 # ----------------------------------------------------------------------------- data
 feat = data.load_features()
@@ -91,7 +93,7 @@ def vbar_chart(labels, values, fmt, colour=BLUE, height=58, reference=None, ref_
         ref = f'<div class="vb-ref" style="bottom:{y + 9:.1f}mm"><span>{ref_label}</span></div>'
     return f'<div class="vbars" style="height:{height + 20}mm">{ref}{"".join(cols)}</div>'
 
-def svg_lines(series, xlim, ylim, w, h, xlabel, ylabel, xticks, yticks, marks=(), xfmt=str, yfmt=str, reverse_x=False, hline=None):
+def svg_lines(series, xlim, ylim, w, h, xlabel, ylabel, xticks, yticks, marks=(), xfmt=str, yfmt=str, reverse_x=False, hline=None, vline=None):
     """A line chart as inline SVG in mm units. ``series``: list of (label, colour, xs, ys)."""
     pad_l, pad_b, pad_t, pad_r = 18, 14, 6, 6
     def X(x):
@@ -110,6 +112,8 @@ def svg_lines(series, xlim, ylim, w, h, xlabel, ylabel, xticks, yticks, marks=()
     if hline is not None:
         parts.append(f'<line x1="{pad_l}" x2="{w - pad_r}" y1="{Y(hline):.2f}" y2="{Y(hline):.2f}" stroke="{MUTED}" stroke-width="0.5"/>')
     parts.append(f'<line x1="{pad_l}" x2="{w - pad_r}" y1="{h - pad_b:.2f}" y2="{h - pad_b:.2f}" stroke="{MUTED}" stroke-width="0.4"/>')
+    if vline is not None:
+        parts.append(f'<line x1="{X(vline):.2f}" x2="{X(vline):.2f}" y1="{pad_t}" y2="{h - pad_b:.2f}" stroke="{ORANGE}" stroke-width="0.5" stroke-dasharray="1.5 1.2"/>')
     for label, colour, xs, ys in series:
         pts = " ".join(f"{X(x):.2f},{Y(y):.2f}" for x, y in zip(xs, ys))
         parts.append(f'<polyline points="{pts}" fill="none" stroke="{colour}" stroke-width="1.1" stroke-linejoin="round"/>')
@@ -166,16 +170,16 @@ def icon(name, colour=BLUE, size=14):
 FONT = "Helvetica Neue, Helvetica, Arial, sans-serif"
 shelf_art = f"""
 <svg viewBox="0 0 200 120" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
-  <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#dfe9f8"/><stop offset="1" stop-color="#f6f9fe"/></linearGradient></defs>
+  <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#dcebdc"/><stop offset="1" stop-color="#f3f8f1"/></linearGradient></defs>
   <rect x="10" y="8" width="180" height="104" rx="10" fill="url(#g)"/>
-  <g stroke="#7a8794" stroke-width="2.2" stroke-linecap="round"><path d="M28 48h144M28 84h144"/><path d="M34 48v-4M166 48v-4M34 84v-4M166 84v-4"/></g>
-  <g><circle cx="48" cy="38" r="8" fill="{ORANGE}"/><circle cx="62" cy="40" r="7" fill="{ORANGE}"/><circle cx="55" cy="30" r="7" fill="#f28a5c"/></g>
-  <g><ellipse cx="100" cy="40" rx="15" ry="6" fill="#e0b66a"/><ellipse cx="100" cy="35" rx="15" ry="6" fill="#efcf8b"/></g>
-  <g><rect x="130" y="26" width="12" height="20" rx="2" fill="{GREEN}"/><rect x="146" y="26" width="12" height="20" rx="2" fill="#5fcf9f"/></g>
-  <g><circle cx="52" cy="74" r="7" fill="#a4d46a"/><circle cx="66" cy="76" r="7" fill="#8bc34a"/></g>
-  <g><rect x="92" y="60" width="26" height="22" rx="3" fill="#f5e7c4" stroke="#d9c38f" stroke-width="1.5"/><path d="M96 66h18M96 72h18M96 78h12" stroke="#d9c38f" stroke-width="1.5" stroke-linecap="round"/></g>
-  <g transform="translate(140 58) rotate(-12)"><path d="M0 8a8 8 0 0 1 8-8h22l14 14-14 14H8a8 8 0 0 1-8-8V8z" fill="{AMBER}"/><circle cx="8" cy="12" r="2.5" fill="white"/>
-    <text x="27" y="17" font-size="12" font-weight="800" fill="#10213a" text-anchor="middle" font-family="{FONT}">&#8722;?%</text></g>
+  <g stroke="#6f8a7a" stroke-width="2.2" stroke-linecap="round"><path d="M28 50h144M28 86h144"/><path d="M34 50v-4M166 50v-4M34 86v-4M166 86v-4"/></g>
+  <g><rect x="52" y="36" width="5" height="12" rx="1.5" fill="#8fb98a"/><circle cx="48" cy="32" r="7" fill="#4f9a5a"/><circle cx="60" cy="31" r="7.5" fill="#5aa565"/><circle cx="54" cy="24" r="7" fill="#4f9a5a"/></g>
+  <g><ellipse cx="100" cy="40" rx="9" ry="9" fill="#e9c35c"/><ellipse cx="100" cy="30" rx="6" ry="7" fill="#e9c35c"/><path d="M100 23v-5" stroke="#6f8a7a" stroke-width="1.5" stroke-linecap="round"/><path d="M101 20c3-4 7-4 9-2-3 2-6 3-9 2z" fill="#5aa565"/></g>
+  <g fill="#5aa565"><path d="M140 48c-4-8-2-16 6-20 2 8 0 15-6 20z"/><path d="M146 48c0-9 6-15 14-16-2 8-7 14-14 16z"/><path d="M152 48c3-7 10-10 17-8-4 6-10 9-17 8z"/></g>
+  <g><path d="M46 60l6 24 6-24z" fill="{ORANGE}"/><path d="M50 60c0-5 1-8 2-10 1 2 2 5 2 10" fill="#5aa565"/></g>
+  <g><circle cx="106" cy="74" r="10" fill="#e4603f"/><path d="M106 64c-3-3-5-3-7-2 3 1 5 2 7 2zM106 64c3-3 5-3 7-2-3 1-5 2-7 2zM106 64v-4" stroke="#4f9a5a" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>
+  <g transform="translate(140 62) rotate(-12)"><path d="M0 8a8 8 0 0 1 8-8h22l14 14-14 14H8a8 8 0 0 1-8-8V8z" fill="{AMBER}"/><circle cx="8" cy="12" r="2.5" fill="white"/>
+    <text x="27" y="17" font-size="12" font-weight="800" fill="{NAVY}" text-anchor="middle" font-family="{FONT}">&#8722;?%</text></g>
   <text x="100" y="105" font-size="7" fill="#52514e" text-anchor="middle" font-family="{FONT}">6 pm &#183; the shelf is still half full &#183; what is tomorrow's price?</text>
 </svg>"""
 
@@ -185,32 +189,75 @@ nice = {"Baseline (7-day mean)": "7-day average (no ML)", "kNN (k=25)": "k-neare
 colour_of = {nice[k]: v for k, v in {"Baseline (7-day mean)": GRAY, "kNN (k=25)": BLUE, "Random forest": ORANGE, "CatBoost": GREEN, "RF + CatBoost (50/50)": AMBER}.items()}
 mae_bars = hbar_rows([(nice[m], mae[m]) for m in order], lambda label: colour_of[label], lambda v: f"{v:.3f}", 0.345, label_w=64)
 
+def svg_dotplot(items, xlim, xticks, w=150, h=44):
+    """Test MAE per model as a dot with its value, best row in bold. ``items``: list of (label, value, colour, bold)."""
+    pad_l, pad_r, pad_t, pad_b = 40, 20, 3, 13
+    X = lambda x: pad_l + (x - xlim[0]) / (xlim[1] - xlim[0]) * (w - pad_l - pad_r)
+    step = (h - pad_t - pad_b) / len(items)
+    out = [f'<svg viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:inherit">']
+    for t in xticks:
+        out.append(f'<line x1="{X(t):.2f}" x2="{X(t):.2f}" y1="{pad_t}" y2="{h - pad_b:.2f}" stroke="{GRID}" stroke-width="0.3"/>'
+                   f'<text x="{X(t):.2f}" y="{h - pad_b + 5.5:.2f}" font-size="4.2" text-anchor="middle" fill="{MUTED}">{t:.2f}</text>')
+    out.append(f'<line x1="{pad_l}" x2="{w - pad_r}" y1="{h - pad_b:.2f}" y2="{h - pad_b:.2f}" stroke="{MUTED}" stroke-width="0.4"/>')
+    for i, (label, value, colour, bold) in enumerate(items):
+        y = pad_t + step * (i + 0.5)
+        out.append(f'<text x="{pad_l - 3}" y="{y + 1.6:.2f}" font-size="4.6" text-anchor="end" fill="{MUTED}">{label}</text>')
+        out.append(f'<circle cx="{X(value):.2f}" cy="{y:.2f}" r="1.9" fill="{colour}"/>')
+        out.append(f'<text x="{X(value) + 3.2:.2f}" y="{y + 1.6:.2f}" font-size="4.8" fill="{INK}" font-weight="{'700' if bold else '400'}">{value:.4f}</text>')
+    out.append(f'<text x="{(pad_l + w - pad_r) / 2:.2f}" y="{h - 1:.2f}" font-size="4.2" text-anchor="middle" fill="{MUTED}">Test MAE on the 2,184-day held-out week (lower is better)</text>')
+    out.append("</svg>")
+    return "\n".join(out)
+
+dotplot = svg_dotplot([("7-day baseline", mae["Baseline (7-day mean)"], GRAY, False), ("kNN (k=25)", mae["kNN (k=25)"], DEEP, False),
+                       ("Random forest", mae["Random forest"], DEEP, False), ("CatBoost", mae["CatBoost"], DEEP, False),
+                       ("RF + CB (50/50)", mae["RF + CatBoost (50/50)"], ORANGE, True)], (0.284, 0.322), [0.29, 0.30, 0.31])
+
+pivot = rf_grid.pivot(index="max_depth", columns="min_leaf", values="mae").reindex(["10", "15", "20", "No limit"])
+vmin, vmax = pivot.min().min(), pivot.max().max()
+def _cell(v):
+    f = (v - vmin) / (vmax - vmin)  # 0 = best (lightest), 1 = worst (darkest green)
+    r, g, b = int(236 - f * (236 - 15)), int(246 - f * (246 - 92)), int(228 - f * (228 - 48))
+    best = abs(v - vmin) < 1e-12
+    return (f'<td style="background:rgb({r},{g},{b});color:{"white" if f > 0.55 else INK};'
+            f'{"outline:1mm solid " + ORANGE + ";outline-offset:-1mm;" if best else ""}">{v:.4f}</td>')
+heat = ['<table class="heat"><tr><th class="corner"></th>' + "".join(f"<th>{c}</th>" for c in pivot.columns) + "</tr>"]
+for depth, row in pivot.iterrows():
+    heat.append(f"<tr><th>{'None' if depth == 'No limit' else depth}</th>" + "".join(_cell(v) for v in row) + "</tr>")
+heat.append("</table>")
+heatmap = "\n".join(heat)
+
+lc3 = curves["lr=0.03"].iloc[::10]
+learning_small = svg_lines([("Train", "#a8b5aa", list(lc3.index + 1), list(lc3.train)), ("Validation", DEEP, list(lc3.index + 1), list(lc3.validation))],
+                           (0, 3000), (0.22, 0.34), 118, 46, "Trees (learning rate 0.03)", "MAE", [100, 1000, 2000, 3000], [0.24, 0.28, 0.32],
+                           marks=[("Train", 2950, 0.232, "#8a978c", "end"), ("Validation", 2950, 0.316, DEEP, "end"), ("500 trees", 560, 0.335, ORANGE, "start")],
+                           yfmt=lambda v: f"{v:.2f}", vline=500)
+
 d = list(curve.index)
-response_svg = svg_lines([("Predicted sales", BLUE, d, list(curve.sales_vs_no_discount)), ("Predicted value", ORANGE, d, list(curve.value_vs_no_discount))],
+response_svg = svg_lines([("Predicted sales", DEEP, d, list(curve.sales_vs_no_discount)), ("Predicted value", ORANGE, d, list(curve.value_vs_no_discount))],
                          (0.6, 1.0), (0.9, 2.5), 150, 62, "Tomorrow's discount rate (deeper to the right)", "× no-discount level", d, [1.0, 1.5, 2.0, 2.5],
-                         marks=[(f"sales {curve.sales_vs_no_discount.iloc[-1]:.1f}×", 0.66, 2.3, BLUE, "end"), (f"value {curve.value_vs_no_discount.iloc[-1]:.2f}×", 0.66, 1.5, ORANGE, "end")],
+                         marks=[(f"sales {curve.sales_vs_no_discount.iloc[-1]:.1f}×", 0.66, 2.3, DEEP, "end"), (f"value {curve.value_vs_no_discount.iloc[-1]:.2f}×", 0.66, 1.5, ORANGE, "end")],
                          xfmt=lambda v: f"{v:.2f}", yfmt=lambda v: f"{v:.1f}", reverse_x=True, hline=1.0)
 
 short = {"Manager (actual)": "The managers", "What-if alone": "Model alone", "+ stock rules": "Model + stock rules", "+ unit cost 0.7": "… + unit cost"}
 policy_rows = []
 for name, row in bands_by_policy.loc[list(short)].iterrows():
     segs = "".join(f'<div class="seg" style="width:{row[c]:.1f}%;background:{col};color:{ink}">{pct(row[c]) if row[c] >= 7 else ""}</div>'
-                   for c, col, ink in [("none", "#d9d8d0", INK), ("moderate", LIGHT_BLUE, INK), ("deep", BLUE, "white")])
+                   for c, col, ink in [("none", MOSS, INK), ("moderate", LEAF, INK), ("deep", DEEP, "white")])
     policy_rows.append(f'<div class="pr"><div class="pr-label">{short[name]}</div><div class="pr-track">{segs}</div><div class="pr-agree"><div style="width:{agreement[name]:.1f}%"></div><span>{pct(agreement[name])}</span></div></div>')
 policy_chart = "\n".join(policy_rows)
 
 lc = curves["lr=0.03"].iloc[::10]
 best_it = int(curves["lr=0.03"].validation.idxmin())
-learning_svg = svg_lines([("Training", MUTED, list(lc.index + 1), list(lc.train)), ("Validation", GREEN, list(lc.index + 1), list(lc.validation))],
+learning_svg = svg_lines([("Training", MUTED, list(lc.index + 1), list(lc.train)), ("Validation", DEEP, list(lc.index + 1), list(lc.validation))],
                          (0, 3000), (0.2, 0.6), 120, 48, "Trees added", "Error", [0, 1500, 3000], [0.2, 0.4, 0.6],
-                         marks=[(f"new week: turns up after {best_it}", 2950, 0.35, GREEN, "end"), ("training rows: keeps falling", 2950, 0.212, MUTED, "end")], yfmt=lambda v: f"{v:.1f}")
+                         marks=[(f"new week: turns up after {best_it}", 2950, 0.35, DEEP, "end"), ("training rows: keeps falling", 2950, 0.212, MUTED, "end")], yfmt=lambda v: f"{v:.1f}")
 deep_bars = vbar_chart(["no discount", "moderate", "deep"], [deep_mae["none"], deep_mae["moderate"], deep_mae["deep"]], lambda v: f"{v:.2f}", colour=AMBER, height=26)
 
 flow_steps = [("shelf", "Sold out today?", "Then no discount tomorrow: the shelf is clear."),
               ("calendar", "A week with no sell-out?", "Then a discount is required; the model picks how deep."),
               ("brain", "Otherwise ask the model", "Only about discounts this product has actually run."),
               ("tag", "Choose", "Highest predicted value, net of unit cost, if the gain is worth it.")]
-flow = "".join(f'<div class="step">{icon(ic, BLUE, 11)}<b>{t}</b><span>{b}</span></div>{"<i>&#8594;</i>" if i < 3 else ""}' for i, (ic, t, b) in enumerate(flow_steps))
+flow = "".join(f'<div class="step">{icon(ic, DEEP, 11)}<b>{t}</b><span>{b}</span></div>{"<i>&#8594;</i>" if i < 3 else ""}' for i, (ic, t, b) in enumerate(flow_steps))
 
 # ----------------------------------------------------------------------------- page
 html = f"""<!doctype html>
@@ -218,32 +265,40 @@ html = f"""<!doctype html>
 <style>
 @page {{ size: 594mm 841mm; margin: 0; }}
 * {{ box-sizing: border-box; }}
-html, body {{ margin: 0; width: 594mm; height: 841mm; background: #ffffff; color: {INK}; font-family: {FONT}; font-size: 18pt; line-height: 1.3; }}
-.page {{ width: 594mm; height: 841mm; padding: 14mm 18mm 8mm; display: flex; flex-direction: column; gap: 7mm; }}
-header {{ display: grid; grid-template-columns: 1fr 190mm; gap: 14mm; align-items: center; background: #eef3fb; border-radius: 8mm; padding: 10mm 16mm; }}
-.kicker {{ font-size: 15pt; letter-spacing: 0.14em; text-transform: uppercase; color: {BLUE}; font-weight: 700; }}
-h1 {{ font-size: 90pt; line-height: 0.98; margin: 5mm 0 6mm; font-weight: 800; letter-spacing: -0.02em; color: #10213a; }}
+html, body {{ margin: 0; width: 594mm; height: 841mm; background: {PAGE}; color: {INK}; font-family: {FONT}; font-size: 18pt; line-height: 1.3; }}
+.page {{ width: 594mm; height: 841mm; padding: 14mm 18mm 8mm; display: flex; flex-direction: column; gap: 6mm; }}
+header {{ display: grid; grid-template-columns: 1fr 190mm; gap: 14mm; align-items: center; background: {PALE}; border-radius: 8mm; padding: 8mm 16mm; }}
+.kicker {{ font-size: 15pt; letter-spacing: 0.14em; text-transform: uppercase; color: {DEEP}; font-weight: 700; }}
+h1 {{ font-size: 90pt; line-height: 0.98; margin: 5mm 0 6mm; font-weight: 800; letter-spacing: -0.02em; color: {NAVY}; }}
 h1 span {{ color: {AMBER}; }}
-.sub {{ font-size: 25pt; color: #33415a; max-width: 330mm; line-height: 1.3; }}
-.who {{ margin-top: 6mm; font-size: 17pt; color: #52514e; }} .who b {{ color: #10213a; }}
-h2 {{ font-size: 32pt; margin: 0 0 4.5mm; line-height: 1.1; color: #10213a; display: flex; align-items: center; gap: 4mm; }}
-h2 i {{ font-style: normal; font-size: 14pt; color: white; background: {BLUE}; border-radius: 2.5mm; padding: 1mm 3mm; font-weight: 700; }}
-section {{ background: white; border: 0.5mm solid {GRID}; border-radius: 6mm; padding: 7.5mm 10mm; }}
+.sub {{ font-size: 25pt; color: #2f4a3f; max-width: 330mm; line-height: 1.3; }}
+.who {{ margin-top: 6mm; font-size: 17pt; color: #52514e; }} .who b {{ color: {NAVY}; }}
+h2 {{ font-size: 32pt; margin: 0 0 4.5mm; line-height: 1.1; color: {NAVY}; display: flex; align-items: center; gap: 4mm; }}
+h2 i {{ font-style: normal; font-size: 14pt; color: white; background: {DEEP}; border-radius: 2.5mm; padding: 1mm 3mm; font-weight: 700; }}
+section {{ background: white; border: 0.5mm solid #dfe6df; border-radius: 6mm; padding: 7.5mm 10mm; }}
 .row {{ display: grid; gap: 7mm; }}
 .moments {{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm; }}
-.moment {{ background: #f7f9fc; border-radius: 5mm; padding: 6mm 7mm; display: flex; gap: 5mm; align-items: flex-start; }}
-.moment b {{ display: block; font-size: 22pt; color: #10213a; margin-bottom: 1.5mm; }} .moment span {{ font-size: 16pt; color: #33415a; }}
+.moment {{ background: {TINT}; border-radius: 5mm; padding: 5mm 7mm; display: flex; gap: 5mm; align-items: flex-start; }}
+.moment b {{ display: block; font-size: 22pt; color: {NAVY}; margin-bottom: 1.5mm; }} .moment span {{ font-size: 16pt; color: #2f4a3f; }}
 .hero {{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm; }}
 .hero div {{ background: #fff7e6; border-radius: 5mm; padding: 6mm 7mm; }}
 .hero b {{ display: block; font-size: 54pt; line-height: 1; color: {AMBER}; font-weight: 800; }} .hero span {{ display: block; margin-top: 2mm; font-size: 15.5pt; color: #52514e; }}
 .hb {{ display: flex; align-items: center; gap: 4mm; margin: 2.6mm 0; }} .hb-label {{ font-size: 17.5pt; }} .hb-track {{ flex: 1; height: 11mm; background: #f3f2ee; border-radius: 1.5mm; overflow: hidden; }}
 .hb-fill {{ height: 100%; border-radius: 0 1.5mm 1.5mm 0; }} .hb-value {{ width: 20mm; font-weight: 700; font-size: 18.5pt; text-align: right; }}
 .cards {{ display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }}
-.card {{ border-left: 2.5mm solid; padding: 1mm 0 0 4mm; font-size: 16pt; color: #33415a; }} .card b {{ display: block; font-size: 18.5pt; color: {INK}; }}
-.lesson {{ background: #f7f9fc; border-radius: 4mm; padding: 4.5mm 6mm; margin-top: 6mm; font-size: 17pt; }}
+.models {{ display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; margin-bottom: 3mm; }}
+.model {{ font-size: 15.5pt; color: #2f4a3f; padding: 2.5mm 4mm; border-radius: 3mm; }} .model b {{ display: block; font-size: 18pt; color: {NAVY}; }}
+.model.final {{ background: {PALE}; border: 0.5mm solid {LEAF}; }} .model .badge {{ float: right; background: {DEEP}; color: white; font-size: 12.5pt; font-weight: 700; border-radius: 1.5mm; padding: 0.8mm 2.5mm; letter-spacing: 0.04em; }}
+.techs {{ display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; align-items: start; }} .techs h4 {{ margin: 0 0 1.5mm; font-size: 16.5pt; color: {NAVY}; }}
+.heat {{ border-collapse: separate; border-spacing: 0.6mm; font-size: 13.5pt; width: 100%; }} .heat th {{ font-weight: 400; color: {MUTED}; font-size: 12.5pt; padding: 0.5mm 1mm; text-align: center; }}
+.heat td {{ text-align: center; padding: 1.2mm 1mm; border-radius: 1mm; }}
+.axis-note {{ font-size: 12.5pt; color: {MUTED}; text-align: center; margin-top: 0.5mm; }}
+.gain {{ display: flex; align-items: center; gap: 6mm; background: {TINT}; border-radius: 4mm; padding: 3mm 6mm; margin-top: 2mm; }}
+.gain b {{ font-size: 36pt; color: {DEEP}; font-weight: 800; line-height: 1; }} .gain span {{ font-size: 16pt; color: #2f4a3f; }}
+.lesson {{ background: {TINT}; border-radius: 4mm; padding: 4.5mm 6mm; margin-top: 6mm; font-size: 17pt; }}
 .flow {{ display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin: 2mm 0 0; }}
-.step {{ background: #f7f9fc; border-radius: 4mm; padding: 5mm 6mm 4mm; font-size: 15pt; color: #33415a; display: flex; flex-direction: column; gap: 2mm; }}
-.step b {{ font-size: 18pt; color: #10213a; }} .flow i {{ display: none; }}
+.step {{ background: {TINT}; border-radius: 4mm; padding: 5mm 6mm 4mm; font-size: 15pt; color: #33415a; display: flex; flex-direction: column; gap: 2mm; }}
+.step b {{ font-size: 18pt; color: {NAVY}; }} .flow i {{ display: none; }}
 .pr {{ display: flex; align-items: center; gap: 3mm; margin: 2.6mm 0; }} .pr-label {{ width: 50mm; font-size: 16.5pt; }}
 .pr-track {{ flex: 1; display: flex; height: 11mm; border-radius: 1.5mm; overflow: hidden; gap: 0.6mm; }} .seg {{ display: flex; align-items: center; justify-content: center; font-size: 13.5pt; }}
 .pr-agree {{ width: 46mm; position: relative; height: 11mm; background: #f3f2ee; border-radius: 1.5mm; overflow: hidden; }} .pr-agree div {{ height: 100%; background: {AMBER}; }}
@@ -251,9 +306,9 @@ section {{ background: white; border: 0.5mm solid {GRID}; border-radius: 6mm; pa
 .legend {{ font-size: 14pt; color: {MUTED}; display: flex; gap: 5mm; margin: 1.5mm 0 0 53mm; white-space: nowrap; }} .legend b {{ display: inline-block; width: 4.5mm; height: 4.5mm; border-radius: 1mm; margin-right: 1.5mm; vertical-align: -0.6mm; }}
 .small {{ font-size: 15.5pt; color: {MUTED}; }}
 .tiles {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 7mm; }}
-.tile {{ background: #f7f9fc; border-radius: 5mm; padding: 5.5mm 8mm; font-size: 16pt; color: #33415a; }}
-.tile .top {{ display: flex; align-items: center; gap: 4mm; margin-bottom: 2.5mm; }} .tile b {{ font-size: 20pt; color: #10213a; line-height: 1.15; }}
-.tile .num {{ font-size: 40pt; font-weight: 800; color: {BLUE}; line-height: 1; margin: 1mm 0 2mm; }}
+.tile {{ background: {TINT}; border-radius: 5mm; padding: 4.5mm 8mm; font-size: 16pt; color: #33415a; }}
+.tile .top {{ display: flex; align-items: center; gap: 4mm; margin-bottom: 2.5mm; }} .tile b {{ font-size: 20pt; color: {NAVY}; line-height: 1.15; }}
+.tile .num {{ font-size: 40pt; font-weight: 800; color: {DEEP}; line-height: 1; margin: 1mm 0 2mm; }}
 .vbars {{ position: relative; display: flex; align-items: flex-end; gap: 2.5mm; padding: 0 1mm; }}
 .vb {{ flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }}
 .vb-fill {{ width: 100%; border-radius: 1.2mm 1.2mm 0 0; }} .vb-value {{ font-size: 12.5pt; margin-bottom: 0.8mm; }} .vb-label {{ font-size: 11.5pt; color: {MUTED}; margin-top: 1.2mm; height: 5mm; white-space: nowrap; }}
@@ -275,9 +330,9 @@ footer {{ display: flex; justify-content: space-between; font-size: 13pt; color:
   <section>
     <h2><i>01</i>A decision every evening, for every product</h2>
     <div class="moments">
-      <div class="moment">{icon("moon", BLUE, 12)}<div><b>6 pm, the shelf is half full</b><span>Tomorrow's discount must be set tonight, before anyone knows how much will sell.</span></div></div>
-      <div class="moment">{icon("scale", BLUE, 12)}<div><b>Two ways to lose</b><span>Hold the price and stock may be thrown away. Cut it and margin goes on sales that would have happened anyway.</span></div></div>
-      <div class="moment">{icon("question", BLUE, 12)}<div><b>Our question</b><span>For one product, in one store, on one day: how much sells tomorrow at each discount, and should we discount at all?</span></div></div>
+      <div class="moment">{icon("moon", DEEP, 12)}<div><b>6 pm, the shelf is half full</b><span>Tomorrow's discount must be set tonight, before anyone knows how much will sell.</span></div></div>
+      <div class="moment">{icon("scale", DEEP, 12)}<div><b>Two ways to lose</b><span>Hold the price and stock may be thrown away. Cut it and margin goes on sales that would have happened anyway.</span></div></div>
+      <div class="moment">{icon("question", DEEP, 12)}<div><b>Our question</b><span>For one product, in one store, on one day: how much sells tomorrow at each discount, and should we discount at all?</span></div></div>
     </div>
   </section>
   <section>
@@ -292,20 +347,23 @@ footer {{ display: flex; justify-content: space-between; font-size: 13pt; color:
 
 <div class="row" style="grid-template-columns: 1fr 1fr">
   <section>
-    <h2><i>03</i>Four models, one unseen week</h2>
-    <p class="small" style="margin:0 0 3mm">Each model learns from the product's own recent sales, today's stock and tomorrow's planned discount. Error on the 2,184 held-out days; lower is better.</p>
-    {mae_bars}
-    <div class="lesson"><b>What we learned:</b> every model beat the no-ML average, the three tree models tie within noise, and choosing the inputs mattered more than any tuning dial. Dropping the weather was the single biggest gain.</div>
+    <h2><i>03</i>Forecasting results</h2>
+    {dotplot}
+    <div class="gain"><b>{(base - ens) / base * 100:.1f}%</b><span>lower MAE than the 7-day average with the 50/50 random forest + CatBoost blend; squared error {mse_gain:.0f}% lower</span></div>
+    <div class="lesson" style="margin-top:3mm;font-size:15.5pt"><b>What we learned:</b> every model beat the no-ML average, the three tree models tie within noise, and choosing the inputs mattered more than any tuning dial. Dropping the weather was the single biggest gain.</div>
   </section>
   <section>
-    <h2><i>04</i>The decisions behind the numbers</h2>
-    <div class="cards">
-      <div class="card" style="border-color:{BLUE}"><b>k-nearest neighbours &#183; 25 look-alike days</b>Finds the 25 most similar past days and averages them. Simple, and already 5% better than the average.</div>
-      <div class="card" style="border-color:{ORANGE}"><b>Random forest &#183; 300 trees, depth 10</b>All 16 settings we tried beat the baseline every single week. A forgiving model.</div>
-      <div class="card" style="border-color:{GREEN}"><b>CatBoost &#183; small and slow on purpose</b>Boosting over-fits in plain sight (see 06), so the best version is 500 shallow trees at a 0.03 learning rate.</div>
-      <div class="card" style="border-color:{AMBER}"><b>Blend &#183; 50/50 forest + CatBoost</b>Their mistakes are 97% correlated, so blending gains only 0.001. We keep it as a safe choice, not a clever one.</div>
+    <h2><i>04</i>Model choices</h2>
+    <div class="models">
+      <div class="model"><b>kNN &#183; 25 neighbours</b>Averages the 25 most similar past days; dropping weather cut its error from 0.327 to 0.312.</div>
+      <div class="model"><b>Random forest &#183; 300 trees</b>Depth 10, 3 rows per leaf; all 16 settings beat the baseline every week.</div>
+      <div class="model"><b>CatBoost &#183; 500 trees</b>Depth 5, learning rate 0.03: small and slow on purpose, because boosting over-fits.</div>
+      <div class="model final"><span class="badge">FINAL MODEL</span><b>RF + CatBoost &#183; 50/50</b>Averages both forecasts; errors correlate at {err_corr:.2f}, so the gain is small but consistent.</div>
     </div>
-    <div class="lesson">Splits are strictly in time order: every validation week is predicted by a model that has never seen it. Random splits would have flattered every model by putting near-identical days on both sides.</div>
+    <div class="techs">
+      <div><h4>Random forest: validation MAE across 16 settings</h4>{heatmap}<div class="axis-note">rows: max depth &#183; columns: min rows per leaf &#183; best outlined</div></div>
+      <div><h4>CatBoost: error as trees are added</h4>{learning_small}</div>
+    </div>
   </section>
 </div>
 
@@ -324,7 +382,7 @@ footer {{ display: flex; justify-content: space-between; font-size: 13pt; color:
     <div>
       <p style="margin:0 0 2mm"><b>What each policy recommends</b> on the test week, and how often it lands in the same band as the real managers.</p>
       {policy_chart}
-      <div class="legend"><span><b style="background:#d9d8d0"></b>no discount</span><span><b style="background:{LIGHT_BLUE}"></b>moderate</span><span><b style="background:{BLUE}"></b>deep</span><span style="margin-left:auto"><b style="background:{AMBER}"></b>agrees with manager</span></div>
+      <div class="legend"><span><b style="background:{MOSS}"></b>no discount</span><span><b style="background:{LEAF}"></b>moderate</span><span><b style="background:{DEEP}"></b>deep</span><span style="margin-left:auto"><b style="background:{AMBER}"></b>agrees with manager</span></div>
       <p class="small" style="margin-top:3mm">Stock rules decide {100 - decided["model"]:.0f}% of days before the model is asked. Agreement rises from {agreement["What-if alone"]:.0f}% to {agreement["+ stock rules"]:.0f}%, and to {agreement["+ unit cost 0.7"]:.0f}% once a unit cost makes deep discounts cost something.</p>
     </div>
   </div>
@@ -333,14 +391,14 @@ footer {{ display: flex; justify-content: space-between; font-size: 13pt; color:
 <section>
   <h2><i>06</i>The challenges we found most interesting</h2>
   <div class="tiles">
-    <div class="tile"><div class="top">{icon("empty", BLUE)}<b>The shelf lies</b></div>On {stockout_share:.0%} of days the shelf was empty for part of the day, so recorded sales are lower than real demand. The model learns from censored numbers.</div>
-    <div class="tile"><div class="top">{icon("units", BLUE)}<b>Sales without units or prices</b></div>The data is normalised: 1.2 is not 1.2 kilograms or dollars. "Value" is sales × discount rate, a proxy, so profit cannot be computed.</div>
-    <div class="tile"><div class="top">{icon("dice", BLUE)}<b>Managers are not random</b></div>Discounts were chosen on days managers expected demand. Part of the lift the model sees is their judgement, not the price cut. Correlation, not cause.</div>
-    <div class="tile"><div class="top">{icon("eye", BLUE)}<b>No counterfactual</b></div>We only ever see what sold at the price the manager chose. Whether our policy sells more or wastes less needs a real experiment.</div>
-    <div class="tile"><div class="top">{icon("cloud", BLUE)}<b>Weather made things worse</b></div><div class="num">0.327 &#8594; 0.312</div>Removing rain, temperature and humidity cut the error more than any amount of tuning did.</div>
-    <div class="tile"><div class="top">{icon("spark", BLUE)}<b>Deep discounts are the hard days</b></div>{deep_bars}<span class="small">Error by tomorrow's discount: every model under-predicts the spike on exactly the days a pricing tool cares about.</span></div>
-    <div class="tile"><div class="top">{icon("bolt", BLUE)}<b>Boosting over-fits in plain sight</b></div>{learning_svg}<span class="small">Training error keeps falling; error on a new week turns up after {best_it} trees.</span></div>
-    <div class="tile"><div class="top">{icon("pin", BLUE)}<b>One city, one week, one guess at shelf life</b></div>Five stores in one city and a single test week that has been scored for four models. The "no sell-out for a week means old stock" rule assumes a shelf life the data never states.</div>
+    <div class="tile"><div class="top">{icon("empty", DEEP)}<b>The shelf lies</b></div>On {stockout_share:.0%} of days the shelf was empty for part of the day, so recorded sales are lower than real demand. The model learns from censored numbers.</div>
+    <div class="tile"><div class="top">{icon("units", DEEP)}<b>Sales without units or prices</b></div>The data is normalised: 1.2 is not 1.2 kilograms or dollars. "Value" is sales × discount rate, a proxy, so profit cannot be computed.</div>
+    <div class="tile"><div class="top">{icon("dice", DEEP)}<b>Managers are not random</b></div>Discounts were chosen on days managers expected demand. Part of the lift the model sees is their judgement, not the price cut. Correlation, not cause.</div>
+    <div class="tile"><div class="top">{icon("eye", DEEP)}<b>No counterfactual</b></div>We only ever see what sold at the price the manager chose. Whether our policy sells more or wastes less needs a real experiment.</div>
+    <div class="tile"><div class="top">{icon("cloud", DEEP)}<b>Weather made things worse</b></div><div class="num">0.327 &#8594; 0.312</div>Removing rain, temperature and humidity cut the error more than any amount of tuning did.</div>
+    <div class="tile"><div class="top">{icon("spark", DEEP)}<b>Deep discounts are the hard days</b></div>{deep_bars}<span class="small">Error by tomorrow's discount: every model under-predicts the spike on exactly the days a pricing tool cares about.</span></div>
+    <div class="tile"><div class="top">{icon("bolt", DEEP)}<b>Boosting over-fits in plain sight</b></div>{learning_svg}<span class="small">Training error keeps falling; error on a new week turns up after {best_it} trees.</span></div>
+    <div class="tile"><div class="top">{icon("pin", DEEP)}<b>One city, one week, one guess at shelf life</b></div>Five stores in one city and a single test week that has been scored for four models. The "no sell-out for a week means old stock" rule assumes a shelf life the data never states.</div>
   </div>
 </section>
 
