@@ -204,7 +204,7 @@ def svg_dotplot(items, xlim, xticks, w=150, h=44):
         out.append(f'<text x="{pad_l - 3}" y="{y + 1.6:.2f}" font-size="4.6" text-anchor="end" fill="{MUTED}">{label}</text>')
         out.append(f'<circle cx="{X(value):.2f}" cy="{y:.2f}" r="1.9" fill="{colour}"/>')
         out.append(f'<text x="{X(value) + 3.2:.2f}" y="{y + 1.6:.2f}" font-size="4.8" fill="{INK}" font-weight="{'700' if bold else '400'}">{value:.4f}</text>')
-    out.append(f'<text x="{(pad_l + w - pad_r) / 2:.2f}" y="{h - 1:.2f}" font-size="4.2" text-anchor="middle" fill="{MUTED}">Test MAE on the 2,184-day held-out week (lower is better)</text>')
+    out.append(f'<text x="{(pad_l + w - pad_r) / 2:.2f}" y="{h - 1:.2f}" font-size="4.2" text-anchor="middle" fill="{MUTED}">Test MAE over 2,184 forecasts: 312 products × 7 held-out days (lower is better)</text>')
     out.append("</svg>")
     return "\n".join(out)
 
