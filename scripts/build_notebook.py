@@ -31,11 +31,20 @@ It is written to be read top to bottom. Each section states what was done, shows
 """)
 
 code(r"""
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from IPython.display import display
 
-from finalproject_pricingml import config as C, data, evaluate as ev, models, plots
+# The helper package lives in src/. It is installed by `uv sync` and in the project's Docker image; in any other
+# environment (for example a course JupyterLab image with this folder mounted), import it straight from the folder.
+try:
+    from finalproject_pricingml import config as C, data, evaluate as ev, models, plots
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path.cwd() / "src"))
+    from finalproject_pricingml import config as C, data, evaluate as ev, models, plots
 
 # Set to True to recompute every tuning grid from the feature table (about a minute in total).
 # When False, the grids are read back from results/ and only the final test-week models are fitted.
