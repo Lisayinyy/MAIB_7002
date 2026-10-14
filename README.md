@@ -43,12 +43,20 @@ Every tuning grid is saved in `results/`, so the notebook runs in well under a m
 
 ## Running in Docker
 
+With Docker Compose (one command, fixed token):
+
+```bash
+docker compose up --build
+```
+
+then open <http://127.0.0.1:8888/lab?token=pricingml>. Or with plain Docker:
+
 ```bash
 docker build -t pricing-ml .
 docker run --rm -p 8888:8888 pricing-ml
 ```
 
-Then open the `http://127.0.0.1:8888/lab?token=...` link printed in the terminal. The data folder is copied into the image, so no volume mount is needed.
+and open the `http://127.0.0.1:8888/lab?token=...` link printed in the terminal. Either way the data folder is copied into the image, so no volume mount is needed; `compose.yaml` has commented-out mounts for keeping notebook edits and regenerated results on the host.
 
 ## Hand-in package
 

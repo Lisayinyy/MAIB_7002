@@ -1,0 +1,21 @@
+# Independent launch with Docker Compose:
+#   docker compose up --build
+# then open http://127.0.0.1:8888/lab?token=pricingml and run discount_sales_prediction.ipynb.
+# The image is self-contained: code, results, the processed table and data/raw/freshretail_raw.zip are copied in,
+# and the notebook's setup cell extracts the raw files once inside the container.
+# Stop with Ctrl-C, or `docker compose down`.
+services:
+  lab:
+    build: .
+    image: pricing-ml
+    container_name: pricing-ml-lab
+    ports:
+      - "8888:8888"
+    environment:
+      JUPYTER_TOKEN: pricingml     # fixed token so the URL above always works
+    # Uncomment to keep notebook edits and regenerated results on the host after the container stops.
+    # Do not mount the whole project folder: it would hide the environment installed at /app/.venv.
+    # volumes:
+    #   - ./discount_sales_prediction.ipynb:/app/discount_sales_prediction.ipynb
+    #   - ./results:/app/results
+    #   - ./data:/app/data
