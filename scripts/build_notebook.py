@@ -12,6 +12,12 @@ code = lambda s: cells.append(nbf.v4.new_code_cell(s.strip()))
 md(r"""
 # Next-day sales for discounted perishables
 
+**HKU MAIB 7002 · Project team: Group Q**
+
+- Aashish Omprakash Pareek
+- Yuanyuan Yin
+- Lingyu Chen
+
 **Should a category manager discount a perishable product tomorrow?** This notebook builds and compares models that predict next-day sales for a store-product given tomorrow's discount, so that the question can eventually be answered by feeding candidate discounts into the best model (phase 2).
 
 It is written to be read top to bottom. Each section states what was done, shows the numbers, and records the decision taken and why. The code that does the work lives in the small package under `src/finalproject_pricingml/`; the cells here only call it, so the story stays readable.

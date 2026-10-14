@@ -52,7 +52,7 @@ Then open the `http://127.0.0.1:8888/lab?token=...` link printed in the terminal
 
 ## Hand-in package
 
-`scripts/make_submission.sh` zips the project folder with the processed table and `freshretail_raw.zip` but without the git history, the virtual environment or the extracted parquet files (about 75 MB). Unzip it anywhere and run the Docker commands above.
+`scripts/make_submission.sh` writes `GroupQ-PricingML-submission.zip` one level above the project. It unpacks into a `GroupQ-PricingML/` folder holding the project with the processed table and `freshretail_raw.zip`, but without the git history, the virtual environment or the extracted parquet files (about 70 MB). Unzip it anywhere and run the Docker commands above from inside that folder.
 
 ## Adding a model
 
