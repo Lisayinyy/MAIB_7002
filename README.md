@@ -2,7 +2,7 @@
 
 HKU MAIB 7002 final project. Should a category manager discount a perishable product tomorrow? We predict next-day sales for a store-product given tomorrow's discount, compare models against a simple baseline, and (phase 2) use the best model to suggest a discount.
 
-**Start with the notebook:** [`discount_sales_prediction.ipynb`](discount_sales_prediction.ipynb). It walks through the data, the feature design, each model's tuning, the decisions taken, the comparison on an unseen week, and phase 2, where the model is turned into a discount recommendation with stock rules around it. GitHub renders it with all outputs, so nothing needs to be installed to read it.
+**Start with the notebook:** [`discount_sales_prediction.ipynb`](discount_sales_prediction.ipynb). The A1 poster is at [`poster/pricing_ml_poster_A1.pdf`](poster/pricing_ml_poster_A1.pdf) (preview: [`poster/pricing_ml_poster_A1_preview.png`](poster/pricing_ml_poster_A1_preview.png)). It walks through the data, the feature design, each model's tuning, the decisions taken, the comparison on an unseen week, and phase 2, where the model is turned into a discount recommendation with stock rules around it. GitHub renders it with all outputs, so nothing needs to be installed to read it.
 
 ## Layout
 
