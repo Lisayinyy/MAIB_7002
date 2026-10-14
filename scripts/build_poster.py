@@ -189,9 +189,9 @@ nice = {"Baseline (7-day mean)": "7-day average (no ML)", "kNN (k=25)": "k-neare
 colour_of = {nice[k]: v for k, v in {"Baseline (7-day mean)": GRAY, "kNN (k=25)": BLUE, "Random forest": ORANGE, "CatBoost": GREEN, "RF + CatBoost (50/50)": AMBER}.items()}
 mae_bars = hbar_rows([(nice[m], mae[m]) for m in order], lambda label: colour_of[label], lambda v: f"{v:.3f}", 0.345, label_w=64)
 
-def svg_dotplot(items, xlim, xticks, w=150, h=44):
+def svg_dotplot(items, xlim, xticks, w=150, h=49):
     """Test MAE per model as a dot with its value, best row in bold. ``items``: list of (label, value, colour, bold)."""
-    pad_l, pad_r, pad_t, pad_b = 40, 20, 3, 13
+    pad_l, pad_r, pad_t, pad_b = 40, 20, 3, 18
     X = lambda x: pad_l + (x - xlim[0]) / (xlim[1] - xlim[0]) * (w - pad_l - pad_r)
     step = (h - pad_t - pad_b) / len(items)
     out = [f'<svg viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:inherit">']
@@ -204,7 +204,9 @@ def svg_dotplot(items, xlim, xticks, w=150, h=44):
         out.append(f'<text x="{pad_l - 3}" y="{y + 1.6:.2f}" font-size="4.6" text-anchor="end" fill="{MUTED}">{label}</text>')
         out.append(f'<circle cx="{X(value):.2f}" cy="{y:.2f}" r="1.9" fill="{colour}"/>')
         out.append(f'<text x="{X(value) + 3.2:.2f}" y="{y + 1.6:.2f}" font-size="4.8" fill="{INK}" font-weight="{'700' if bold else '400'}">{value:.4f}</text>')
-    out.append(f'<text x="{(pad_l + w - pad_r) / 2:.2f}" y="{h - 1:.2f}" font-size="4.2" text-anchor="middle" fill="{MUTED}">Test MAE over 2,184 forecasts: 312 products × 7 held-out days (lower is better)</text>')
+    cx = (pad_l + w - pad_r) / 2
+    out.append(f'<text x="{cx:.2f}" y="{h - 6:.2f}" font-size="4.2" text-anchor="middle" fill="{MUTED}">Test MAE (lower is better)</text>')
+    out.append(f'<text x="{cx:.2f}" y="{h - 1:.2f}" font-size="3.8" text-anchor="middle" fill="{MUTED}">2,184 forecasts: 312 products × 7 held-out days</text>')
     out.append("</svg>")
     return "\n".join(out)
 

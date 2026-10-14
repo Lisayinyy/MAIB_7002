@@ -99,7 +99,7 @@ footer { display: flex; justify-content: space-between; font-size: 13pt; color: 
 <div class="row" style="grid-template-columns: 1fr 1fr">
   <section>
     <h2><i>03</i>Forecasting results</h2>
-    <svg viewBox="0 0 150 44" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:inherit">
+    <svg viewBox="0 0 150 49" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:inherit">
 <line x1="54.21" x2="54.21" y1="3" y2="31.00" stroke="#e1e0d9" stroke-width="0.3"/><text x="54.21" y="36.50" font-size="4.2" text-anchor="middle" fill="#52514e">0.29</text>
 <line x1="77.89" x2="77.89" y1="3" y2="31.00" stroke="#e1e0d9" stroke-width="0.3"/><text x="77.89" y="36.50" font-size="4.2" text-anchor="middle" fill="#52514e">0.30</text>
 <line x1="101.58" x2="101.58" y1="3" y2="31.00" stroke="#e1e0d9" stroke-width="0.3"/><text x="101.58" y="36.50" font-size="4.2" text-anchor="middle" fill="#52514e">0.31</text>
@@ -119,7 +119,8 @@ footer { display: flex; justify-content: space-between; font-size: 13pt; color: 
 <text x="37" y="29.80" font-size="4.6" text-anchor="end" fill="#52514e">RF + CB (50/50)</text>
 <circle cx="52.39" cy="28.20" r="1.9" fill="#eb6834"/>
 <text x="55.59" y="29.80" font-size="4.8" fill="#0b0b0b" font-weight="700">0.2892</text>
-<text x="85.00" y="43.00" font-size="4.2" text-anchor="middle" fill="#52514e">Test MAE over 2,184 forecasts: 312 products × 7 held-out days (lower is better)</text>
+<text x="85.00" y="43.00" font-size="4.2" text-anchor="middle" fill="#52514e">Test MAE (lower is better)</text>
+<text x="85.00" y="48.00" font-size="3.8" text-anchor="middle" fill="#52514e">2,184 forecasts: 312 products × 7 held-out days</text>
 </svg>
     <div class="gain"><b>7.9%</b><span>lower MAE than the 7-day average with the 50/50 random forest + CatBoost blend; squared error 22% lower</span></div>
     <div class="lesson" style="margin-top:3mm;font-size:15.5pt"><b>What we learned:</b> every model beat the no-ML average, the three tree models tie within noise, and choosing the inputs mattered more than any tuning dial. Dropping the weather was the single biggest gain.</div>
