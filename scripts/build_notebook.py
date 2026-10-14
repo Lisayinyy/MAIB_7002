@@ -36,51 +36,6 @@ It is written to be read top to bottom. Each section states what was done, shows
 | Appendix | A. Reproducing the notebook · B. CatBoost explained · C. The ensemble explained |
 """)
 
-code(r"""
-import importlib.util
-import subprocess
-import sys
-from pathlib import Path
-
-# A generic JupyterLab image may lack the two packages below. Install only what is missing, pinned to this project's
-# lock file; in the project's own environment or Docker image nothing happens here.
-missing = [req for mod, req in [("catboost", "catboost==1.2.10"), ("pyarrow", "pyarrow==25.0.1")] if importlib.util.find_spec(mod) is None]
-if missing:
-    print(f"Not installed in this environment: {', '.join(missing)}. Installing once (needs network).")
-    if importlib.util.find_spec("pip") is None:  # environments made by uv ship without pip
-        subprocess.run([sys.executable, "-m", "ensurepip", "--upgrade"], check=True, capture_output=True)
-    install = subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", *missing], capture_output=True, text=True)
-    if install.returncode != 0:
-        raise RuntimeError(f"Could not install {' '.join(missing)}. Run `pip install {' '.join(missing)}` in this environment, "
-                           f"or use the project's Dockerfile.\n{install.stderr[-800:]}")
-
-import numpy as np
-import pandas as pd
-from IPython.display import display
-
-# The helper package lives in src/. It is installed by `uv sync` and in the project's Docker image; in any other
-# environment (for example a course JupyterLab image with this folder mounted), import it straight from the folder.
-try:
-    from finalproject_pricingml import config as C, data, evaluate as ev, models, plots
-except ModuleNotFoundError:
-    sys.path.insert(0, str(Path.cwd() / "src"))
-    from finalproject_pricingml import config as C, data, evaluate as ev, models, plots
-
-# Set to True to recompute every tuning grid from the feature table (about a minute in total).
-# When False, the grids are read back from results/ and only the final test-week models are fitted.
-RERUN_TUNING = False
-
-# One-time data setup: verify the two raw parquet files, else extract them once from data/raw/freshretail_raw.zip,
-# else download them (110 MB) from the pinned public revision. Nothing is repeated once valid files exist.
-try:
-    print(data.ensure_raw_data())
-except Exception as exc:  # no raw data and no network: the shipped feature table in data/processed/ still runs everything below
-    print(f"Raw data unavailable ({exc}); continuing with the shipped feature table in data/processed/.")
-
-pd.set_option("display.precision", 4)
-pd.set_option("display.width", 140)
-""")
-
 md(r"""
 ### Team contributions and use of generative AI
 
@@ -131,6 +86,51 @@ Source: [FreshRetailNet-50K](https://huggingface.co/datasets/Dingdong-Inc/FreshR
 
 - `sale_amount` is normalised, not real units, so errors only mean something relative to a baseline.
 - Stockouts mean recorded sales understate true demand on those days. Stockout days were kept.
+""")
+
+code(r"""
+import importlib.util
+import subprocess
+import sys
+from pathlib import Path
+
+# A generic JupyterLab image may lack the two packages below. Install only what is missing, pinned to this project's
+# lock file; in the project's own environment or Docker image nothing happens here.
+missing = [req for mod, req in [("catboost", "catboost==1.2.10"), ("pyarrow", "pyarrow==25.0.1")] if importlib.util.find_spec(mod) is None]
+if missing:
+    print(f"Not installed in this environment: {', '.join(missing)}. Installing once (needs network).")
+    if importlib.util.find_spec("pip") is None:  # environments made by uv ship without pip
+        subprocess.run([sys.executable, "-m", "ensurepip", "--upgrade"], check=True, capture_output=True)
+    install = subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", *missing], capture_output=True, text=True)
+    if install.returncode != 0:
+        raise RuntimeError(f"Could not install {' '.join(missing)}. Run `pip install {' '.join(missing)}` in this environment, "
+                           f"or use the project's Dockerfile.\n{install.stderr[-800:]}")
+
+import numpy as np
+import pandas as pd
+from IPython.display import display
+
+# The helper package lives in src/. It is installed by `uv sync` and in the project's Docker image; in any other
+# environment (for example a course JupyterLab image with this folder mounted), import it straight from the folder.
+try:
+    from finalproject_pricingml import config as C, data, evaluate as ev, models, plots
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path.cwd() / "src"))
+    from finalproject_pricingml import config as C, data, evaluate as ev, models, plots
+
+# Set to True to recompute every tuning grid from the feature table (about a minute in total).
+# When False, the grids are read back from results/ and only the final test-week models are fitted.
+RERUN_TUNING = False
+
+# One-time data setup: verify the two raw parquet files, else extract them once from data/raw/freshretail_raw.zip,
+# else download them (110 MB) from the pinned public revision. Nothing is repeated once valid files exist.
+try:
+    print(data.ensure_raw_data())
+except Exception as exc:  # no raw data and no network: the shipped feature table in data/processed/ still runs everything below
+    print(f"Raw data unavailable ({exc}); continuing with the shipped feature table in data/processed/.")
+
+pd.set_option("display.precision", 4)
+pd.set_option("display.width", 140)
 """)
 
 md(r"""
