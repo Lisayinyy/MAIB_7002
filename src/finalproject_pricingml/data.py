@@ -10,6 +10,84 @@ import pandas as pd
 from . import config as C
 
 
+
+from pathlib import Path
+import hashlib
+import shutil
+import tempfile
+import urllib.request
+import zipfile
+
+# --- Raw data: the two public parquet files, pinned to one revision ---------------------------
+# The notebook calls ensure_raw_data() once at setup. It never downloads or extracts when valid
+# files are already present, so a second run costs one hash check and nothing else.
+RAW_REVISION = "08c1fab7f9257bc73679d415d65d644165d351d4"
+RAW_URL = "https://huggingface.co/datasets/Dingdong-Inc/FreshRetailNet-50K/resolve/{revision}/data/{name}"
+RAW_SHA256 = {
+    "train.parquet": "6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d",
+    "eval.parquet": "1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e",
+}
+RAW_ZIP = "freshretail_raw.zip"  # the same two files, zipped (66 MB), shipped inside the hand-in folder
+
+
+def _sha256(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _verified(raw_dir):
+    return all((raw_dir / name).is_file() and _sha256(raw_dir / name) == digest for name, digest in RAW_SHA256.items())
+
+
+def _place(source, dest):
+    """Move a verified file into place, replacing any stale file or dangling link."""
+    if dest.is_symlink() or dest.exists():
+        dest.unlink()
+    shutil.move(str(source), str(dest))
+
+
+def ensure_raw_data(raw_dir=None, download=True):
+    """Make sure data/raw holds the two raw parquet files, byte-identical to the pinned public revision.
+
+    Tried in order, stopping at the first that succeeds:
+      1. the files are already present and their SHA-256 matches: nothing is done;
+      2. data/raw/freshretail_raw.zip is present: extract it once and verify;
+      3. download the two files from the pinned Hugging Face revision and verify.
+    Returns a one-line description of what happened. Raises if none of the three succeeds.
+    """
+    raw_dir = Path(raw_dir or C.RAW)
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    if _verified(raw_dir):
+        return "Raw data already present and verified (SHA-256 matches the pinned revision); nothing downloaded or extracted."
+    zip_path = raw_dir / RAW_ZIP
+    if zip_path.is_file():
+        with tempfile.TemporaryDirectory(dir=raw_dir) as tmp:
+            with zipfile.ZipFile(zip_path) as archive:
+                archive.extractall(tmp)
+            for name, digest in RAW_SHA256.items():
+                extracted = Path(tmp) / name
+                if extracted.is_file() and _sha256(extracted) == digest:
+                    _place(extracted, raw_dir / name)
+        if _verified(raw_dir):
+            return f"Raw data extracted once from {RAW_ZIP} and verified against the pinned revision."
+    if download:
+        for name, digest in RAW_SHA256.items():
+            dest = raw_dir / name
+            if dest.is_file() and _sha256(dest) == digest:
+                continue
+            part = raw_dir / (name + ".part")
+            urllib.request.urlretrieve(RAW_URL.format(revision=RAW_REVISION, name=name), part)
+            if _sha256(part) != digest:
+                part.unlink()
+                raise RuntimeError(f"{name}: downloaded file failed SHA-256 verification")
+            _place(part, dest)
+        return "Raw data downloaded once (about 110 MB) from the pinned Hugging Face revision and verified."
+    raise FileNotFoundError(f"Raw data not found in {raw_dir} and download is disabled")
+
+
 def select_series(raw=None):
     """Score every store-product series for discount variation and pick the top stores.
 

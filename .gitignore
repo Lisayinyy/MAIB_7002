@@ -9,8 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
-# Data (kept local: not in git, not synced to iCloud via .nosync)
-data
+# Raw data stays out of git (110 MB; the notebook fetches or unzips it once). The 0.5 MB processed table is tracked.
+data/raw/
 data.nosync/
 
 # Editor and notebook scratch
@@ -20,3 +20,4 @@ catboost_info/
 
 # Claude Code local settings
 .claude/
+.DS_Store

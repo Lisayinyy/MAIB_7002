@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Cut the price, or trust the shelf?</title>
+<style>
+@page { size: 594mm 841mm; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 594mm; height: 841mm; background: #ffffff; color: #0b0b0b; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 18pt; line-height: 1.3; }
+.page { width: 594mm; height: 841mm; padding: 14mm 18mm 8mm; display: flex; flex-direction: column; gap: 7mm; }
+header { display: grid; grid-template-columns: 1fr 190mm; gap: 14mm; align-items: center; background: #eef3fb; border-radius: 8mm; padding: 10mm 16mm; }
+.kicker { font-size: 15pt; letter-spacing: 0.14em; text-transform: uppercase; color: #2a78d6; font-weight: 700; }
+h1 { font-size: 90pt; line-height: 0.98; margin: 5mm 0 6mm; font-weight: 800; letter-spacing: -0.02em; color: #10213a; }
+h1 span { color: #eda100; }
+.sub { font-size: 25pt; color: #33415a; max-width: 330mm; line-height: 1.3; }
+.who { margin-top: 6mm; font-size: 17pt; color: #52514e; } .who b { color: #10213a; }
+h2 { font-size: 32pt; margin: 0 0 4.5mm; line-height: 1.1; color: #10213a; display: flex; align-items: center; gap: 4mm; }
+h2 i { font-style: normal; font-size: 14pt; color: white; background: #2a78d6; border-radius: 2.5mm; padding: 1mm 3mm; font-weight: 700; }
+section { background: white; border: 0.5mm solid #e1e0d9; border-radius: 6mm; padding: 7.5mm 10mm; }
+.row { display: grid; gap: 7mm; }
+.moments { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm; }
+.moment { background: #f7f9fc; border-radius: 5mm; padding: 6mm 7mm; display: flex; gap: 5mm; align-items: flex-start; }
+.moment b { display: block; font-size: 22pt; color: #10213a; margin-bottom: 1.5mm; } .moment span { font-size: 16pt; color: #33415a; }
+.hero { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm; }
+.hero div { background: #fff7e6; border-radius: 5mm; padding: 6mm 7mm; }
+.hero b { display: block; font-size: 54pt; line-height: 1; color: #eda100; font-weight: 800; } .hero span { display: block; margin-top: 2mm; font-size: 15.5pt; color: #52514e; }
+.hb { display: flex; align-items: center; gap: 4mm; margin: 2.6mm 0; } .hb-label { font-size: 17.5pt; } .hb-track { flex: 1; height: 11mm; background: #f3f2ee; border-radius: 1.5mm; overflow: hidden; }
+.hb-fill { height: 100%; border-radius: 0 1.5mm 1.5mm 0; } .hb-value { width: 20mm; font-weight: 700; font-size: 18.5pt; text-align: right; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+.card { border-left: 2.5mm solid; padding: 1mm 0 0 4mm; font-size: 16pt; color: #33415a; } .card b { display: block; font-size: 18.5pt; color: #0b0b0b; }
+.lesson { background: #f7f9fc; border-radius: 4mm; padding: 4.5mm 6mm; margin-top: 6mm; font-size: 17pt; }
+.flow { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin: 2mm 0 0; }
+.step { background: #f7f9fc; border-radius: 4mm; padding: 5mm 6mm 4mm; font-size: 15pt; color: #33415a; display: flex; flex-direction: column; gap: 2mm; }
+.step b { font-size: 18pt; color: #10213a; } .flow i { display: none; }
+.pr { display: flex; align-items: center; gap: 3mm; margin: 2.6mm 0; } .pr-label { width: 50mm; font-size: 16.5pt; }
+.pr-track { flex: 1; display: flex; height: 11mm; border-radius: 1.5mm; overflow: hidden; gap: 0.6mm; } .seg { display: flex; align-items: center; justify-content: center; font-size: 13.5pt; }
+.pr-agree { width: 46mm; position: relative; height: 11mm; background: #f3f2ee; border-radius: 1.5mm; overflow: hidden; } .pr-agree div { height: 100%; background: #eda100; }
+.pr-agree span { position: absolute; left: 2.5mm; top: 0; line-height: 11mm; font-size: 13.5pt; font-weight: 700; }
+.legend { font-size: 14pt; color: #52514e; display: flex; gap: 5mm; margin: 1.5mm 0 0 53mm; white-space: nowrap; } .legend b { display: inline-block; width: 4.5mm; height: 4.5mm; border-radius: 1mm; margin-right: 1.5mm; vertical-align: -0.6mm; }
+.small { font-size: 15.5pt; color: #52514e; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7mm; }
+.tile { background: #f7f9fc; border-radius: 5mm; padding: 5.5mm 8mm; font-size: 16pt; color: #33415a; }
+.tile .top { display: flex; align-items: center; gap: 4mm; margin-bottom: 2.5mm; } .tile b { font-size: 20pt; color: #10213a; line-height: 1.15; }
+.tile .num { font-size: 40pt; font-weight: 800; color: #2a78d6; line-height: 1; margin: 1mm 0 2mm; }
+.vbars { position: relative; display: flex; align-items: flex-end; gap: 2.5mm; padding: 0 1mm; }
+.vb { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.vb-fill { width: 100%; border-radius: 1.2mm 1.2mm 0 0; } .vb-value { font-size: 12.5pt; margin-bottom: 0.8mm; } .vb-label { font-size: 11.5pt; color: #52514e; margin-top: 1.2mm; height: 5mm; white-space: nowrap; }
+.vb-ref { position: absolute; left: 0; right: 0; border-top: 0.5mm dashed #52514e; } .vb-ref span { position: absolute; right: 1mm; top: -5mm; font-size: 11pt; color: #52514e; }
+footer { display: flex; justify-content: space-between; font-size: 13pt; color: #52514e; padding: 0 2mm; }
+</style></head><body><div class="page">
+
+<header>
+  <div>
+    <div class="kicker">HKU MAIB 7002 &#183; Group Q &#183; Machine learning for pricing</div>
+    <h1>Cut the price,<br>or <span>trust the shelf?</span></h1>
+    <div class="sub">We taught a model to predict what a perishable will sell tomorrow at any discount. Then we discovered it would discount everything, and had to teach it to read the shelf first.</div>
+    <div class="who"><b>Aashish Omprakash Pareek &#183; Yuanyuan Yin &#183; Lingyu Chen</b> &nbsp;&#183;&nbsp; Dingdong FreshRetailNet-50K, a public dataset of 50,000 store-product histories</div>
+  </div>
+  <div>
+<svg viewBox="0 0 200 120" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#dfe9f8"/><stop offset="1" stop-color="#f6f9fe"/></linearGradient></defs>
+  <rect x="10" y="8" width="180" height="104" rx="10" fill="url(#g)"/>
+  <g stroke="#7a8794" stroke-width="2.2" stroke-linecap="round"><path d="M28 48h144M28 84h144"/><path d="M34 48v-4M166 48v-4M34 84v-4M166 84v-4"/></g>
+  <g><circle cx="48" cy="38" r="8" fill="#eb6834"/><circle cx="62" cy="40" r="7" fill="#eb6834"/><circle cx="55" cy="30" r="7" fill="#f28a5c"/></g>
+  <g><ellipse cx="100" cy="40" rx="15" ry="6" fill="#e0b66a"/><ellipse cx="100" cy="35" rx="15" ry="6" fill="#efcf8b"/></g>
+  <g><rect x="130" y="26" width="12" height="20" rx="2" fill="#1baf7a"/><rect x="146" y="26" width="12" height="20" rx="2" fill="#5fcf9f"/></g>
+  <g><circle cx="52" cy="74" r="7" fill="#a4d46a"/><circle cx="66" cy="76" r="7" fill="#8bc34a"/></g>
+  <g><rect x="92" y="60" width="26" height="22" rx="3" fill="#f5e7c4" stroke="#d9c38f" stroke-width="1.5"/><path d="M96 66h18M96 72h18M96 78h12" stroke="#d9c38f" stroke-width="1.5" stroke-linecap="round"/></g>
+  <g transform="translate(140 58) rotate(-12)"><path d="M0 8a8 8 0 0 1 8-8h22l14 14-14 14H8a8 8 0 0 1-8-8V8z" fill="#eda100"/><circle cx="8" cy="12" r="2.5" fill="white"/>
+    <text x="27" y="17" font-size="12" font-weight="800" fill="#10213a" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">&#8722;?%</text></g>
+  <text x="100" y="105" font-size="7" fill="#52514e" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">6 pm &#183; the shelf is still half full &#183; what is tomorrow's price?</text>
+</svg></div>
+</header>
+
+<div class="row" style="grid-template-columns: 1.55fr 1fr">
+  <section>
+    <h2><i>01</i>A decision every evening, for every product</h2>
+    <div class="moments">
+      <div class="moment"><svg viewBox="0 0 24 24" style="width:12mm;height:12mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><div><b>6 pm, the shelf is half full</b><span>Tomorrow's discount must be set tonight, before anyone knows how much will sell.</span></div></div>
+      <div class="moment"><svg viewBox="0 0 24 24" style="width:12mm;height:12mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M12 3v18M5 21h14M6 8l6-2 6 2M3 14a3 3 0 0 0 6 0L6 8l-3 6zM15 14a3 3 0 0 0 6 0l-3-6-3 6z"/></svg><div><b>Two ways to lose</b><span>Hold the price and stock may be thrown away. Cut it and margin goes on sales that would have happened anyway.</span></div></div>
+      <div class="moment"><svg viewBox="0 0 24 24" style="width:12mm;height:12mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg><div><b>Our question</b><span>For one product, in one store, on one day: how much sells tomorrow at each discount, and should we discount at all?</span></div></div>
+    </div>
+  </section>
+  <section>
+    <h2><i>02</i>The raw material</h2>
+    <div class="hero">
+      <div><b>312</b><span>product histories in five stores, picked because their discounts vary</span></div>
+      <div><b>28,080</b><span>store-product-days; one unseen week of 2,184 kept for the test</span></div>
+      <div><b>45%</b><span>of days have an empty-shelf hour, a clue we later put to work</span></div>
+    </div>
+  </section>
+</div>
+
+<div class="row" style="grid-template-columns: 1fr 1fr">
+  <section>
+    <h2><i>03</i>Four models, one unseen week</h2>
+    <p class="small" style="margin:0 0 3mm">Each model learns from the product's own recent sales, today's stock and tomorrow's planned discount. Error on the 2,184 held-out days; lower is better.</p>
+    <div class="hb"><div class="hb-label" style="width:64mm">7-day average (no ML)</div><div class="hb-track"><div class="hb-fill" style="width:91.1%;background:#898781"></div></div><div class="hb-value">0.314</div></div>
+<div class="hb"><div class="hb-label" style="width:64mm">k-nearest neighbours</div><div class="hb-track"><div class="hb-fill" style="width:88.1%;background:#2a78d6"></div></div><div class="hb-value">0.304</div></div>
+<div class="hb"><div class="hb-label" style="width:64mm">Random forest</div><div class="hb-track"><div class="hb-fill" style="width:84.7%;background:#eb6834"></div></div><div class="hb-value">0.292</div></div>
+<div class="hb"><div class="hb-label" style="width:64mm">CatBoost</div><div class="hb-track"><div class="hb-fill" style="width:84.0%;background:#1baf7a"></div></div><div class="hb-value">0.290</div></div>
+<div class="hb"><div class="hb-label" style="width:64mm">Forest + CatBoost blend</div><div class="hb-track"><div class="hb-fill" style="width:83.8%;background:#eda100"></div></div><div class="hb-value">0.289</div></div>
+    <div class="lesson"><b>What we learned:</b> every model beat the no-ML average, the three tree models tie within noise, and choosing the inputs mattered more than any tuning dial. Dropping the weather was the single biggest gain.</div>
+  </section>
+  <section>
+    <h2><i>04</i>The decisions behind the numbers</h2>
+    <div class="cards">
+      <div class="card" style="border-color:#2a78d6"><b>k-nearest neighbours &#183; 25 look-alike days</b>Finds the 25 most similar past days and averages them. Simple, and already 5% better than the average.</div>
+      <div class="card" style="border-color:#eb6834"><b>Random forest &#183; 300 trees, depth 10</b>All 16 settings we tried beat the baseline every single week. A forgiving model.</div>
+      <div class="card" style="border-color:#1baf7a"><b>CatBoost &#183; small and slow on purpose</b>Boosting over-fits in plain sight (see 06), so the best version is 500 shallow trees at a 0.03 learning rate.</div>
+      <div class="card" style="border-color:#eda100"><b>Blend &#183; 50/50 forest + CatBoost</b>Their mistakes are 97% correlated, so blending gains only 0.001. We keep it as a safe choice, not a clever one.</div>
+    </div>
+    <div class="lesson">Splits are strictly in time order: every validation week is predicted by a model that has never seen it. Random splits would have flattered every model by putting near-identical days on both sides.</div>
+  </section>
+</div>
+
+<section>
+  <h2><i>05</i>The twist: a good forecaster is a reckless pricer</h2>
+  <div class="row" style="grid-template-columns: 1fr 1.1fr 1.25fr; align-items: start">
+    <div>
+      <p style="margin:0 0 2mm"><b>Ask the model "what if I discount?"</b> and it answers: deeper is always better. At a 0.6 rate it predicts 2.3× the sales.</p>
+      <svg viewBox="0 0 150 62" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:inherit">
+<line x1="18" x2="144" y1="45.38" y2="45.38" stroke="#e1e0d9" stroke-width="0.3"/><text x="16" y="46.98" font-size="4.2" text-anchor="end" fill="#52514e">1.0</text>
+<line x1="18" x2="144" y1="32.25" y2="32.25" stroke="#e1e0d9" stroke-width="0.3"/><text x="16" y="33.85" font-size="4.2" text-anchor="end" fill="#52514e">1.5</text>
+<line x1="18" x2="144" y1="19.12" y2="19.12" stroke="#e1e0d9" stroke-width="0.3"/><text x="16" y="20.73" font-size="4.2" text-anchor="end" fill="#52514e">2.0</text>
+<line x1="18" x2="144" y1="6.00" y2="6.00" stroke="#e1e0d9" stroke-width="0.3"/><text x="16" y="7.60" font-size="4.2" text-anchor="end" fill="#52514e">2.5</text>
+<text x="18.00" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">1.00</text>
+<text x="33.75" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">0.95</text>
+<text x="49.50" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">0.90</text>
+<text x="65.25" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">0.85</text>
+<text x="81.00" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">0.80</text>
+<text x="96.75" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">0.75</text>
+<text x="112.50" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">0.70</text>
+<text x="144.00" y="54.00" font-size="4.2" text-anchor="middle" fill="#52514e">0.60</text>
+<line x1="18" x2="144" y1="45.38" y2="45.38" stroke="#52514e" stroke-width="0.5"/>
+<line x1="18" x2="144" y1="48.00" y2="48.00" stroke="#52514e" stroke-width="0.4"/>
+<polyline points="18.00,45.38 33.75,40.72 49.50,39.55 65.25,37.68 81.00,35.87 96.75,33.58 112.50,25.87 144.00,10.65" fill="none" stroke="#2a78d6" stroke-width="1.1" stroke-linejoin="round"/>
+<circle cx="18.00" cy="45.38" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<circle cx="33.75" cy="40.72" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<circle cx="49.50" cy="39.55" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<circle cx="65.25" cy="37.68" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<circle cx="81.00" cy="35.87" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<circle cx="96.75" cy="33.58" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<circle cx="112.50" cy="25.87" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<circle cx="144.00" cy="10.65" r="1.6" fill="#2a78d6" stroke="white" stroke-width="0.6"/>
+<polyline points="18.00,45.38 33.75,42.27 49.50,42.76 65.25,42.77 81.00,43.02 96.75,43.09 112.50,39.59 144.00,35.04" fill="none" stroke="#eb6834" stroke-width="1.1" stroke-linejoin="round"/>
+<circle cx="18.00" cy="45.38" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<circle cx="33.75" cy="42.27" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<circle cx="49.50" cy="42.76" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<circle cx="65.25" cy="42.77" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<circle cx="81.00" cy="43.02" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<circle cx="96.75" cy="43.09" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<circle cx="112.50" cy="39.59" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<circle cx="144.00" cy="35.04" r="1.6" fill="#eb6834" stroke="white" stroke-width="0.6"/>
+<text x="125.10" y="11.25" font-size="4.4" font-weight="600" fill="#2a78d6" text-anchor="end">sales 2.3×</text>
+<text x="125.10" y="32.25" font-size="4.4" font-weight="600" fill="#eb6834" text-anchor="end">value 1.39×</text>
+<text x="81.00" y="61.00" font-size="4.2" text-anchor="middle" fill="#52514e">Tomorrow's discount rate (deeper to the right)</text>
+<text transform="translate(5,27.00) rotate(-90)" font-size="4.2" text-anchor="middle" fill="#52514e">× no-discount level</text>
+</svg>
+      <p class="small">It learned that from clearance days, which are fewer than 1% of the data. Left alone it would discount on 98% of days.</p>
+    </div>
+    <div>
+      <p style="margin:0 0 2mm"><b>So we put the shelf before the model.</b> Three stock rules decide first; the model only chooses among discounts the product has actually run.</p>
+      <div class="flow"><div class="step"><svg viewBox="0 0 24 24" style="width:11mm;height:11mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M3 7h18M3 13h18M3 19h18"/><rect x="5" y="3" width="4" height="4" rx="0.8"/><rect x="11" y="3" width="4" height="4" rx="0.8"/><rect x="5" y="9" width="4" height="4" rx="0.8"/><rect x="15" y="15" width="4" height="4" rx="0.8"/></svg><b>Sold out today?</b><span>Then no discount tomorrow: the shelf is clear.</span></div><i>&#8594;</i><div class="step"><svg viewBox="0 0 24 24" style="width:11mm;height:11mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><b>A week with no sell-out?</b><span>Then a discount is required; the model picks how deep.</span></div><i>&#8594;</i><div class="step"><svg viewBox="0 0 24 24" style="width:11mm;height:11mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3h3V4H9zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3h-3V4h3z"/></svg><b>Otherwise ask the model</b><span>Only about discounts this product has actually run.</span></div><i>&#8594;</i><div class="step"><svg viewBox="0 0 24 24" style="width:11mm;height:11mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M3 11V4a1 1 0 0 1 1-1h7l10 10-8 8L3 11z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg><b>Choose</b><span>Highest predicted value, net of unit cost, if the gain is worth it.</span></div></div>
+    </div>
+    <div>
+      <p style="margin:0 0 2mm"><b>What each policy recommends</b> on the test week, and how often it lands in the same band as the real managers.</p>
+      <div class="pr"><div class="pr-label">The managers</div><div class="pr-track"><div class="seg" style="width:54.3%;background:#d9d8d0;color:#0b0b0b">54%</div><div class="seg" style="width:34.7%;background:#8db8ea;color:#0b0b0b">35%</div><div class="seg" style="width:11.0%;background:#2a78d6;color:white">11%</div></div><div class="pr-agree"><div style="width:100.0%"></div><span>100%</span></div></div>
+<div class="pr"><div class="pr-label">Model alone</div><div class="pr-track"><div class="seg" style="width:1.7%;background:#d9d8d0;color:#0b0b0b"></div><div class="seg" style="width:66.0%;background:#8db8ea;color:#0b0b0b">66%</div><div class="seg" style="width:32.3%;background:#2a78d6;color:white">32%</div></div><div class="pr-agree"><div style="width:30.7%"></div><span>31%</span></div></div>
+<div class="pr"><div class="pr-label">Model + stock rules</div><div class="pr-track"><div class="seg" style="width:45.0%;background:#d9d8d0;color:#0b0b0b">45%</div><div class="seg" style="width:36.6%;background:#8db8ea;color:#0b0b0b">37%</div><div class="seg" style="width:18.4%;background:#2a78d6;color:white">18%</div></div><div class="pr-agree"><div style="width:39.9%"></div><span>40%</span></div></div>
+<div class="pr"><div class="pr-label">… + unit cost</div><div class="pr-track"><div class="seg" style="width:71.9%;background:#d9d8d0;color:#0b0b0b">72%</div><div class="seg" style="width:28.1%;background:#8db8ea;color:#0b0b0b">28%</div><div class="seg" style="width:0.0%;background:#2a78d6;color:white"></div></div><div class="pr-agree"><div style="width:54.2%"></div><span>54%</span></div></div>
+      <div class="legend"><span><b style="background:#d9d8d0"></b>no discount</span><span><b style="background:#8db8ea"></b>moderate</span><span><b style="background:#2a78d6"></b>deep</span><span style="margin-left:auto"><b style="background:#eda100"></b>agrees with manager</span></div>
+      <p class="small" style="margin-top:3mm">Stock rules decide 53% of days before the model is asked. Agreement rises from 31% to 40%, and to 54% once a unit cost makes deep discounts cost something.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><i>06</i>The challenges we found most interesting</h2>
+  <div class="tiles">
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M3 19h18M3 9h18"/><path d="M8 13h8" stroke-dasharray="1.5 2"/></svg><b>The shelf lies</b></div>On 45% of days the shelf was empty for part of the day, so recorded sales are lower than real demand. The model learns from censored numbers.</div>
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M4 17V7l4 6 4-6v10M15 7h5M17.5 7v10M15 17h5"/><path d="M3 20L21 4" stroke="#eb6834"/></svg><b>Sales without units or prices</b></div>The data is normalised: 1.2 is not 1.2 kilograms or dollars. "Value" is sales × discount rate, a proxy, so profit cannot be computed.</div>
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.3" fill="currentColor"/><circle cx="16" cy="8" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="8" cy="16" r="1.3" fill="currentColor"/><circle cx="16" cy="16" r="1.3" fill="currentColor"/></svg><b>Managers are not random</b></div>Discounts were chosen on days managers expected demand. Part of the lift the model sees is their judgement, not the price cut. Correlation, not cause.</div>
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16" stroke="#eb6834"/></svg><b>No counterfactual</b></div>We only ever see what sold at the price the manager chose. Whether our policy sells more or wastes less needs a real experiment.</div>
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M7 18a4 4 0 0 1-.6-7.95A6 6 0 0 1 18 9a4 4 0 0 1 0 9H7z"/><path d="M4 4l16 16" stroke="#eb6834"/></svg><b>Weather made things worse</b></div><div class="num">0.327 &#8594; 0.312</div>Removing rain, temperature and humidity cut the error more than any amount of tuning did.</div>
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M4 18l5-7 4 4 7-9"/><path d="M16 6h4v4"/></svg><b>Deep discounts are the hard days</b></div><div class="vbars" style="height:46mm"><div class="vb"><div class="vb-value">0.23</div><div class="vb-fill" style="height:9.5mm;background:#eda100"></div><div class="vb-label">no discount</div></div><div class="vb"><div class="vb-value">0.30</div><div class="vb-fill" style="height:12.2mm;background:#eda100"></div><div class="vb-label">moderate</div></div><div class="vb"><div class="vb-value">0.54</div><div class="vb-fill" style="height:22.0mm;background:#eda100"></div><div class="vb-label">deep</div></div></div><span class="small">Error by tomorrow's discount: every model under-predicts the spike on exactly the days a pricing tool cares about.</span></div>
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg><b>Boosting over-fits in plain sight</b></div><svg viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:inherit">
+<line x1="18" x2="114" y1="34.00" y2="34.00" stroke="#e1e0d9" stroke-width="0.3"/><text x="16" y="35.60" font-size="4.2" text-anchor="end" fill="#52514e">0.2</text>
+<line x1="18" x2="114" y1="20.00" y2="20.00" stroke="#e1e0d9" stroke-width="0.3"/><text x="16" y="21.60" font-size="4.2" text-anchor="end" fill="#52514e">0.4</text>
+<line x1="18" x2="114" y1="6.00" y2="6.00" stroke="#e1e0d9" stroke-width="0.3"/><text x="16" y="7.60" font-size="4.2" text-anchor="end" fill="#52514e">0.6</text>
+<text x="18.00" y="40.00" font-size="4.2" text-anchor="middle" fill="#52514e">0</text>
+<text x="66.00" y="40.00" font-size="4.2" text-anchor="middle" fill="#52514e">1500</text>
+<text x="114.00" y="40.00" font-size="4.2" text-anchor="middle" fill="#52514e">3000</text>
+<line x1="18" x2="114" y1="34.00" y2="34.00" stroke="#52514e" stroke-width="0.4"/>
+<polyline points="18.03,11.90 18.35,17.05 18.67,20.60 18.99,22.93 19.31,24.50 19.63,25.52 19.95,26.27 20.27,26.79 20.59,27.12 20.91,27.37 21.23,27.58 21.55,27.75 21.87,27.87 22.19,27.98 22.51,28.07 22.83,28.14 23.15,28.21 23.47,28.26 23.79,28.30 24.11,28.34 24.43,28.39 24.75,28.43 25.07,28.47 25.39,28.51 25.71,28.54 26.03,28.57 26.35,28.60 26.67,28.63 26.99,28.65 27.31,28.68 27.63,28.70 27.95,28.72 28.27,28.74 28.59,28.76 28.91,28.78 29.23,28.80 29.55,28.82 29.87,28.84 30.19,28.86 30.51,28.88 30.83,28.90 31.15,28.92 31.47,28.94 31.79,28.96 32.11,28.98 32.43,29.00 32.75,29.02 33.07,29.04 33.39,29.05 33.71,29.07 34.03,29.08 34.35,29.09 34.67,29.10 34.99,29.12 35.31,29.14 35.63,29.14 35.95,29.16 36.27,29.17 36.59,29.18 36.91,29.19 37.23,29.21 37.55,29.22 37.87,29.23 38.19,29.24 38.51,29.26 38.83,29.27 39.15,29.29 39.47,29.30 39.79,29.31 40.11,29.33 40.43,29.35 40.75,29.36 41.07,29.37 41.39,29.39 41.71,29.40 42.03,29.41 42.35,29.43 42.67,29.44 42.99,29.46 43.31,29.47 43.63,29.48 43.95,29.49 44.27,29.50 44.59,29.51 44.91,29.53 45.23,29.54 45.55,29.55 45.87,29.56 46.19,29.57 46.51,29.59 46.83,29.59 47.15,29.61 47.47,29.62 47.79,29.64 48.11,29.65 48.43,29.66 48.75,29.67 49.07,29.69 49.39,29.70 49.71,29.71 50.03,29.72 50.35,29.73 50.67,29.75 50.99,29.76 51.31,29.77 51.63,29.78 51.95,29.79 52.27,29.80 52.59,29.81 52.91,29.82 53.23,29.83 53.55,29.84 53.87,29.85 54.19,29.86 54.51,29.88 54.83,29.89 55.15,29.90 55.47,29.91 55.79,29.92 56.11,29.94 56.43,29.95 56.75,29.96 57.07,29.97 57.39,29.98 57.71,29.99 58.03,30.00 58.35,30.01 58.67,30.02 58.99,30.03 59.31,30.04 59.63,30.05 59.95,30.06 60.27,30.07 60.59,30.07 60.91,30.08 61.23,30.09 61.55,30.10 61.87,30.11 62.19,30.12 62.51,30.13 62.83,30.14 63.15,30.15 63.47,30.16 63.79,30.17 64.11,30.17 64.43,30.19 64.75,30.20 65.07,30.21 65.39,30.22 65.71,30.22 66.03,30.23 66.35,30.24 66.67,30.25 66.99,30.26 67.31,30.27 67.63,30.28 67.95,30.29 68.27,30.30 68.59,30.31 68.91,30.32 69.23,30.33 69.55,30.34 69.87,30.35 70.19,30.36 70.51,30.37 70.83,30.38 71.15,30.38 71.47,30.39 71.79,30.40 72.11,30.41 72.43,30.42 72.75,30.43 73.07,30.44 73.39,30.44 73.71,30.45 74.03,30.46 74.35,30.47 74.67,30.48 74.99,30.49 75.31,30.50 75.63,30.51 75.95,30.51 76.27,30.52 76.59,30.53 76.91,30.54 77.23,30.54 77.55,30.55 77.87,30.56 78.19,30.56 78.51,30.57 78.83,30.58 79.15,30.59 79.47,30.59 79.79,30.60 80.11,30.61 80.43,30.61 80.75,30.62 81.07,30.63 81.39,30.64 81.71,30.65 82.03,30.65 82.35,30.66 82.67,30.67 82.99,30.67 83.31,30.68 83.63,30.69 83.95,30.70 84.27,30.70 84.59,30.71 84.91,30.72 85.23,30.72 85.55,30.73 85.87,30.74 86.19,30.74 86.51,30.75 86.83,30.76 87.15,30.76 87.47,30.77 87.79,30.78 88.11,30.78 88.43,30.79 88.75,30.80 89.07,30.80 89.39,30.81 89.71,30.82 90.03,30.82 90.35,30.83 90.67,30.84 90.99,30.84 91.31,30.85 91.63,30.86 91.95,30.86 92.27,30.87 92.59,30.88 92.91,30.88 93.23,30.89 93.55,30.89 93.87,30.90 94.19,30.91 94.51,30.92 94.83,30.92 95.15,30.93 95.47,30.93 95.79,30.94 96.11,30.95 96.43,30.96 96.75,30.96 97.07,30.97 97.39,30.97 97.71,30.98 98.03,30.99 98.35,30.99 98.67,31.00 98.99,31.00 99.31,31.01 99.63,31.01 99.95,31.02 100.27,31.02 100.59,31.03 100.91,31.04 101.23,31.04 101.55,31.05 101.87,31.05 102.19,31.06 102.51,31.07 102.83,31.07 103.15,31.08 103.47,31.09 103.79,31.09 104.11,31.10 104.43,31.10 104.75,31.11 105.07,31.12 105.39,31.12 105.71,31.13 106.03,31.14 106.35,31.14 106.67,31.15 106.99,31.15 107.31,31.16 107.63,31.17 107.95,31.17 108.27,31.18 108.59,31.19 108.91,31.19 109.23,31.20 109.55,31.20 109.87,31.21 110.19,31.21 110.51,31.22 110.83,31.23 111.15,31.23 111.47,31.24 111.79,31.24 112.11,31.25 112.43,31.26 112.75,31.26 113.07,31.27 113.39,31.27 113.71,31.28" fill="none" stroke="#52514e" stroke-width="1.1" stroke-linejoin="round"/>
+<polyline points="18.03,8.01 18.35,13.66 18.67,17.47 18.99,19.98 19.31,21.68 19.63,22.81 19.95,23.64 20.27,24.20 20.59,24.68 20.91,25.04 21.23,25.30 21.55,25.52 21.87,25.67 22.19,25.81 22.51,25.93 22.83,26.02 23.15,26.08 23.47,26.16 23.79,26.20 24.11,26.24 24.43,26.27 24.75,26.29 25.07,26.32 25.39,26.34 25.71,26.36 26.03,26.38 26.35,26.40 26.67,26.41 26.99,26.42 27.31,26.43 27.63,26.44 27.95,26.44 28.27,26.45 28.59,26.46 28.91,26.46 29.23,26.47 29.55,26.48 29.87,26.49 30.19,26.49 30.51,26.50 30.83,26.51 31.15,26.52 31.47,26.52 31.79,26.53 32.11,26.54 32.43,26.54 32.75,26.54 33.07,26.54 33.39,26.55 33.71,26.55 34.03,26.56 34.35,26.55 34.67,26.55 34.99,26.55 35.31,26.56 35.63,26.55 35.95,26.55 36.27,26.56 36.59,26.56 36.91,26.57 37.23,26.58 37.55,26.57 37.87,26.57 38.19,26.57 38.51,26.57 38.83,26.58 39.15,26.58 39.47,26.57 39.79,26.57 40.11,26.58 40.43,26.59 40.75,26.58 41.07,26.58 41.39,26.58 41.71,26.58 42.03,26.57 42.35,26.56 42.67,26.56 42.99,26.56 43.31,26.56 43.63,26.57 43.95,26.56 44.27,26.56 44.59,26.56 44.91,26.55 45.23,26.55 45.55,26.55 45.87,26.56 46.19,26.56 46.51,26.56 46.83,26.56 47.15,26.56 47.47,26.56 47.79,26.55 48.11,26.55 48.43,26.55 48.75,26.55 49.07,26.55 49.39,26.55 49.71,26.55 50.03,26.55 50.35,26.55 50.67,26.55 50.99,26.55 51.31,26.55 51.63,26.55 51.95,26.56 52.27,26.56 52.59,26.56 52.91,26.55 53.23,26.56 53.55,26.56 53.87,26.56 54.19,26.56 54.51,26.55 54.83,26.56 55.15,26.56 55.47,26.56 55.79,26.56 56.11,26.56 56.43,26.56 56.75,26.56 57.07,26.56 57.39,26.55 57.71,26.55 58.03,26.54 58.35,26.54 58.67,26.54 58.99,26.53 59.31,26.53 59.63,26.53 59.95,26.52 60.27,26.52 60.59,26.53 60.91,26.52 61.23,26.52 61.55,26.52 61.87,26.52 62.19,26.52 62.51,26.52 62.83,26.52 63.15,26.52 63.47,26.51 63.79,26.52 64.11,26.52 64.43,26.52 64.75,26.52 65.07,26.52 65.39,26.52 65.71,26.52 66.03,26.51 66.35,26.51 66.67,26.51 66.99,26.51 67.31,26.51 67.63,26.51 67.95,26.51 68.27,26.50 68.59,26.51 68.91,26.51 69.23,26.50 69.55,26.50 69.87,26.50 70.19,26.49 70.51,26.50 70.83,26.50 71.15,26.49 71.47,26.49 71.79,26.49 72.11,26.49 72.43,26.49 72.75,26.49 73.07,26.49 73.39,26.49 73.71,26.49 74.03,26.49 74.35,26.49 74.67,26.49 74.99,26.49 75.31,26.49 75.63,26.49 75.95,26.48 76.27,26.48 76.59,26.48 76.91,26.48 77.23,26.48 77.55,26.47 77.87,26.47 78.19,26.47 78.51,26.47 78.83,26.47 79.15,26.47 79.47,26.47 79.79,26.47 80.11,26.47 80.43,26.47 80.75,26.47 81.07,26.47 81.39,26.47 81.71,26.47 82.03,26.47 82.35,26.47 82.67,26.47 82.99,26.47 83.31,26.47 83.63,26.46 83.95,26.46 84.27,26.46 84.59,26.45 84.91,26.45 85.23,26.45 85.55,26.45 85.87,26.44 86.19,26.44 86.51,26.44 86.83,26.44 87.15,26.44 87.47,26.43 87.79,26.44 88.11,26.44 88.43,26.43 88.75,26.43 89.07,26.43 89.39,26.43 89.71,26.43 90.03,26.43 90.35,26.43 90.67,26.43 90.99,26.43 91.31,26.42 91.63,26.42 91.95,26.41 92.27,26.41 92.59,26.41 92.91,26.41 93.23,26.40 93.55,26.40 93.87,26.40 94.19,26.40 94.51,26.40 94.83,26.40 95.15,26.40 95.47,26.40 95.79,26.40 96.11,26.40 96.43,26.40 96.75,26.39 97.07,26.40 97.39,26.39 97.71,26.39 98.03,26.39 98.35,26.39 98.67,26.39 98.99,26.39 99.31,26.38 99.63,26.38 99.95,26.38 100.27,26.38 100.59,26.38 100.91,26.38 101.23,26.39 101.55,26.38 101.87,26.38 102.19,26.39 102.51,26.39 102.83,26.39 103.15,26.39 103.47,26.39 103.79,26.39 104.11,26.39 104.43,26.39 104.75,26.39 105.07,26.38 105.39,26.38 105.71,26.38 106.03,26.38 106.35,26.39 106.67,26.38 106.99,26.38 107.31,26.38 107.63,26.38 107.95,26.38 108.27,26.38 108.59,26.38 108.91,26.38 109.23,26.38 109.55,26.38 109.87,26.38 110.19,26.38 110.51,26.38 110.83,26.38 111.15,26.38 111.47,26.38 111.79,26.38 112.11,26.38 112.43,26.37 112.75,26.37 113.07,26.37 113.39,26.37 113.71,26.37" fill="none" stroke="#1baf7a" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="112.40" y="23.50" font-size="4.4" font-weight="600" fill="#1baf7a" text-anchor="end">new week: turns up after 701</text>
+<text x="112.40" y="33.16" font-size="4.4" font-weight="600" fill="#52514e" text-anchor="end">training rows: keeps falling</text>
+<text x="66.00" y="47.00" font-size="4.2" text-anchor="middle" fill="#52514e">Trees added</text>
+<text transform="translate(5,20.00) rotate(-90)" font-size="4.2" text-anchor="middle" fill="#52514e">Error</text>
+</svg><span class="small">Training error keeps falling; error on a new week turns up after 701 trees.</span></div>
+    <div class="tile"><div class="top"><svg viewBox="0 0 24 24" style="width:14mm;height:14mm;flex:none" fill="none" stroke="#2a78d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" color="#2a78d6"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg><b>One city, one week, one guess at shelf life</b></div>Five stores in one city and a single test week that has been scored for four models. The "no sell-out for a week means old stock" rule assumes a shelf life the data never states.</div>
+  </div>
+</section>
+
+<footer><span>Data: Dingdong-Inc/FreshRetailNet-50K on Hugging Face, CC BY 4.0 &#183; scikit-learn and CatBoost &#183; Errors are mean absolute error in normalised sales units</span><span>Full notebook, code and Docker image: github.com/Lisayinyy/MAIB_7002, branch pricing-ml-ap</span></footer>
+</div></body></html>

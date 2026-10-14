@@ -1,9 +1,10 @@
 # Reproducible environment for the notebook and the helper package.
 #
 # Build:  docker build -t pricing-ml .
-# Run:    docker run --rm -p 8888:8888 -v "$PWD/data:/app/data" pricing-ml
+# Run:    docker run --rm -p 8888:8888 pricing-ml
 #         then open the http://127.0.0.1:8888/lab?token=... link printed in the terminal.
-# The raw data (data/raw/train.parquet, data/raw/eval.parquet) is not in the image; mount it.
+# The data folder is copied into the image: the processed feature table plus data/raw/freshretail_raw.zip.
+# The notebook's first cell extracts the raw files from that zip once (or downloads them if the zip is absent).
 
 FROM python:3.12-slim
 
@@ -18,6 +19,7 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-install-proj
 
 COPY src ./src
 COPY results ./results
+COPY data ./data
 COPY docs ./docs
 COPY README.md discount_sales_prediction.ipynb ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen

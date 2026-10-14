@@ -293,8 +293,8 @@ def plot_test_errors(test, methods, colours, highlight, save=None):
     left.set_xlim(0, lim)
     left.set_ylim(0, lim)
     left.set_xlabel("Actual next-day sales")
-    left.set_ylabel(f"Predicted next-day sales ({highlight})")
-    left.set_title("Big days are under-predicted", loc="left", fontsize=11)
+    left.set_ylabel("Predicted next-day sales, " + highlight)
+    left.set_title("Forecasts shrink toward typical sales:\nbig days under-predicted, small days slightly over", loc="left", fontsize=11)
 
     band = pd.cut(test.discount_next, C.DISCOUNT_BAND_EDGES, labels=["deep", "moderate", "none"])
     order = ["none", "moderate", "deep"]
@@ -315,7 +315,7 @@ def plot_test_errors(test, methods, colours, highlight, save=None):
     right.set_xticks(range(len(order)), [f"{'no' if b == 'none' else b} discount\n({counts[b]:,} days)" for b in order])
     right.set_xlim(-0.6, len(order) - 0.3)
     right.set_ylabel("Mean next-day sales")
-    right.set_title("The deep-discount spike: actual (black line) against each model", loc="left", fontsize=11)
+    right.set_title("Average predicted level by band, a bias check, not accuracy\n(actual is the black line; for error by band see the summary figure)", loc="left", fontsize=11)
     right.legend(frameon=False, loc="upper left", fontsize=9)
     right.margins(y=0.15)
     fig.suptitle("Test-week diagnostics", x=0.01, ha="left", fontsize=12, fontweight="bold")
@@ -405,4 +405,118 @@ def plot_policy_outcomes(bands, agreement, n_days, save=None):
     for ax in (left, right):
         ax.grid(False)
         ax.grid(axis="x", color=C.GRID, linewidth=1)
+    return _finish(fig, save)
+
+
+# --- Appendix: how CatBoost and the ensemble work -------------------------------------------
+
+def _box(ax, x, y, w, h, text, face, size=9, weight="normal", colour=None):
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.004,rounding_size=0.015", facecolor=face, edgecolor="none"))
+    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=size, color=colour or C.INK, fontweight=weight, linespacing=1.4)
+
+
+def _arrow(ax, x0, y0, x1, y1, colour=None):
+    ax.annotate("", xy=(x1, y1), xytext=(x0, y0), arrowprops=dict(arrowstyle="->", color=colour or C.MUTED, linewidth=1.4))
+
+
+def plot_boosting_schematic(learning_rate=0.03, save=None):
+    """Left: boosting adds shallow trees one after another, each fitted to what is still wrong. Right: a symmetric tree."""
+    fig, (left, right) = _figure(1, 2, figsize=(13, 4.2), gridspec_kw={"width_ratios": [1.5, 1]})
+    for ax in (left, right):
+        ax.axis("off"); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    tint, accent = "#e8f6ef", C.COLOURS["catboost"]
+    _box(left, 0.0, 0.62, 0.17, 0.22, "Start:\naverage sales", C.GRID)
+    steps = ["tree 1 fits\nthe errors", "tree 2 fits\nwhat is left", "tree 3 fits\nwhat is left", "…", "tree 500"]
+    for i, text in enumerate(steps):
+        x = 0.2 + i * 0.165
+        _box(left, x, 0.62, 0.14, 0.22, text, tint if text != "…" else C.SURFACE, size=9)
+        _arrow(left, x - 0.035, 0.73, x - 0.003, 0.73)
+    left.text(0.5, 0.42, f"prediction = average + {learning_rate} × tree 1 + {learning_rate} × tree 2 + … + {learning_rate} × tree 500",
+              ha="center", fontsize=10.5, color=C.INK)
+    left.text(0.5, 0.3, "Each tree is shallow (depth 5 here) and corrects only a small share of the remaining error,\n"
+                        "so the sequence is a slow descent. The learning rate sets the step size; the iteration count sets how many steps.",
+              ha="center", va="top", fontsize=9, color=C.MUTED, linespacing=1.5)
+    left.set_title("Boosting: trees in sequence, each one fixing the last one's mistakes", loc="left", fontsize=11, color=C.INK)
+    # symmetric (oblivious) tree: the same question on every node of a level
+    _box(right, 0.3, 0.8, 0.4, 0.14, "7-day mean > 1.2 ?", tint, size=9)
+    for x in (0.08, 0.52):
+        _box(right, x, 0.5, 0.4, 0.14, "tomorrow's discount < 0.9 ?", tint, size=9)
+    _arrow(right, 0.42, 0.8, 0.28, 0.65); _arrow(right, 0.58, 0.8, 0.72, 0.65)
+    for i, x in enumerate((0.02, 0.26, 0.5, 0.74)):
+        _box(right, x, 0.18, 0.22, 0.14, ["−0.04", "+0.05", "+0.02", "+0.18"][i], C.SURFACE, size=10, weight="bold", colour=accent)
+    for x0, x1 in ((0.28, 0.13), (0.28, 0.37), (0.72, 0.61), (0.72, 0.85)):
+        _arrow(right, x0, 0.5, x1, 0.33)
+    right.text(0.5, 0.05, "Leaf values are small corrections, not sales levels", ha="center", fontsize=9, color=C.MUTED)
+    right.set_title("One CatBoost tree: symmetric, one split per level", loc="left", fontsize=11, color=C.INK)
+    return _finish(fig, save)
+
+
+def plot_learning_zoom(curve, n=100, label="lr=0.03", save=None):
+    """The first ``n`` boosting steps of one learning curve: the descent is fast at first, then each tree adds less."""
+    c = curve.iloc[:n]
+    fig, ax = _figure(figsize=(9, 4))
+    ax.plot(c.index + 1, c.train, color=C.MUTED, linewidth=1.5, label="Training rows")
+    ax.plot(c.index + 1, c.validation, color=C.COLOURS["catboost"], linewidth=2, label="Validation week")
+    for k in (1, 10, 50, n):
+        v = float(c.validation.iloc[k - 1])
+        ax.annotate(f"{v:.3f}", (k, v), textcoords="offset points", xytext=(6, 8), fontsize=9, color=C.INK)
+        ax.plot([k], [v], "o", color=C.COLOURS["catboost"], markersize=5)
+    ax.set_xlabel("Boosting iteration (trees added)")
+    ax.set_ylabel("Mean absolute error")
+    ax.set_title(f"The first {n} trees at {label}: most of the gain comes early, then each tree adds a little", loc="left", fontsize=11)
+    ax.legend(frameon=False)
+    return _finish(fig, save)
+
+
+def plot_ensemble_schematic(save=None):
+    """Bagging (random forest), boosting (CatBoost) and the 50/50 blend of the two, side by side."""
+    fig, axes = _figure(1, 3, figsize=(13, 4.2))
+    for ax in axes:
+        ax.axis("off"); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    rf, cb, en = "#fdeae2", "#e8f6ef", "#fff6e0"
+    ax = axes[0]
+    _box(ax, 0.3, 0.84, 0.4, 0.13, "training rows", C.GRID)
+    for i, x in enumerate((0.02, 0.27, 0.52, 0.77)):
+        _box(ax, x, 0.58, 0.21, 0.13, f"sample {i + 1}" if i < 3 else "… 300", rf, size=8.5)
+        _box(ax, x, 0.36, 0.21, 0.13, "deep tree", rf, size=8.5)
+        _arrow(ax, 0.5, 0.84, x + 0.105, 0.715); _arrow(ax, x + 0.105, 0.58, x + 0.105, 0.5); _arrow(ax, x + 0.105, 0.36, 0.5, 0.2)
+    _box(ax, 0.3, 0.06, 0.4, 0.13, "average of 300 trees", rf, size=9, weight="bold")
+    ax.set_title("Bagging: the random forest", loc="left", fontsize=11, color=C.INK)
+    ax.text(0.5, -0.02, "Independent trees on resampled rows; averaging cancels their noise", ha="center", fontsize=8.5, color=C.MUTED)
+    ax = axes[1]
+    _box(ax, 0.3, 0.84, 0.4, 0.13, "training rows", C.GRID)
+    for i, x in enumerate((0.02, 0.27, 0.52, 0.77)):
+        _box(ax, x, 0.5, 0.21, 0.16, ["shallow\ntree 1", "tree 2 fits\nthe errors", "tree 3 fits\nthe errors", "… 500"][i], cb, size=8.5)
+        if i < 3:
+            _arrow(ax, x + 0.215, 0.58, x + 0.265, 0.58)
+    _arrow(ax, 0.5, 0.84, 0.125, 0.67)
+    _box(ax, 0.3, 0.06, 0.4, 0.13, "sum of 500 small steps", cb, size=9, weight="bold")
+    _arrow(ax, 0.875, 0.5, 0.6, 0.2)
+    ax.set_title("Boosting: CatBoost", loc="left", fontsize=11, color=C.INK)
+    ax.text(0.5, -0.02, "Dependent trees in sequence; each corrects what the previous ones left", ha="center", fontsize=8.5, color=C.MUTED)
+    ax = axes[2]
+    _box(ax, 0.05, 0.6, 0.38, 0.2, "random forest\nprediction", rf, size=9)
+    _box(ax, 0.57, 0.6, 0.38, 0.2, "CatBoost\nprediction", cb, size=9)
+    _arrow(ax, 0.24, 0.6, 0.45, 0.33); _arrow(ax, 0.76, 0.6, 0.55, 0.33)
+    ax.text(0.3, 0.44, "× 0.5", fontsize=9, color=C.MUTED); ax.text(0.64, 0.44, "× 0.5", fontsize=9, color=C.MUTED)
+    _box(ax, 0.25, 0.12, 0.5, 0.18, "blend = the average\nof the two", en, size=9.5, weight="bold")
+    ax.set_title("Blend: our ensemble", loc="left", fontsize=11, color=C.INK)
+    ax.text(0.5, -0.02, "Helps only where the two models err differently", ha="center", fontsize=8.5, color=C.MUTED)
+    return _finish(fig, save)
+
+
+def plot_error_scatter(oof, save=None):
+    """The forest's error against CatBoost's error on the same validation rows: a tight diagonal means little to gain from blending."""
+    e_rf, e_cb = oof.rf - oof.actual, oof.catboost - oof.actual
+    corr = e_rf.corr(e_cb)
+    lim = max(e_rf.abs().quantile(0.999), e_cb.abs().quantile(0.999))
+    fig, ax = _figure(figsize=(6.2, 5.6))
+    ax.plot([-lim, lim], [-lim, lim], color=C.MUTED, linewidth=1)
+    ax.scatter(e_rf, e_cb, s=7, alpha=0.2, color=C.COLOURS["ensemble"], linewidths=0, rasterized=True)
+    ax.axhline(0, color=C.AXIS, linewidth=1); ax.axvline(0, color=C.AXIS, linewidth=1)
+    ax.set_xlim(-lim, lim); ax.set_ylim(-lim, lim)
+    ax.set_xlabel("Random forest error (predicted − actual)")
+    ax.set_ylabel("CatBoost error (predicted − actual)")
+    ax.set_title(f"Validation rows: both models miss the same days (r = {corr:.2f})", loc="left", fontsize=11)
+    ax.text(lim * 0.95, -lim * 0.9, "off the diagonal = days where\nblending can help", ha="right", fontsize=9, color=C.MUTED)
     return _finish(fig, save)

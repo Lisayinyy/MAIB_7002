@@ -23,10 +23,11 @@ It is written to be read top to bottom. Each section states what was done, shows
 | 8 | k-nearest neighbours: tuning, locked design |
 | 9 | Random forest: tuning, locked design |
 | 10–11 | CatBoost and a forest + CatBoost ensemble (next models to test) |
-| 12 | Comparison on the validation weeks and the unseen test week |
-| 13 | Findings and limits |
-| 14 | Phase 2: from a forecast to a discount recommendation |
+| 12 | Comparison on the validation weeks, the hard week, and the unseen test week |
+| 13 | Findings and limits: business outcome, model performance, data limitations |
+| 14 | Phase 2: should we discount, and how much? |
 | 15 | Next steps |
+| Appendix | A. Reproducing the notebook · B. CatBoost explained · C. The ensemble explained |
 """)
 
 code(r"""
@@ -40,6 +41,13 @@ from finalproject_pricingml import config as C, data, evaluate as ev, models, pl
 # When False, the grids are read back from results/ and only the final test-week models are fitted.
 RERUN_TUNING = False
 
+# One-time data setup: verify the two raw parquet files, else extract them once from data/raw/freshretail_raw.zip,
+# else download them (110 MB) from the pinned public revision. Nothing is repeated once valid files exist.
+try:
+    print(data.ensure_raw_data())
+except Exception as exc:  # no raw data and no network: the shipped feature table in data/processed/ still runs everything below
+    print(f"Raw data unavailable ({exc}); continuing with the shipped feature table in data/processed/.")
+
 pd.set_option("display.precision", 4)
 pd.set_option("display.width", 140)
 """)
@@ -47,10 +55,15 @@ pd.set_option("display.width", 140)
 md(r"""
 ## 1. Goal
 
-Help a Dingdong category manager decide whether to discount a perishable product tomorrow, by predicting next-day sales for a store-product given tomorrow's discount.
+A Dingdong category manager asks two questions every evening about every perishable product:
 
-- **Success test:** lower next-day sales error than a simple baseline.
-- **Phase 2 (after the best model is chosen):** feed candidate discount rates into the model to suggest a discount. This is a model-based claim, not something the data can verify.
+1. **Should this product be discounted tomorrow?**
+2. **If so, by how much, to sell more without giving value away?**
+
+Both are answered by one model. It does not predict whether to discount, and it does not predict the discount rate. It predicts **next-day sales for a store-product given tomorrow's discount rate**, with the discount as an input alongside the product's recent history. Asking the model the same question under several candidate discounts gives a what-if curve for that product on that evening, and a decision rule picks from it. Phase 1 (sections 3 to 13) builds and tests that sales model. Phase 2 (section 14) turns it into the two answers, with stock rules in front of it.
+
+- **Success test for phase 1:** lower next-day sales error than a simple baseline, the mean of the last 7 days.
+- **Phase 2 is a model-based claim**, not something the data can verify: the data records what sold under the discount the manager chose, never under any other.
 
 Two limits set by the data:
 
@@ -80,7 +93,7 @@ Source: [FreshRetailNet-50K](https://huggingface.co/datasets/Dingdong-Inc/FreshR
 md(r"""
 ## 3. Store and product selection
 
-The model needs series where the discount actually varies. A day counts as "discounted" when the discount is below 0.95. A series is usable when:
+The model needs series where the discount actually varies. A day counts as "discounted" when the discount is below 0.95, that is more than 5% off. The same convention is used wherever the notebook counts discounted days, here and in the phase 2 tables. Rows at or above 0.95 are not dropped: every row keeps its true rate as a model input, and the test-week tables place a 0.95 day in the moderate band. A series is usable when:
 
 - it is discounted on 15–85% of days (removes never- and always-discounted products),
 - it switches between discounted and not at least 6 times,
@@ -135,10 +148,12 @@ Sales rise steadily as the discount deepens. Tomorrow's discount is worth modell
 | Mean sales to date | `sales_mean_to_date` | up to t |
 | Stockout hours | `stockout_hours_t` | t |
 | Discount | `discount_t` | t |
-| Discount (the manager's decision) | `discount_next` | t+1 |
+| Tomorrow's discount: the input the manager sets | `discount_next` | t+1 |
 | Activity flag | `activity_t` | t |
 | Holiday flag | `holiday_next` | t+1 |
 | Weekday | `weekday_next` | t+1 |
+
+Every feature is the dataset's own column, shifted or averaged within the series; nothing is imputed or synthetic. `discount_next`, `holiday_next` and `weekday_next` are the raw values on the forecast day itself, renamed to say which day they describe. The discount is the one input the manager controls, which is what lets section 14 ask the model what would happen under a different value.
 
 **Considered and left out:**
 
@@ -576,7 +591,34 @@ fig = plots.plot_validation_weeks(validation_mae, colours, annotate=validation_m
 """)
 
 md(r"""
-The baseline and kNN sit clearly above the three tree models, which are bunched together in every week. The hard week (June 5–11) is hard for everyone.
+The baseline and kNN sit clearly above the three tree models, which are bunched together in every week. The hard week, June 5–11, is hard for everyone; the next sub-section looks at why.
+
+### The hard week: June 5–11
+
+Every model's worst week is the same one, and the data says why: it contains the Dragon Boat Festival, a three-day public holiday from Saturday June 8 to Monday June 10.
+""")
+
+code(r"""
+weeks = feat.assign(relative_sales=feat[C.TARGET] / feat.groupby(C.KEY)[C.TARGET].transform("mean"))  # relative to each series' average over all its days
+weeks = weeks[weeks.val_fold > 0].assign(week=lambda d: d.val_fold.map(C.FOLD_LABELS), baseline_error=lambda d: (d[C.TARGET] - d.sales_mean7).abs())
+g = weeks.groupby("week", sort=False)
+hard = pd.DataFrame({"holiday-flag days": g.holiday_next.sum().astype(int), "sales vs series average": g.relative_sales.mean(),
+                     "spread of that ratio (sd)": g.relative_sales.std(), "days discounted, %": g.discount_next.apply(lambda d: (d < C.DISCOUNT_DAY).mean() * 100),
+                     "deep discounts, %": g.discount_next.apply(lambda d: (d <= 0.8).mean() * 100), "activity days, %": g.activity_t.mean() * 100,
+                     "baseline MAE": g.baseline_error.mean(),
+                     "baseline MAE, deep-discount days": g.apply(lambda x: x.baseline_error[x.discount_next <= 0.8].mean(), include_groups=False)})
+display(hard.reindex(C.FOLD_LABELS.values()).round(2))
+w = weeks[weeks.val_fold == 3]
+print("Largest baseline misses in the week:")
+display(w.nlargest(6, "baseline_error")[C.ROW_KEY + ["discount_next", "sales_mean7", C.TARGET, "holiday_next"]].rename(columns={"sales_mean7": "7-day mean before", C.TARGET: "actual"}).reset_index(drop=True))
+""")
+
+md(r"""
+- **A festival week.** June 8–10 carry three holiday flags against two for an ordinary weekend, and the festival Monday is the week's peak at 1.38× normal sales. Over the week, sales run 13% above each series' own average against 1 to 8% in the other weeks, and they are far more dispersed (a spread of 0.83 against 0.53 to 0.57).
+- **More and deeper discounting.** 53% of days are discounted and 14.5% deeply, both the highest of the five weeks, with the most activity flags. Baseline error on deep-discount days is 0.74 against 0.46 to 0.64 elsewhere.
+- **One product tells most of the story.** Product 858 was cut to half price in all five stores from Friday June 7 and sold 13 to 33 times its own 7-day average; the largest misses of the week are that product, once per store, before any model is involved.
+- **Why every model struggles.** The inputs carry a generic holiday flag that cannot tell a festival from a weekend, no product identity or category, and recent-sales features that describe a normal week. A half-price promotion on a product that rarely sells is outside anything the lags can anticipate, so the three tree models sit together and even the baseline jumps.
+- **Two consequences.** A festival calendar would be a cheap feature to add, and part of the deep-discount lift the models learned is festival demand, a second reason to treat the phase 2 response curve with care.
 
 ### The unseen test week (June 26 – July 2)
 
@@ -626,8 +668,9 @@ fig = plots.plot_test_errors(test, diagnostic, {"RF + CatBoost (50/50)": C.COLOU
 
 md(r"""
 - All three tree models beat the baseline on deep-discount days; kNN does not. The ensemble has the lowest deep-discount error.
-- CatBoost comes closest to the size of the deep-discount spike (1.61 predicted against 1.66 actual; the forest says 1.57, the baseline 1.39). It also puts twice the importance on tomorrow's discount that the forest does (next table), which is why.
+- CatBoost comes closest to the size of the deep-discount spike (1.61 predicted against 1.66 actual; the forest says 1.57, the baseline 1.39). It also puts twice the importance on tomorrow's discount that the forest does (next table), which fits.
 - On moderate discounts the edge is small: CatBoost and the ensemble beat the baseline by about 2% (0.297–0.298 against 0.303), the forest is level with it (0.301), and kNN is behind (0.309).
+- **Reading the diagnostics figure.** The left panel shows the usual shrinkage of a regression toward typical sales: days above 2 are under-predicted 79% of the time, days at or below 1 are over-predicted 66% of the time, and the overall means agree (0.967 predicted against 0.969 actual), so there is no bias overall. The right panel shows the average predicted *level* per band, a bias check rather than an accuracy score: kNN's deep-day average (1.50) sits closer to the actual 1.66 than the baseline's 1.39, yet its MAE on those days is worse (0.581 against 0.561), because it over-predicts on half of them and misses by more on the other half. Part of the deep-discount under-prediction is the festival effect from the hard week above.
 
 ### By day and by store
 """)
@@ -667,19 +710,32 @@ display(table.round(3))
 md(r"""
 ## 13. Findings and limits
 
-1. **Success test met by every model.** All four beat the 7-day average on validation and on the test week.
-2. **Best model: the 50/50 forest + CatBoost ensemble**, with CatBoost alone effectively tied. Test-week MAE 0.289 against 0.314 for the baseline (8% lower), MSE 22% lower.
-3. **The three tree models are equivalent within noise.** Validation 0.3013 to 0.3033; the spread across seeds and weeks is larger than the spread across models. Two unrelated tree methods reaching the same error says the ceiling is in the features and the data.
-4. **Feature choice mattered more than any setting, for every model.** Removing weather was the largest single gain; k, depth, leaf size, learning rate and iterations all moved MAE by less than week-to-week noise.
-5. **Boosting over-fits visibly; forests barely do.** The learning curve turns up after a few hundred trees, which is why the best CatBoost is small and slow. The forest got no worse with more trees, and removing the depth limit cost it only 0.002.
-6. **Ensembling buys little here** because the two models' errors correlate at 0.97. The 0.001 gain is real across weeks but small.
-7. **Deep discounts remain the weak spot.** Errors there are more than twice the ordinary-day error for every model, and all still under-predict the spike. On moderate discounts the edge is small: CatBoost and the ensemble are about 2% ahead of the baseline, the forest is level with it, kNN is behind.
-8. **Selection optimism.** Many options were compared on the same five weeks, and the test week has now been scored for four models. The test figures are the honest ones but no longer pristine.
-9. **Scope.** Five stores in one city, one test week. Results may not carry to other cities or seasons.
+**Business outcome**
 
-## 14. Phase 2: from a forecast to a discount recommendation
+1. **A forecast 8% more accurate than the manager's rule of thumb.** The 50/50 forest + CatBoost ensemble has test-week MAE 0.289 against 0.314 for the 7-day average, and 22% lower squared error, with CatBoost alone effectively tied.
+2. **Asked on its own which discount to apply, the model would discount on 98% of days** (section 14). It has learned what clearance days look like, not what a price cut causes.
+3. **With stock rules in front of it, the policy declines a discount on 45% of days** and lands in the manager's band on 40% of days, 54% once a unit cost is included. What a manager gets is a decision aid that says "no" after a sell-out and proposes mild, historically supported discounts elsewhere. Not shown: whether it sells more or wastes less.
 
-The models above answer "how much will sell under a given discount". The manager's question is "which discount". This section turns the ensemble from section 12 into a recommendation and checks it against what managers actually did on the 2,184 test-week store-product-days.
+**Model performance**
+
+4. **Success test met by every model**, on validation and on the test week.
+5. **The three tree models are equivalent within noise.** Validation 0.3013 to 0.3033; the spread across seeds and weeks is larger than the spread across models. Two unrelated tree methods reaching the same error says the ceiling is in the features and the data.
+6. **Feature choice mattered more than any setting, for every model.** Removing weather was the largest single gain; k, depth, leaf size, learning rate and iterations all moved MAE by less than week-to-week noise.
+7. **Boosting over-fits visibly; forests barely do.** The learning curve turns up after a few hundred trees, which is why the best CatBoost is small and slow. The forest got no worse with more trees, and removing the depth limit cost it only 0.002.
+8. **Ensembling buys little here** because the two models' errors correlate at 0.97. The 0.001 gain is real across weeks but small.
+9. **Deep discounts remain the weak spot.** Errors there are more than twice the ordinary-day error for every model and all still under-predict the spike. The Dragon Boat week shows why: festival demand and festival promotions that no feature describes.
+
+**Data limitations**
+
+10. **Normalised sales, no unit price or cost.** Errors mean something only relative to a baseline, "value" in phase 2 is a proxy, and profit cannot be computed.
+11. **Censored demand.** Stockouts on 45% of days mean recorded sales understate what customers wanted, and the models are trained on those rows.
+12. **Discounts were chosen, not assigned.** Managers discounted on days they expected demand, so the learned response to discount mixes the price effect with their judgement. There is one discount per day, so no intraday markdown to study.
+13. **No stock quantity, age or shelf life.** The week-without-stockout rule in phase 2 rests on an assumed one-week shelf life for every category.
+14. **Selection optimism and scope.** Many options were compared on the same five weeks, the test week has now been scored for four models, and the working set is five stores in one city over one test week. The test figures are the honest ones but no longer pristine, and results may not carry to other cities or seasons.
+
+## 14. Phase 2: should we discount, and how much?
+
+**What the manager sees.** On a given evening the recommendation for each product is one of three answers: *hold the price, the shelf cleared today* (44% of test-week days); *discount, nothing has cleared the shelf for a week, and the model picks how deep* (9%); or *here is the mildest supported discount worth taking, if any* (47%, where the sales model decides). This section builds that recommender from the ensemble of section 12 and checks it against what managers actually did on the 2,184 test-week store-product-days.
 
 **Goals**
 
@@ -689,7 +745,7 @@ The models above answer "how much will sell under a given discount". The manager
 - **Two business dials.** A unit cost (as a share of full price) inside the value objective, so that deep discounts are penalised, and a minimum-gain hurdle, so that a discount is recommended only when its predicted value clearly beats no discount.
 - **Judge by agreement with the manager, not by realised outcome.** The data records what sold under the discount the manager chose, never what would have sold under another one. The honest checks are how often the policy lands in the manager's discount band and where it departs.
 
-### How a recommendation is produced
+### How the two answers are produced
 
 Rule 2 needs no box of its own: a running discount that did not clear the shelf reaches step 3, where today's discount is one of the model's inputs.
 """)
@@ -807,15 +863,46 @@ print(f"Training days with a stockout: {len(so):,} ({len(so) / len(train):.0%});
 """)
 
 md(r"""
+### One evening, one product: a worked example
+
+Store 18, product 11, on the evening of June 25, deciding for June 26: the first test-week day in store-product order. The table is what the manager would see once the rules have been checked.
+""")
+
+code(r"""
+case = test.sort_values(C.ROW_KEY).pipe(lambda d: d[(d.store_id == 18) & (d.product_id == 11)]).iloc[0]
+print(f"Store {case.store_id}, product {case.product_id}, forecast for {case["dt"].date()}: sales today {case.sales_t:.1f}, 7-day mean {case.sales_mean7:.2f}, "
+      f"stockout hours today {case.stockout_hours_t:.0f}, stockout days in the past week {case.stockout_days7:.0f}, discount today {case.discount_t:.3f}")
+print(f"Stock state: {scenario.stock_state(test.loc[[case.name]]).iloc[0]} -> neither rule fires, the model chooses among the supported candidates")
+options = supported[(supported.store_id == case.store_id) & (supported.product_id == case.product_id) & (supported.dt == case["dt"])].sort_values("discount", ascending=False)
+options = options.assign(sales_vs_full=options.pred_sales / options.pred_sales.iloc[0], value_vs_full=options.pred_value / options.pred_value.iloc[0],
+                         value_at_unit_cost_07=options.pred_sales * (options.discount - 0.7))
+options["max-value rule"] = np.where(options.pred_value == options.pred_value.max(), "recommended", "")
+options["with unit cost 0.7"] = np.where(options.value_at_unit_cost_07 == options.value_at_unit_cost_07.max(), "recommended", "")
+display(options[["discount", "pred_sales", "pred_value", "sales_vs_full", "value_vs_full", "value_at_unit_cost_07", "max-value rule", "with unit cost 0.7"]].round(3).reset_index(drop=True))
+print(f"Manager's actual choice for that day: {case.discount_next:.3f}; actual sales: {case[C.TARGET]:.1f}")
+""")
+
+md(r"""
+Read the table as the manager's menu for one product; the candidates are only the discounts this product has run before. Under the plain value proxy (sales × rate) the 5% discount wins narrowly: the model expects about 12% more sales for a 5% price cut, and deeper cuts add volume but not value. Charge a unit cost of 0.7 and holding the price wins, because each extra unit now earns little. The manager held the price (0.989) and sold 0.6, below every forecast: a reminder that single days are noisy, and that the data cannot say what 0.95 would have sold.
+
 **Findings**
+
+*Business outcome*
 
 - **The rules decide more than half the days.** The sold-out rule fixes 44% of days at no discount, the week-without-stockout rule requires a discount on 9%, and the model chooses on the remaining 47% (Table 5).
 - **The policy declines to discount on 45% of days, against 2% for the what-if alone.** Nearly all of those are sold-out days. Where the model is allowed to choose it still discounts almost always (98% of turning-over days), and the mean predicted lift at the recommended discount falls from 44% to 24% because sold-out days contribute nothing (Table 4).
 - **Agreement with the manager rises from 31% to 40%, mostly by construction.** On sold-out days the manager chose no discount 54% of the time, so a rule that always says no agrees that often. In the turning-over state, where the model decides, agreement is 28%, no better than without the rules (Table 5).
 - **The biggest change of practice is on running discounts.** Managers continue a running discount on 56% of such days and stop it on 20%; the policy stops it on 66%, because 46% of the test-week days with a discount running are also sold-out days (Table 6). Table 3 says most of those continued discounts would have ended in another stockout.
-- **The sold-out threshold is the strongest dial; cost is what makes the model itself say no.** Counting only days with 8 or more stockout hours as sold out hands 72% of days to the model and the policy discounts on 79% of them; the median stockout day has 7 of the 16 tracked hours empty, so one hour is not an unreasonable threshold, but the choice is the manager's. With a unit cost of 0.7 the policy discounts on 28% of days and agrees with the manager's band on 54%; without a cost only the rules ever say no. The hurdle matters once cost is in: at cost 0.5 a 10% hurdle cuts the discount share from 46% to 24%.
+- **The dials belong to the category manager.** The sold-out threshold is the strongest; cost is what makes the model itself say no. Counting only days with 8 or more stockout hours as sold out hands 72% of days to the model and the policy discounts on 79% of them; the median stockout day has 7 of the 16 tracked hours empty, so one hour is not an unreasonable threshold, but the choice is the manager's. With a unit cost of 0.7 the policy discounts on 28% of days and agrees with the manager's band on 54%; without a cost only the rules ever say no. The hurdle matters once cost is in: at cost 0.5 a 10% hurdle cuts the discount share from 46% to 24%.
 
-**Limitations**
+*Model behaviour*
+
+- **Alone, the model says discount everything.** Predicted sales at 0.6 are 2.3× the no-discount level, so the unrestricted rule picks 0.6 on 71% of days; fewer than 1% of training days carry such a discount, and those are clearance days.
+- **Support restriction fixes where, not whether.** Kept to discounts each product has run, the what-if still recommends a discount on 98% of days and agrees with the manager's band on 31%.
+- **A value floor never binds**, because predicted value rises with every cut on 98% of rows, so the max-value rule is the one used.
+- **Agreement rises from 31% to 40% mostly by construction**; where the model decides it stays at 28%, no better than without rules.
+
+*Data limitations*
 
 - **Correlation, not cause.** Discounts were applied on days when managers expected demand, so part of the lift the model learned is manager judgement. The response curve describes past co-occurrence; only an experiment, or at least a within-series check of predicted against observed lift, could say what a new discount would do.
 - **No realised outcome.** Whether the policy sells more or wastes less is not observable in this data. Agreement with the manager is a sanity check, not a score, and disagreement is not evidence that either side is wrong.
@@ -823,15 +910,15 @@ md(r"""
 - **Thresholds are business choices.** One stockout hour, three supporting days, the unit cost and the hurdle were set by judgement, not learned, and Table 4 shows how much rides on them.
 - **Rule 3 assumes a one-week shelf life for every category.** The dataset's category levels are unused so far, and produce, bread and dairy do not share a week.
 
-**Guardrails worth adding next**, each a few lines on the same pattern: the hour of the stockout rather than the count (a sell-out in the last hour is the ideal outcome, a sell-out by noon is an ordering signal); a shelf life per category instead of a flat week; a cap of one candidate step per day, since managers change a running discount on only a quarter of days; the spread of the forest's 300 trees as the hurdle instead of a fixed percentage; a joint order-and-discount recommendation (sold out: no discount, order more; a week without a stockout: discount, order less); and training on less censored targets.
-
 ## 15. Next steps
 
-1. The within-series lift check: does the model's predicted lift match the lift each series actually showed on its own discounted days, or is it inherited from manager timing?
-2. The per-category shelf-life rule and the forest-spread hurdle from the list above.
-3. A later untouched week from the dataset, to restore a genuinely unseen test.
+1. **The within-series lift check:** does the model's predicted lift match the lift each series actually showed on its own discounted days, or is it inherited from manager timing?
+2. **Further guardrails**, each a few lines on the same pattern: the hour of the stockout rather than the count (a sell-out in the last hour is the ideal outcome, a sell-out by noon is an ordering signal); a shelf life per category instead of a flat week; a cap of one candidate step per day, since managers change a running discount on only a quarter of days; the spread of the forest's 300 trees as the hurdle instead of a fixed percentage; a joint order-and-discount recommendation (sold out: no discount, order more; a week without a stockout: discount, order less); and training on less censored targets.
+3. **A festival calendar as a feature**, prompted by the June 5–11 week.
+4. **A later untouched week** from the dataset, to restore a genuinely unseen test.
+5. **From forecasting to learning the policy.** The pricing problem is naturally sequential: tonight's discount changes tomorrow's stock and tomorrow's decision. Once a store can run a live pilot with real prices and costs, a contextual bandit over the supported candidate discounts, seeded with this model's forecasts, is the right next tool. Reinforcement learning was not used here because the data has no reward signal (no price, cost or waste) and the logged discounts were never explored.
 
-## Appendix: reproducing this notebook
+## Appendix A. Reproducing this notebook
 
 | Where | What |
 |---|---|
@@ -843,7 +930,61 @@ md(r"""
 | `results/` | Every tuning grid, the out-of-fold predictions, test-week predictions and the figures |
 | `docs/` | The original build-out notes for kNN and the random forest |
 
-Set `RERUN_TUNING = True` in the first cell to recompute every grid from scratch (two to three minutes). The one-off checks quoted in sections 6, 8 and 9 were run interactively and are not scripted.
+Set `RERUN_TUNING = True` in the first cell to recompute every grid from scratch (two to three minutes). The one-off checks quoted in sections 6, 8 and 9 were run interactively and are not scripted. The notebook itself is generated by `scripts/build_notebook.py`; the data setup in the first cell is `data.ensure_raw_data`, and `scripts/make_submission.sh` builds the hand-in zip.
+
+## Appendix B. CatBoost explained
+
+**The idea.** Boosting builds one shallow tree at a time. Each new tree is fitted to the errors the previous trees left behind, and its correction is added to the running prediction after being shrunk by the learning rate. Five hundred small corrections add up to the forecast. CatBoost's trees are *symmetric*: every node on a level asks the same question, which makes each tree a small lookup table, fast to evaluate and hard to over-fit on its own.
+""")
+
+code(r"""
+fig = plots.plot_boosting_schematic(CAT_BEST["learning_rate"], save=C.RESULTS / "catboost_schematic.png")
+""")
+
+md(r"""
+**Seen in our data.** The first 100 steps of the saved learning curve at a 0.03 rate: the first ten trees do most of the work and the next ninety refine. The full curve in section 10 shows the other half of the story: after about 700 trees the validation error turns up while the training error keeps falling.
+""")
+
+code(r"""
+fig = plots.plot_learning_zoom(curves["lr=0.03"], n=100, save=C.RESULTS / "catboost_first_trees.png")
+""")
+
+md(r"""
+**The dials, and what we found in section 10**
+
+| Dial | What it controls | What we found |
+|---|---|---|
+| Depth | how complex each correction is | 3 to 5 made no measurable difference; 6 and 8 were worse |
+| Learning rate | the size of each step | 0.03; slower needs more trees, faster over-fits sooner (0.1 turns up at about 200 trees) |
+| Iterations | how many steps | 500; the validation minimum on the last fold is near 700 |
+| Loss | what each tree is fitted to | squared error kept; the MAE objective traded 0.0006 on MAE for 0.005 on MSE |
+| L2 regularisation | shrinks the leaf values | the default of 3; 10 hurt slightly |
+| Row and feature sampling | randomness per tree | neither helped, unlike in the forest |
+| Categorical handling | ordered target statistics for category columns | not used: the ten inputs are numeric; store and product IDs were left out by design |
+
+**Where it fits.** Tabular data with mixed numeric and categorical inputs, medium-sized sets, and interactions between features, which is why it is a default choice in retail and finance. Where it does not: raw images, text or audio, very small samples, and anything that needs predictions beyond the range of the training data, since a tree predicts a flat value outside what it has seen. That last limit is exactly why section 14 restricts the what-if to discounts a product has actually run.
+
+## Appendix C. The ensemble explained
+
+**Three ways to combine trees.** A random forest grows many deep trees independently on resampled rows and averages them; averaging cancels the noise of the individual trees. Boosting grows shallow trees in sequence, each correcting the last. Our ensemble is a third thing: a plain average of those two finished models.
+""")
+
+code(r"""
+fig = plots.plot_ensemble_schematic(save=C.RESULTS / "ensemble_schematic.png")
+""")
+
+md(r"""
+**Why blending needs disagreement.** Averaging two forecasts helps only where they miss in different directions. On our validation rows they mostly do not: the forest's error and CatBoost's error line up along the diagonal with a correlation of 0.97, which is why the weight sweep in section 11 is such a shallow curve and the gain is 0.001.
+""")
+
+code(r"""
+fig = plots.plot_error_scatter(oof_table, save=C.RESULTS / "error_scatter.png")
+""")
+
+md(r"""
+**The dials.** The weights, chosen on validation (anything from 40% to 70% forest is within 0.0002 of the best, so 50/50); the members (adding kNN as a third did not help); and the combining rule, a fixed average here rather than *stacking*, where a second model learns the weights, which needs more data than one week per fold to be worth its extra variance.
+
+**Where it fits.** Members with different biases, such as a tree model beside a linear or a neighbour model; unstable learners whose errors change a lot with the training sample; competitions where the last 1% matters. Where it does not: members that fail on the same rows, as here, and settings where one explainable model is worth more than a small gain in error.
 """)
 
 nb.cells = cells
