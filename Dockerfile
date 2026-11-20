@@ -14,8 +14,9 @@ RUN apt-get update \
     && useradd --create-home --uid 1000 freshretail
 
 WORKDIR /workspace
-COPY requirements-models.txt requirements-docker.txt ./
-RUN python -m pip install --no-cache-dir -r requirements-docker.txt \
+# constraints-docker.txt pins every indirect dependency to the verified 7 October 2026 environment.
+COPY requirements-models.txt requirements-docker.txt constraints-docker.txt ./
+RUN python -m pip install --no-cache-dir -r requirements-docker.txt -c constraints-docker.txt \
     && python -m pip check
 
 COPY --chown=freshretail:freshretail . /workspace

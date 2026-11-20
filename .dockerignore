@@ -6,12 +6,15 @@
 **/.DS_Store
 **/.ipynb_checkpoints
 **/__pycache__
+**/.pytest_cache
 **/*.pyc
 **/*.log
 *.zip
 *.tar
 *.tar.gz
 .venv
+venv
+01_freshretail_project_report.html
 tmp
 data/raw
 data/metadata/selected_series.json

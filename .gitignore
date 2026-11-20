@@ -12,9 +12,14 @@
 .ipynb_checkpoints/
 __pycache__/
 *.py[cod]
+.pytest_cache/
 .DS_Store
 .venv/
+venv/
 *.log
+
+# Local HTML export from the README's nbconvert command (the shipped report is outputs/final_protocol/*.html).
+/01_freshretail_project_report.html
 
 # Local environment configuration.
 .env
