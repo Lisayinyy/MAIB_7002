@@ -46,12 +46,14 @@ This is a **report-based reconstruction**, not an exact reproduction of the team
 
 ## Run the project
 
-Run these commands from the `group_project` directory in the same Python environment used by the notebook:
+Run these commands from the repository root (the directory that contains `01_freshretail_project.ipynb`), in the same Python environment used by the notebook. Python 3.11 or newer is required; the verified run used Python 3.11.14.
 
 ```bash
 python -m pip install -r requirements-models.txt
 python scripts/reproduce.py
 ```
+
+`requirements-models.txt` pins the directly used packages. To also pin every indirect dependency to the verified Docker environment (Python 3.11), add `-c constraints-docker.txt` to the install command; the Docker image is built this way.
 
 The downloader uses only the Python standard library. It retrieves the official public `train` and `eval` Parquet files at the pinned dataset revision, verifies their SHA-256 hashes, and skips files that already match. Downloads are first written to a temporary file; an existing data file is replaced only after the new file passes verification. Use `python scripts/download_public_data.py --check-only` for an offline integrity check.
 
@@ -67,7 +69,7 @@ To export the executed notebook as a standalone HTML report:
 python -m nbconvert --to html --embed-images 01_freshretail_project.ipynb --output 01_freshretail_project_report.html
 ```
 
-The HTML export uses saved notebook outputs. Run the notebook first when fresh results are needed. Rerunning writes updated notebook outputs and files under `outputs/final_protocol/`; archived notebooks and older results are retained separately.
+The HTML export uses saved notebook outputs. Run the notebook first when fresh results are needed. Rerunning writes updated notebook outputs and files under `outputs/final_protocol/`. The export above is written to the repository root and is ignored by Git; the shipped report is `outputs/final_protocol/01_freshretail_project.html`.
 
 ## Frozen experiment protocol
 
@@ -98,9 +100,9 @@ The reported diagnostic bands use right-closed boundaries: none/light `discount 
 
 ## Outputs and provenance
 
-**Use `outputs/final_protocol/` for the current 312-series experiment.** Files directly under `outputs/` belong to the older 100-series pilot and must not be mixed with the current results. Earlier notebooks and supporting files are preserved under `outputs/backups/`.
+**Use `outputs/final_protocol/` for the current 312-series experiment.** `outputs/index.html` is the generated landing page for these results. `outputs/ensemble_exploration/` contains the supplementary combination experiment, including out-of-fold predictions, the validation-selected weights and final-week predictions. Its weights are applied to freshly generated base-model predictions when the full notebook is rerun.
 
-The shared repository excludes the old pilot files and backups. `outputs/index.html` is the generated current-results landing page. `outputs/ensemble_exploration/` contains the supplementary combination experiment, including out-of-fold predictions, the validation-selected weights and final-week predictions. Its weights are applied to freshly generated base-model predictions when the full notebook is rerun.
+Two kinds of files exist only in a working copy and are ignored by Git: the older 100-series pilot (any other file directly under `outputs/`), and the notebook backups that `scripts/build_submission_notebook.py` writes to `outputs/backups/` each time it regenerates the notebook. If you have them locally, do not mix them with the current results.
 
 Key current outputs include:
 
@@ -109,7 +111,8 @@ Key current outputs include:
 - `validation_trials.csv`, `validation_candidates.csv`, `chosen_parameters.csv`, and `selection_before_test.json`: validation evidence and the pre-final-evaluation selection record.
 - `model_comparison_test.csv`: both baselines followed by the five full models; `all_test_scores.csv` also includes ablations.
 - `promotion_ablation_test.csv`, `test_slice_scores.csv`, `daily_test_mae.csv`, and `test_predictions.csv`: promotion comparison, diagnostic slices, and row-level predictions.
-- `selected_forecast_model.joblib`: the fitted full-feature model selected by validation MAE.
+- `selected_forecast_model.joblib`: the fitted full-feature model selected by validation MAE. It is written by a full run and is **not stored in Git** (model binaries are ignored), so it is absent from a fresh clone.
+- `release_manifest.json`: SHA-256 hashes of the shareable files at the time of the verified run; `scripts/build_release_manifest.py` refreshes it.
 - `RESULTS.md`, `run_manifest.json`, and PNG figures: generated findings, execution provenance, and plots.
 - `illustrative_discount_scenarios.csv` and `scenario_metadata.json`: a restricted scenario demonstration and its assumptions.
 
@@ -129,6 +132,13 @@ python scripts/check_saved_results.py
 
 This checks artifact consistency, including all 19 ensemble candidates; it does not establish that training has been rerun. In Docker, prefix the command with `docker compose exec lab`.
 
-Run `python scripts/verify_final_protocol.py` after executing the notebook. This independently reconstructs all ten features from original observations, checks the time boundaries and selection rule, recomputes saved scores, and verifies the saved model and scenario output. The result is written to `outputs/final_protocol/independent_verification.json`.
+The offline test suite covers the metric formulas, the past-only feature construction, fold boundaries, the downloader's verify-then-replace behaviour, and the headline scores recomputed from the saved predictions. It needs no dataset download, scikit-learn, CatBoost or Docker:
+
+```bash
+python -m pip install -r requirements-test.txt
+python -m pytest
+```
+
+`python scripts/verify_final_protocol.py` is the full audit. It needs the raw data in `data/raw/` and the fitted `selected_forecast_model.joblib`, neither of which is stored in Git, so run it after `python scripts/reproduce.py` (which already calls it) or after executing the notebook. It independently reconstructs all ten features from original observations, checks the time boundaries and selection rule, recomputes saved scores, and verifies the saved model and scenario output. The result is written to `outputs/final_protocol/independent_verification.json`.
 
 Data attribution: [Dingdong-Inc/FreshRetailNet-50K](https://huggingface.co/datasets/Dingdong-Inc/FreshRetailNet-50K), CC BY 4.0, revision `08c1fab7f9257bc73679d415d65d644165d351d4`. The source hashes are recorded in `outputs/final_protocol/locked_protocol.json` and the downloader.

@@ -131,7 +131,7 @@ The hypothetical predictions under alternative rates are not observed sales outc
 
 ## Evidence and verification
 
-The current main experiment is in [the executed notebook](../01_freshretail_project.ipynb), with results under [outputs/final_protocol](../outputs/final_protocol/). Files directly under `outputs/` belong to an older 100-series pilot and should not be mixed with this comparison.
+The current main experiment is in [the executed notebook](../01_freshretail_project.ipynb), with results under [outputs/final_protocol](../outputs/final_protocol/). Apart from the generated `outputs/index.html` landing page, files directly under `outputs/` belong to an older 100-series pilot; they are local-only (ignored by Git) and should not be mixed with this comparison.
 
 For this summary, the October 7 Docker run's saved row-level evidence was independently checked without retraining or changing source outputs:
 
