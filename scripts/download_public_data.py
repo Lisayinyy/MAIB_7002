@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
 import os
 from pathlib import Path
 import sys
@@ -89,7 +90,7 @@ def main() -> int:
     for split in dict.fromkeys(args.splits):
         try:
             ensure_split(split, args.data_dir, check_only=args.check_only, timeout=args.timeout)
-        except (OSError, ValueError, urllib.error.URLError) as error:
+        except (OSError, ValueError, urllib.error.URLError, http.client.HTTPException) as error:
             # Do not print exception URLs, redirect locations, response bodies, or credentials.
             if isinstance(error, urllib.error.HTTPError):
                 detail = f"HTTP {error.code}"

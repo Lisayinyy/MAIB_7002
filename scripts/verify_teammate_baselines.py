@@ -65,7 +65,9 @@ def main():
     expected_cv={'MAE':.328,'WAPE_percent':34.5,'MSE':.270}
     result['report_comparison']['cv_seven_day_avg']={k:{'actual_fold_mean':result['cv_mean_of_folds']['seven_day_avg'][k],'actual_pooled':result['cv_pooled']['seven_day_avg'][k],'reported':v,'fold_mean_matches_reported_rounding':round(result['cv_mean_of_folds']['seven_day_avg'][k],1 if k=='WAPE_percent' else 3)==v} for k,v in expected_cv.items()}
     result['report_comparison']['discount_band_match']=(bands=={'deep':241,'moderate':757,'none_or_light':1186})
-    Path(args.output).write_text(json.dumps(result,indent=2)+'\n')
+    output=Path(args.output)
+    output.parent.mkdir(parents=True,exist_ok=True)  # outputs/teammate_protocol/ is git-ignored, so absent in a fresh clone
+    output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result,indent=2))
 
 if __name__=='__main__':main()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Independently verify this project's executed final protocol.
 
-Run: python scripts/verify_final_protocol.py [--root /path/to/group_project]
+Run: python scripts/verify_final_protocol.py [--root /path/to/MAIB_7002]
 Reads original public observations and saved outputs. It only writes
 outputs/final_protocol/independent_verification.json; no models are retrained.
 The feature reference uses explicit per-row historical slices rather than the
@@ -56,7 +56,14 @@ def main():
     args=parser.parse_args()
     ROOT=args.root.resolve()
     OUT=ROOT/'outputs/final_protocol'
-    assert (OUT/'run_manifest.json').exists(), 'Run the complete notebook before verification.'
+    if not __debug__:
+        raise SystemExit('Run without -O or PYTHONOPTIMIZE: every check in this audit is an assert.')
+    required=[OUT/'run_manifest.json',ROOT/'data/raw/train.parquet',ROOT/'data/raw/eval.parquet',OUT/'selected_forecast_model.joblib']
+    missing=[p.relative_to(ROOT).as_posix() for p in required if not p.is_file()]
+    if missing:
+        raise SystemExit('Missing inputs for the full audit: '+', '.join(missing)+'. Raw data and the fitted model are '
+            'not stored in Git; run `python scripts/reproduce.py` first (it downloads the public data, executes the '
+            'notebook and then runs this audit). For an offline check of the saved results use scripts/check_saved_results.py.')
     expected_hashes={'train':'6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d',
                      'eval':'1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e'}
     actual_hashes={}

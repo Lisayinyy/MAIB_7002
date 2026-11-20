@@ -94,5 +94,16 @@ def main():
     print('This is a saved-artifact consistency check, not a new training run or causal evaluation.')
 
 
+def run():
+    """Command-line entry point: plain messages for the two ways this check can be misused."""
+    if not __debug__:
+        raise SystemExit('Run without -O or PYTHONOPTIMIZE: every check in this script is an assert.')
+    try:
+        main()
+    except FileNotFoundError as error:
+        raise SystemExit(f'Missing packaged artifact: {error.filename}. Use a complete checkout, '
+                         'or regenerate the outputs with scripts/reproduce.py.') from None
+
+
 if __name__ == '__main__':
-    main()
+    run()
