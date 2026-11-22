@@ -32,9 +32,9 @@ def main():
         candidates.extend((ROOT/folder).rglob('*'))
     files = {}
     for path in sorted(set(candidates)):
-        if not path.is_file() or path == manifest_path or '__pycache__' in path.parts:
+        if not path.is_file() or path == manifest_path or {'__pycache__', '.ipynb_checkpoints'} & set(path.parts):
             continue
-        if path.suffix in {'.joblib', '.log', '.pyc', '.pkl', '.pickle'}:
+        if path.name == '.DS_Store' or path.suffix in {'.joblib', '.log', '.pyc', '.pkl', '.pickle'}:
             continue
         files[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
     manifest = {

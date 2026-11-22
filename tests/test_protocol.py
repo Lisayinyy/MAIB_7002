@@ -102,6 +102,29 @@ def test_release_manifest_still_describes_the_saved_results(root, main_dir):
     assert audit['notebook_sha256'] == manifest['01_freshretail_project.ipynb']
 
 
+def test_release_manifest_lists_only_files_a_clone_can_contain(root, tmp_path, monkeypatch):
+    """Finder and Jupyter leave .DS_Store and .ipynb_checkpoints beside the outputs; Git ignores both."""
+    import shutil
+
+    import build_release_manifest as builder
+
+    shipped = ['01_freshretail_project.ipynb', 'outputs/final_protocol/independent_verification.json',
+               'outputs/ensemble_exploration/verification.json',
+               'outputs/ensemble_exploration/selection_before_final_week.json']
+    for name in shipped:
+        (tmp_path / name).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root / name, tmp_path / name)
+    (tmp_path / 'outputs/final_protocol/.DS_Store').write_bytes(b'')
+    checkpoint = tmp_path / 'outputs/final_protocol/.ipynb_checkpoints/RESULTS-checkpoint.md'
+    checkpoint.parent.mkdir()
+    checkpoint.write_text('unsaved draft')
+    monkeypatch.setattr(builder, 'ROOT', tmp_path)
+    monkeypatch.setattr(builder, 'OUT', tmp_path / 'outputs/final_protocol')
+    builder.main()
+    manifest = json.loads((tmp_path / 'outputs/final_protocol/release_manifest.json').read_text())
+    assert sorted(manifest['files']) == sorted(shipped)
+
+
 def test_selection_records_do_not_reference_the_final_week(main_dir, ensemble_dir):
     main = json.loads((main_dir / 'selection_before_test.json').read_text())
     with (main_dir / 'chosen_parameters.csv').open(newline='') as handle:
