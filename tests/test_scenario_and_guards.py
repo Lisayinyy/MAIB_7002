@@ -28,12 +28,14 @@ def scenario(notebook_ns):
     rates = [1.0] * 4 + [0.9] * 3 + [0.8] * 3 + [0.7] * 2      # 0.70 has only two supporting days
     history = pd.DataFrame({'store_id': 18, 'product_id': 11, 'activity_flag': 0, 'discount': rates,
                             'dt': [target - pd.Timedelta(days=i + 1) for i in range(len(rates))]})
-    # Three days each that must be ignored: other activity state, target date or later, other store.
+    # Days that must be ignored: other activity state, the target date and later, other store,
+    # other product. The target-date row repeats 0.70: counting that day would give 0.70 a third day.
     past = [target - pd.Timedelta(days=i + 1) for i in range(3)]
     later = [target + pd.Timedelta(days=i) for i in range(3)]
-    extra = pd.DataFrame({'store_id': [18] * 6 + [99] * 3, 'product_id': 11,
-                          'activity_flag': [1] * 3 + [0] * 6, 'discount': [0.6] * 3 + [0.5] * 3 + [0.4] * 3,
-                          'dt': past + later + past})
+    extra = pd.DataFrame({'store_id': [18] * 6 + [99] * 3 + [18] * 3, 'product_id': [11] * 9 + [12] * 3,
+                          'activity_flag': [1] * 3 + [0] * 9,
+                          'discount': [0.6] * 3 + [0.7, 0.5, 0.5] + [0.4] * 3 + [0.3] * 3,
+                          'dt': past + later + past + past})
     return notebook_ns['recommend_discount'], context, pd.concat([history, extra], ignore_index=True)
 
 
