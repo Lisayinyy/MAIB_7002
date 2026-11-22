@@ -105,3 +105,14 @@ def test_assert_based_checks_refuse_optimised_mode(root):
                             capture_output=True, text=True)
     assert result.returncode != 0 and 'PASS' not in result.stdout
     assert '-O' in result.stderr
+
+
+@pytest.mark.parametrize('script', ['build_release_manifest.py', 'explore_ensembles.py'])
+def test_assert_based_writers_refuse_optimised_mode(root, tmp_path, script):
+    """Their checks are asserts too: under -O they would record a verified result without checking it."""
+    copy = tmp_path / 'scripts' / script      # a copy, so a missing guard cannot touch the real outputs
+    copy.parent.mkdir()
+    copy.write_bytes((root / 'scripts' / script).read_bytes())
+    result = subprocess.run([sys.executable, '-O', str(copy)], capture_output=True, text=True)
+    assert result.returncode != 0 and 'PYTHONOPTIMIZE' in result.stderr
+    assert list(tmp_path.rglob('*.json')) == []

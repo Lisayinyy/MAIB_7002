@@ -18,6 +18,8 @@ def main(argv=None):
     parser.add_argument('--quiet', action='store_true',
                         help='Hide fold progress and the detailed terminal table.')
     args = parser.parse_args(argv)
+    if not __debug__:
+        raise SystemExit('Run without -O or PYTHONOPTIMIZE: every check in this script is an assert.')
 
     import numpy as np
     import pandas as pd

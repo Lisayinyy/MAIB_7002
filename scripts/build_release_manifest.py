@@ -10,6 +10,8 @@ OUT = ROOT/'outputs/final_protocol'
 
 
 def main():
+    if not __debug__:
+        raise SystemExit('Run without -O or PYTHONOPTIMIZE: every check in this script is an assert.')
     audit = json.loads((OUT/'independent_verification.json').read_text())
     assert audit['status'] == 'PASS'
     notebook_path = ROOT/'01_freshretail_project.ipynb'
