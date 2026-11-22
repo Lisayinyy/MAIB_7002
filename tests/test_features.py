@@ -52,10 +52,13 @@ def test_a_day_outcome_never_enters_features_for_that_day_or_earlier(notebook_ns
 def test_series_do_not_share_history(notebook_ns):
     make_features = notebook_ns['make_features']
     base = toy()
-    changed = base.copy()
-    changed.loc[changed.product_id.eq(11), ['sale_amount', 'discount', 'stock_hour6_22_cnt']] = 5.0
-    pd.testing.assert_frame_equal(series(make_features(base), 10)[HISTORY],
-                                  series(make_features(changed), 10)[HISTORY])
+    # Both directions: history features look backwards, so a shift that ignored the series
+    # boundary could only carry values from the series sorted first (10) into the next one (11).
+    for changed_product, checked_product in [(10, 11), (11, 10)]:
+        changed = base.copy()
+        changed.loc[changed.product_id.eq(changed_product), ['sale_amount', 'discount', 'stock_hour6_22_cnt']] = 5.0
+        pd.testing.assert_frame_equal(series(make_features(base), checked_product)[HISTORY],
+                                      series(make_features(changed), checked_product)[HISTORY])
 
 
 def test_input_row_order_does_not_matter(notebook_ns):
