@@ -114,9 +114,7 @@ def main(argv=None):
         emit(f'Completed fold {fold["fold"]}/5',flush=True)
     oof=pd.concat(oof,ignore_index=True)
     assert len(oof)==10920 and not oof.duplicated(['store_id','product_id','dt']).any()
-    oof.to_csv(OUT/'validation_predictions.csv',index=False)
     errors=oof[short].subtract(oof.sale_amount,axis=0)
-    errors.corr().to_csv(OUT/'validation_error_correlations.csv')
     foldrows=[]
     for method,w in methods.items():
         for fold,rows in oof.groupby('fold'):
@@ -127,6 +125,13 @@ def main(argv=None):
     cvmean['weights']=cvmean.index.map(lambda x:json.dumps(methods[x].tolist()))
     winner=cvmean.MAE.idxmin()
     weights=methods[winner]
+    # Compare each reconstructed single-model CV mean with the locked experiment before any
+    # score file is replaced: a failed reproduction must not leave refreshed scores next to
+    # the previous run's verification.json, summary.json and RESULTS.md.
+    for name,alias in zip(names,short):
+        assert np.isclose(cvmean.loc[alias,'MAE'],choice.loc[name,'MAE'],rtol=1e-9,atol=1e-12)
+    oof.to_csv(OUT/'validation_predictions.csv',index=False)
+    errors.corr().to_csv(OUT/'validation_error_correlations.csv')
     cvfold.to_csv(OUT/'validation_fold_scores.csv',index=False)
     cvmean.to_csv(OUT/'validation_scores.csv')
     selected={'method':winner,'weights':dict(zip(short,weights.tolist())),
@@ -156,9 +161,6 @@ def main(argv=None):
                 **score(rows.sale_amount,matrix[idx]@methods[method])})
     pd.DataFrame(bandrows).to_csv(OUT/'discount_band_scores.csv',index=False)
 
-    # Compare each reconstructed single-model CV mean with the locked experiment.
-    for name,alias in zip(names,short):
-        assert np.isclose(cvmean.loc[alias,'MAE'],choice.loc[name,'MAE'],rtol=1e-9,atol=1e-12)
     assert np.allclose(out.selected_ensemble_prediction,matrix@weights)
     # Refresh verification from this run; do not preserve old release/hash claims.
     assert fit_count == len(protocol['folds']) * len(names) == 25
