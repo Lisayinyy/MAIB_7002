@@ -1,0 +1,9 @@
+period,method_a,method_b,MAE_difference,ci95_low,ci95_high,interval_excludes_zero,series_share_a_better
+"validation (5 folds, out-of-fold)",Random Forest Regressor,7-day average baseline,-0.0246810686,-0.03463187177,-0.01610731874,True,0.6987179487
+"validation (5 folds, out-of-fold)",Random Forest Regressor,CatBoost Regressor,-7.087193234e-05,-0.002718228289,0.002592359029,False,0.5096153846
+"validation (5 folds, out-of-fold)",RF + CatBoost (50/50),Random Forest Regressor,-0.002310848531,-0.003544849679,-0.001111076937,True,0.5961538462
+"validation (5 folds, out-of-fold)",RF + CatBoost (50/50),CatBoost Regressor,-0.002381720463,-0.004077671371,-0.0008151553843,True,0.5833333333
+final week,Random Forest Regressor,7-day average baseline,-0.02123587055,-0.03379896679,-0.01009239171,True,0.6153846154
+final week,Random Forest Regressor,CatBoost Regressor,0.005151890615,6.825851041e-05,0.01059231741,True,0.483974359
+final week,RF + CatBoost (50/50),Random Forest Regressor,-0.005661231392,-0.008973888487,-0.002704610215,True,0.5512820513
+final week,RF + CatBoost (50/50),CatBoost Regressor,-0.0005093407771,-0.003413687154,0.00231536674,False,0.5384615385
