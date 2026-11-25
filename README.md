@@ -4,6 +4,46 @@ Forecast next-day observed sales for perishable products, then compare candidate
 
 **Recommended exploratory combination: 50% Random Forest + 50% CatBoost**, selected by mean validation MAE among the tested combinations. In the verified Docker run (7 October 2026): validation MAE **0.30140**, final-week MAE **0.28729**, final-week RMSE **0.45288**. This is a post-hoc extension: the final week had already been viewed, and new dates are needed to confirm the small improvement. The original validation-selected Random Forest and its illustrative discount scenario remain separately reported. The earlier macOS run gave MAE 0.28728; the Docker run has a small numerical difference and the same selected combination. Full environment versions are saved in `outputs/final_protocol/docker_python_packages.txt`.
 
+> **Authorship.** Group coursework for HKU MAIB 7002 (Group Q, three members; their names are on the poster in this repository). This is the team's shared repository. `main` consists of a single upload commit, so the Git history does not record who wrote which part. The dataset is the public FreshRetailNet-50K by Dingdong (CC BY 4.0).
+
+![Final-week MAE and WAPE of the two baselines and five models](outputs/final_protocol/model_comparison.png)
+
+## Results
+
+312 store–product series, five expanding weekly validation folds, one final week of 2,184 store–product-days. Lower is better.
+
+| Method | Mean validation MAE | Final-week MAE | Final-week MASE | Series beating the 7-day baseline |
+|---|---:|---:|---:|---:|
+| 7-day average baseline | 0.3284 | 0.3142 | 0.785 | – |
+| Same-weekday baseline (seasonal naive) | 0.4150 | 0.3998 | 1.002 | 20.8% |
+| Ridge Regression | 0.3151 | 0.3075 | 0.785 | 53.8% |
+| Decision Tree | 0.3218 | 0.3139 | 0.794 | 52.6% |
+| **Random Forest (selected on validation)** | 0.3037 | 0.2929 | 0.747 | 61.5% |
+| HistGradientBoosting | 0.3055 | 0.2892 | 0.737 | 63.5% |
+| CatBoost | 0.3038 | 0.2878 | 0.739 | 60.9% |
+| RF + CatBoost 50/50 (post-hoc supplement) | 0.3014 | 0.2873 | 0.737 | 64.4% |
+
+MASE divides each series' final-week MAE by the error of a same-weekday forecast on that series' own training history, then averages over the 312 series, so a high-volume series does not count for more than a low-volume one.
+
+What the numbers support:
+
+- **The gain over the baseline is real but not universal.** Random Forest's final-week MAE is 6.8% below the 7-day average (difference −0.021, series-level bootstrap 95% interval −0.034 to −0.010), yet it is no better than that baseline on 38% of the series.
+- **Random Forest and CatBoost cannot be separated.** Their validation MAE differs by −0.00007 (interval −0.0027 to +0.0026), and on the final week CatBoost is ahead by 0.005 (interval 0.0001 to 0.0106). The 50/50 blend's edge over Random Forest excludes zero on both validation and the final week; its edge over CatBoost does not on the final week.
+- **One error margin does not fit every discount level.** An 80% interval built from pooled validation errors covers 82.5% of final-week sales overall but only 63.5% on deep-discount days (discount ≤ 0.80). Calibrating the margin per discount band raises that to 86.7% (81.0% overall); at the 95% level, 87.1% becomes 93.4%.
+- **Stock-outs bias the forecast.** On days with 9–16 recorded out-of-stock hours the Random Forest over-forecasts observed sales by 0.136 on average (mean observed sales 0.80); on days with 1–4 hours it under-forecasts by 0.136.
+
+The bootstrap resamples series as independent units although they share the same calendar days, so the intervals understate the uncertainty.
+
+Each number has one command behind it:
+
+| Numbers | Command | Needs |
+|---|---|---|
+| Validation and final-week MAE, RMSE, WAPE; the 19 ensemble candidates | `python scripts/check_saved_results.py` | a clone (standard library only) |
+| MASE, RMSSE, paired intervals, interval coverage, stock-out bias | `python scripts/evaluate_forecast_diagnostics.py` | a clone and `requirements-test.txt` |
+| Everything from the raw data: download, 185 fits, audit, report | `python scripts/reproduce.py` | `requirements-models.txt`, about 110 MiB of data |
+
+The first two recompute the tables from the saved row-level predictions; they do not retrain. Details of the diagnostics are in `outputs/forecast_diagnostics/RESULTS.md`.
+
 ## Open with Docker
 
 Install and start Docker Desktop (or Docker Engine with Compose), then:
@@ -102,6 +142,8 @@ The reported diagnostic bands use right-closed boundaries: none/light `discount 
 
 **Use `outputs/final_protocol/` for the current 312-series experiment.** `outputs/index.html` is the generated landing page for these results. `outputs/ensemble_exploration/` contains the supplementary combination experiment, including out-of-fold predictions, the validation-selected weights and final-week predictions. Its weights are applied to freshly generated base-model predictions when the full notebook is rerun.
 
+`outputs/forecast_diagnostics/` holds the scale-aware and interval diagnostics described under [Results](#results): `scaled_scores.csv`, `paired_differences.csv`, `interval_coverage.csv`, `stockout_bias.csv` and a generated `RESULTS.md`. They are recomputed from the saved predictions and select nothing.
+
 Two kinds of files exist only in a working copy and are ignored by Git: the older 100-series pilot (any other file directly under `outputs/`), and the notebook backups that `scripts/build_submission_notebook.py` writes to `outputs/backups/` each time it regenerates the notebook. If you have them locally, do not mix them with the current results.
 
 Key current outputs include:
@@ -112,7 +154,7 @@ Key current outputs include:
 - `model_comparison_test.csv`: both baselines followed by the five full models; `all_test_scores.csv` also includes ablations.
 - `promotion_ablation_test.csv`, `test_slice_scores.csv`, `daily_test_mae.csv`, and `test_predictions.csv`: promotion comparison, diagnostic slices, and row-level predictions.
 - `selected_forecast_model.joblib`: the fitted full-feature model selected by validation MAE. It is written by a full run and is **not stored in Git** (model binaries are ignored), so it is absent from a fresh clone.
-- `release_manifest.json`: SHA-256 hashes of the shareable files at the time of the verified run; `scripts/build_release_manifest.py` refreshes it.
+- `release_manifest.json`: SHA-256 hashes of every shareable file in the tree (scripts, tests, documents and outputs). Run `python scripts/build_release_manifest.py` after editing any of them; the test suite fails while the manifest is stale.
 - `RESULTS.md`, `run_manifest.json`, and PNG figures: generated findings, execution provenance, and plots.
 - `illustrative_discount_scenarios.csv` and `scenario_metadata.json`: a restricted scenario demonstration and its assumptions.
 
@@ -121,6 +163,18 @@ Key current outputs include:
 The target is **observed daily normalized sales**, not unconstrained demand, unit counts, or monetary revenue. Stockouts may suppress the observed target. Better forecast errors do not establish the causal effect of changing a discount.
 
 The optional scenario demonstration compares historically supported discount values using the selected sales model and a dimensionless sales-value proxy. Its 5% proxy-loss tolerance is an illustrative assumption, not a currency-denominated business guarantee or validated optimal pricing policy. Neither this analysis nor the final-period comparisons prove that a recommendation will increase actual sales or reduce food waste. Full assumptions and limitations are retained in the notebook.
+
+## Known limits
+
+- **Retrospective cohort.** The 312 series are chosen using all 90 training days, so later validation weeks influence which series are evaluated.
+- **The final week is not a fresh holdout.** The team had seen it before the reconstruction and before the ensemble supplement.
+- **Target-day `discount` and `activity_flag` are assumed to be known in advance.** The public data do not confirm this.
+- **Observed sales, not demand.** Stock-outs cap the target; the diagnostics measure the resulting bias but nothing here recovers the lost demand.
+- **Random Forest versus CatBoost is a tie.** The validation margin that selected Random Forest (0.00007 MAE) is far inside its bootstrap interval.
+- **Point forecasts only.** The models produce no intervals; the coverage figures come from margins added afterwards from validation errors.
+- **Not bit-for-bit reproducible across platforms.** Random Forest results differ in the sixth decimal between the macOS and Docker runs; the Docker run of 7 October 2026 is the reference.
+- **No causal claim.** A lower forecast error does not show that a discount raises sales, revenue or reduces waste.
+- This repository has no licence file for the code; the data licence is in `DATA_LICENSE.md`.
 
 ## Verify the saved execution
 
@@ -132,7 +186,7 @@ python scripts/check_saved_results.py
 
 This checks artifact consistency, including all 19 ensemble candidates; it does not establish that training has been rerun. In Docker, prefix the command with `docker compose exec lab`.
 
-The offline test suite covers the metric formulas, the past-only feature construction, fold boundaries, the downloader's verify-then-replace behaviour, and the headline scores recomputed from the saved predictions. It needs no dataset download, scikit-learn, CatBoost or Docker:
+The offline test suite covers the metric formulas, the past-only feature construction, fold boundaries, the downloader's verify-then-replace behaviour, the headline scores recomputed from the saved predictions, the diagnostic formulas, and whether `release_manifest.json` still matches every file it lists. It needs no dataset download, scikit-learn, CatBoost or Docker:
 
 ```bash
 python -m pip install -r requirements-test.txt
@@ -142,3 +196,12 @@ python -m pytest
 `python scripts/verify_final_protocol.py` is the full audit. It needs the raw data in `data/raw/` and the fitted `selected_forecast_model.joblib`, neither of which is stored in Git, so run it after `python scripts/reproduce.py` (which already calls it) or after executing the notebook. It independently reconstructs all ten features from original observations, checks the time boundaries and selection rule, recomputes saved scores, and verifies the saved model and scenario output. The result is written to `outputs/final_protocol/independent_verification.json`.
 
 Data attribution: [Dingdong-Inc/FreshRetailNet-50K](https://huggingface.co/datasets/Dingdong-Inc/FreshRetailNet-50K), CC BY 4.0, revision `08c1fab7f9257bc73679d415d65d644165d351d4`. The source hashes are recorded in `outputs/final_protocol/locked_protocol.json` and the downloader.
+
+## References
+
+Methods borrowed for the diagnostics in `scripts/evaluate_forecast_diagnostics.py`:
+
+- [Nixtla/utilsforecast, `utilsforecast/losses.py`](https://github.com/Nixtla/utilsforecast/blob/main/utilsforecast/losses.py) (`mase`, `rmsse`, `coverage`): errors scaled by each series' in-sample seasonal-naive error.
+- [Nixtla/statsforecast, `python/statsforecast/utils.py`](https://github.com/Nixtla/statsforecast/blob/main/python/statsforecast/utils.py) (`_conformal_rank`, `ConformalIntervals`) and `models.py` (`_add_conformal_error_intervals`): interval margins as the finite-sample quantile of absolute cross-validation errors.
+- Hyndman & Athanasopoulos, *Forecasting: Principles and Practice* (3rd ed.), [5.8 Evaluating point forecast accuracy](https://otexts.com/fpp3/accuracy.html) and [5.10 Time series cross-validation](https://otexts.com/fpp3/tscv.html); the Winkler score and interval coverage follow [tidyverts/fabletools, `R/accuracy.R`](https://github.com/tidyverts/fabletools/blob/main/R/accuracy.R).
+- [Mcompetitions/M5-methods, `M5-Competitors-Guide.pdf`](https://github.com/Mcompetitions/M5-methods/blob/master/M5-Competitors-Guide.pdf), "Point forecasts": why retail series are compared with scaled errors (RMSSE) rather than pooled absolute or percentage errors.

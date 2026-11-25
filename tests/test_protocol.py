@@ -86,17 +86,15 @@ def test_requirement_pins_match_the_recorded_docker_environment(root, main_dir):
         assert versions[name] == pins[name]
 
 
-def test_release_manifest_still_describes_the_saved_results(root, main_dir):
-    """The result files of the verified 7 October 2026 run have not been edited since."""
-    import hashlib
+def test_release_manifest_matches_every_shareable_file(main_dir):
+    """A file edited, added or removed without `python scripts/build_release_manifest.py` shows up here."""
+    import build_release_manifest as builder
 
     manifest = json.loads((main_dir / 'release_manifest.json').read_text())['files']
-    results = {name: digest for name, digest in manifest.items() if name.startswith('outputs/')
-               or name in {'01_freshretail_project.ipynb', 'data/metadata/teammate_selected_series.csv'}}
-    assert len(results) >= 40
-    changed = [name for name, digest in results.items()
-               if hashlib.sha256((root / name).read_bytes()).hexdigest() != digest]
-    assert changed == []
+    current = builder.shareable_files()
+    assert len(current) >= 40
+    stale = sorted(name for name in set(manifest) | set(current) if manifest.get(name) != current.get(name))
+    assert stale == []
     audit = json.loads((main_dir / 'independent_verification.json').read_text())
     assert audit['status'] == 'PASS'
     assert audit['notebook_sha256'] == manifest['01_freshretail_project.ipynb']

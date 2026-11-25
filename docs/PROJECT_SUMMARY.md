@@ -113,6 +113,24 @@ This is **post-hoc exploration**. Individual-model parameters and ensemble weigh
 
 The runs are not numerically identical. Small differences were observed in Random Forest results and combinations containing it; their precise cause has not been isolated. Both runs select Random Forest for the main experiment and the 50/50 blend for the supplement. The Docker run is the reference for the current report; its [Python package inventory](../outputs/final_protocol/docker_python_packages.txt) and [run manifest](../outputs/final_protocol/run_manifest.json) document the environment.
 
+## Scale-aware and interval diagnostics
+
+Added after the canonical run and computed only from its saved predictions by `python scripts/evaluate_forecast_diagnostics.py`; no model is refitted and nothing is reselected. Full tables are in [outputs/forecast_diagnostics](../outputs/forecast_diagnostics/RESULTS.md).
+
+| Method | Final-period MASE | Final-period RMSSE | Series with lower MAE than the seven-day baseline |
+|---|---:|---:|---:|
+| Seven-day average baseline | 0.7849 | 0.7190 | – |
+| Same-weekday baseline | 1.0016 | 0.9291 | 20.8% |
+| Random Forest Regressor | 0.7469 | 0.6828 | 61.5% |
+| CatBoost Regressor | 0.7391 | 0.6764 | 60.9% |
+| RF + CatBoost, 50/50 | 0.7366 | 0.6748 | 64.4% |
+
+Each series' error is divided by the in-sample error of a same-weekday forecast on its 90 training days and then averaged over the 312 series, so the comparison does not depend on a series' sales level.
+
+A percentile bootstrap over series (10,000 draws, seed 7002) puts Random Forest's validation MAE 0.0247 below the seven-day baseline (95% interval 0.0161–0.0346). Its difference from CatBoost on validation is −0.00007 (interval −0.0027 to +0.0026): the two cannot be separated, and on the final period CatBoost is ahead by 0.0052 (interval 0.0001–0.0106). The blend's advantage over Random Forest excludes zero in both periods. Series share calendar days, so these intervals understate the uncertainty.
+
+Intervals built from the pooled absolute validation errors of Random Forest cover 82.5% of final-period observations at the 80% level, but only 63.5% of deep-discount days. Using one margin per discount band gives 86.7% on deep-discount days and 81.0% overall. On days with 9–16 recorded stockout hours Random Forest over-forecasts observed sales by 0.136 on average.
+
 ## Illustrative discount decision
 
 The saved scenario uses **Random Forest**, store 18, product 11, June 26, 2024, and `activity_flag = 0`. Candidate rates are rounded to two decimal places and require at least three training days for the same store–SKU and activity state. The highest supported rate is the reference; the example uses 1.00.

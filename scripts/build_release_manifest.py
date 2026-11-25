@@ -9,6 +9,28 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT/'outputs/final_protocol'
 
 
+def shareable_files():
+    """Path -> SHA-256 of every file a clone shares, except the manifest itself."""
+    manifest_path = OUT/'release_manifest.json'
+    candidates = [ROOT/p for p in (
+        '01_freshretail_project.ipynb', 'README.md', 'DATA_LICENSE.md',
+        'Dockerfile', 'compose.yaml', '.dockerignore', '.gitignore', '.env.example',
+        'requirements-models.txt', 'requirements-docker.txt', 'constraints-docker.txt',
+        'requirements-test.txt', 'pytest.ini', 'outputs/index.html',
+        'data/metadata/teammate_selected_series.csv')]
+    for folder in ['scripts', 'tests', 'docs', '.github', 'outputs/final_protocol',
+                   'outputs/ensemble_exploration', 'outputs/forecast_diagnostics']:
+        candidates.extend((ROOT/folder).rglob('*'))
+    files = {}
+    for path in sorted(set(candidates)):
+        if not path.is_file() or path == manifest_path or {'__pycache__', '.ipynb_checkpoints'} & set(path.parts):
+            continue
+        if path.name == '.DS_Store' or path.suffix in {'.joblib', '.log', '.pyc', '.pkl', '.pickle'}:
+            continue
+        files[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return files
+
+
 def main():
     if not __debug__:
         raise SystemExit('Run without -O or PYTHONOPTIMIZE: every check in this script is an assert.')
@@ -25,20 +47,7 @@ def main():
     assert ensemble_audit['notebook_supplement_source_check']['source_sha256'] == source_hash
     assert ensemble_audit['base_model_fit_count'] == 25 and ensemble_audit['selection_matches_validation_minimum']
     manifest_path = OUT/'release_manifest.json'
-    candidates = [ROOT/p for p in (
-        '01_freshretail_project.ipynb', 'README.md', 'DATA_LICENSE.md',
-        'Dockerfile', 'compose.yaml', '.dockerignore', '.gitignore', '.env.example',
-        'requirements-models.txt', 'requirements-docker.txt', 'outputs/index.html',
-        'data/metadata/teammate_selected_series.csv')]
-    for folder in ['scripts', 'docs', '.github', 'outputs/final_protocol', 'outputs/ensemble_exploration']:
-        candidates.extend((ROOT/folder).rglob('*'))
-    files = {}
-    for path in sorted(set(candidates)):
-        if not path.is_file() or path == manifest_path or {'__pycache__', '.ipynb_checkpoints'} & set(path.parts):
-            continue
-        if path.name == '.DS_Store' or path.suffix in {'.joblib', '.log', '.pyc', '.pkl', '.pickle'}:
-            continue
-        files[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
+    files = shareable_files()
     manifest = {
         'created_utc': datetime.now(timezone.utc).isoformat(),
         'files': files,

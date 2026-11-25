@@ -17,6 +17,7 @@ def main():
     run(sys.executable, "scripts/run_notebook.py")
     run(sys.executable, "scripts/verify_final_protocol.py")
     run(sys.executable, "scripts/check_saved_results.py")
+    run(sys.executable, "scripts/evaluate_forecast_diagnostics.py")
     run(sys.executable, "-m", "nbconvert", "--to", "html", "--embed-images",
         "01_freshretail_project.ipynb", "--output", "01_freshretail_project.html",
         "--output-dir", "outputs/final_protocol")
